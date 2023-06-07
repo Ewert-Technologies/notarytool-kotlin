@@ -39,6 +39,18 @@ java {
   }
 }
 
+//
+// Set up various Properties and Constants used by the build script
+//
+
+// Application Properties
+val author: String by project
+val company: String by project
+
+
+//
+// Configure Testing
+//
 testing {
   suites {
     // Configure the built-in test suite
@@ -47,6 +59,19 @@ testing {
       useKotlinTest("1.8.21")
     }
   }
+}
+
+/**
+ * Displays general build info, such as versions, key directory locations, etc.
+ */
+tasks.register("buildInfo") {
+  group = "help"
+  description = "Displays general build info, such as versions, etc."
+
+  logger.quiet("Project: ${project.name} - ${project.description}")
+  logger.quiet("Project version: ${project.version}")
+  logger.quiet("Author: $author")
+  logger.quiet("Company: $company")
 }
 
 
