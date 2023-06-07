@@ -35,6 +35,11 @@ dependencies {
   //Logging
   implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.7")
+
+
+  //Testing
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version="5.7.1")
+  testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -57,14 +62,8 @@ val company: String by project
 //
 // Configure Testing
 //
-testing {
-  suites {
-    // Configure the built-in test suite
-    val test by getting(JvmTestSuite::class) {
-      // Use Kotlin Test test framework
-      useKotlinTest("1.8.21")
-    }
-  }
+tasks.named<Test>("test") {
+  useJUnitPlatform()
 }
 
 /**

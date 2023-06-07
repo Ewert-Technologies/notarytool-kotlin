@@ -3,12 +3,16 @@
  */
 package ca.ewert.notarytoolkotlin
 
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import assertk.assertThat
+import assertk.assertions.isTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 
 class LibraryTest {
-    @Test fun someLibraryMethodReturnsTrue() {
-        val classUnderTest = Library()
-        assertTrue(classUnderTest.someLibraryMethod(), "someLibraryMethod should return 'true'")
-    }
+  @Test
+  fun someLibraryMethodReturnsTrue() {
+    val classUnderTest = Library()
+    assertEquals(classUnderTest.someLibraryMethod(), true)
+    assertThat(classUnderTest.someLibraryMethod(), name = "Test Message").isTrue()
+  }
 }
