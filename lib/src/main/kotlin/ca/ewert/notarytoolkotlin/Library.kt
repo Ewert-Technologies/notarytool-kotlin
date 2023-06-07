@@ -3,8 +3,14 @@
  */
 package ca.ewert.notarytoolkotlin
 
+import mu.KotlinLogging
+
+private val log = KotlinLogging.logger{}
+
 class Library {
-    fun someLibraryMethod(): Boolean {
-        return true
-    }
+
+  fun someLibraryMethod(): Boolean {
+    log.info {"Hello notarytool-kotlin"}
+    return true
+  }
 }

@@ -30,6 +30,11 @@ dependencies {
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 //  implementation("com.google.guava:guava:31.1-jre")
+
+
+  //Logging
+  implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
+  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.7")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
