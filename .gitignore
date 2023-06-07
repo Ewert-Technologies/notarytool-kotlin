@@ -1,5 +1,52 @@
+### Intellij ###
+
+# User-specific stuff:
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries
+
+# Sensitive or high-churn files:
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.xml
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+
+# Gradle:
+.idea/**/gradle.xml
+.idea/**/libraries
+
+# Intellij project files
+*.iml
+modules.xml
+.idea/misc.xml
+*.ipr
+
+## Plugin-specific files:
+
+# IntelliJ
+/out/
+.idea/ant.xml
+.idea/kotlinc.xml
+.idea/CommitMessageTemplateConfig.xml
+.idea/compiler.xml
+.idea/copyright/*
+.idea/vcs.xml
+.idea/git_toolbox_prj.xml
+.idea/encodings.xml
+.idea/inspectionProfiles
+.idea/codeStyles
+.idea/.gitignore
+.idea/.name
+.idea/jarRepositories.xml
+
 # Ignore Gradle project-specific cache directory
 .gradle
 
 # Ignore Gradle build output directory
 build
+
+# VSCode
+/.vscode
