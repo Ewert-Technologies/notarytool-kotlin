@@ -15,6 +15,8 @@ plugins {
   idea
   `java-library`
   id("org.jetbrains.kotlin.jvm") version "1.8.21"
+  id("com.github.ben-manes.versions") version "0.46.0"
+  id("org.barfuin.gradle.taskinfo") version "2.1.0"
 }
 
 // Repositories for Library Dependencies
