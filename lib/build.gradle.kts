@@ -7,6 +7,16 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+import org.jetbrains.dokka.base.DokkaBase
+import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.dokka.base.DokkaBaseConfiguration
+
+buildscript {
+  dependencies {
+    classpath("org.jetbrains.dokka:dokka-base:1.8.20")
+  }
+}
+
 //
 // Plugins
 //
@@ -67,6 +77,18 @@ val company: String by project
 tasks.named<Test>("test") {
   useJUnitPlatform()
 }
+
+//
+// Configure Dokka
+//
+tasks.withType<DokkaTask>().configureEach {
+  pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+
+    footerMessage = "(c) 2023 Ewert Technologies"
+  }
+}
+
+
 
 /**
  * Displays general build info, such as versions, key directory locations, etc.

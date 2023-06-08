@@ -7,9 +7,20 @@ import mu.KotlinLogging
 
 private val log = KotlinLogging.logger{}
 
-class Library {
+/**
+ * This is a test Library Class, created by the gradle template.
+ *
+ * @author Victor Ewert
+ */
+public class Library {
 
-  fun someLibraryMethod(): Boolean {
+  /**
+   * A Test method
+   *
+   * @param name A name to pass in
+   * @return Always returns true
+   */
+  public fun someLibraryMethod(name: String?): Boolean {
     log.info {"Hello notarytool-kotlin"}
     return true
   }

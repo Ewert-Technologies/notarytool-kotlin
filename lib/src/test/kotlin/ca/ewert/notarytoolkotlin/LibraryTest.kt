@@ -12,7 +12,7 @@ class LibraryTest {
   @Test
   fun someLibraryMethodReturnsTrue() {
     val classUnderTest = Library()
-    assertEquals(classUnderTest.someLibraryMethod(), true)
-    assertThat(classUnderTest.someLibraryMethod(), name = "Test Message").isTrue()
+    assertEquals(classUnderTest.someLibraryMethod("kotlin"), true)
+    assertThat(classUnderTest.someLibraryMethod("kotlin"), name = "Test Message").isTrue()
   }
 }
