@@ -43,13 +43,17 @@ dependencies {
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 //  implementation("com.google.guava:guava:31.1-jre")
 
+  // Other
+  implementation(group = "io.github.nefilim.kjwt", name="kJWT", version="0.1.6")
+  implementation(group = "io.arrow-kt", name = "arrow-core", version = "1.1.5")
+  implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
 
-  //Logging
+  // Logging
   implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.7")
 
 
-  //Testing
+  // Testing
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version="5.7.1")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
 }
