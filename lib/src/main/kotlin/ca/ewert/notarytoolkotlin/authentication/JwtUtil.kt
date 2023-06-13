@@ -16,6 +16,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 import kotlin.io.path.useLines
 
@@ -59,12 +60,13 @@ enum class Scope(val scopeValue: String) {
  * to Apple's Notary Web API. The token String is included in the request Header as:
  * `Authorization: Bearer <json web token>`
  */
-fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path, tokenLifetime: Duration): String {
+fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path,
+                issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String {
   val jwt = JWT.es256(privateKeyId) {
     issuer(issuerId)
-    issuedAt(LocalDateTime.ofInstant(Instant.now(), ZONE_UTC))
-    expiresAt(LocalDateTime.ofInstant(Instant.now(), ZONE_UTC).plus(tokenLifetime))
-    claim("aud", AUDIENCE_CLAIM_VALUE)
+    issuedAt(LocalDateTime.ofInstant(issuedDate.toInstant(), ZONE_UTC))
+    expiresAt(LocalDateTime.ofInstant(expiryDate.toInstant(), ZONE_UTC))
+    claim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
   }
 
   val ecPrivateKey = createPrivateKey(privateKeyFile)
@@ -75,7 +77,8 @@ fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path, to
   }
 }
 
-fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path, tokenLifetime: Duration): String {
+fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
+                 issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String {
   val ecPrivateKey = createPrivateKey(privateKeyFile)
   val algorithm = Algorithm.ECDSA256(ecPrivateKey)
   val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
@@ -84,9 +87,9 @@ fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path, t
     val renderedToken: String = com.auth0.jwt.JWT.create()
       .withIssuer(issuerId)
       .withKeyId(privateKeyId)
-      .withIssuedAt(Instant.now())
-      .withExpiresAt(Instant.now().plus(tokenLifetime))
-      .withClaim(AUDIENCE_CLAIM_VALUE, AUDIENCE_CLAIM_VALUE)
+      .withIssuedAt(issuedDate.toInstant())
+      .withExpiresAt(expiryDate.toInstant())
+      .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
       .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
       .sign(algorithm)
     renderedToken
