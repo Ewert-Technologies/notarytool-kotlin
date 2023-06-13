@@ -1,6 +1,8 @@
 package ca.ewert.notarytoolkotlin.authentication
 
 import arrow.core.Either
+import com.auth0.jwt.algorithms.Algorithm
+import com.auth0.jwt.exceptions.JWTVerificationException
 import io.github.nefilim.kjwt.JWT
 import io.github.nefilim.kjwt.sign
 import mu.KLogger
@@ -20,11 +22,36 @@ import kotlin.io.path.useLines
 /** Logger Object **/
 private val log: KLogger = KotlinLogging.logger {}
 
-/** Constant for `aud` field value in JWT */
-private const val AUDIENCE: String = "appstoreconnect-v1"
+
+/** Constant for the `aud` claim name in the JWT */
+private const val AUDIENCE_CLAIM_NAME = "aud"
+
+/** Constant for `aud` claim value in the JWT */
+private const val AUDIENCE_CLAIM_VALUE: String = "appstoreconnect-v1"
+
+/** Constant for the `scope` claim name in the JWT */
+private const val SCOPE_CLAIM_NAME: String = "scope"
 
 /** Constant for the UTC Time Zone */
 private val ZONE_UTC: ZoneId = ZoneId.of("UTC")
+
+/**
+ * Enum of possible scope values
+ */
+enum class Scope(val scopeValue: String) {
+
+  /**
+   * Scope value of `GET /notary/v2/submissions`
+   */
+  GET_SUBMISSIONS("GET /notary/v2/submissions");
+
+  /**
+   * To String method for the Enum. Returns the [scopeValue]
+   */
+  override fun toString(): String {
+    return scopeValue
+  }
+}
 
 
 /**
@@ -37,7 +64,7 @@ fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path, to
     issuer(issuerId)
     issuedAt(LocalDateTime.ofInstant(Instant.now(), ZONE_UTC))
     expiresAt(LocalDateTime.ofInstant(Instant.now(), ZONE_UTC).plus(tokenLifetime))
-    claim("aud", AUDIENCE)
+    claim("aud", AUDIENCE_CLAIM_VALUE)
   }
 
   val ecPrivateKey = createPrivateKey(privateKeyFile)
@@ -45,6 +72,27 @@ fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path, to
   return when (val result = jwt.sign(ecPrivateKey)) {
     is Either.Left -> result.value.toString()
     is Either.Right -> result.value.rendered
+  }
+}
+
+fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path, tokenLifetime: Duration): String {
+  val ecPrivateKey = createPrivateKey(privateKeyFile)
+  val algorithm = Algorithm.ECDSA256(ecPrivateKey)
+  val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
+
+  return try {
+    val renderedToken: String = com.auth0.jwt.JWT.create()
+      .withIssuer(issuerId)
+      .withKeyId(privateKeyId)
+      .withIssuedAt(Instant.now())
+      .withExpiresAt(Instant.now().plus(tokenLifetime))
+      .withClaim(AUDIENCE_CLAIM_VALUE, AUDIENCE_CLAIM_VALUE)
+      .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
+      .sign(algorithm)
+    renderedToken
+  } catch (jWTVerificationException: JWTVerificationException) {
+    log.warn("Error creating JWT", jWTVerificationException)
+    "ERROR"
   }
 }
 
