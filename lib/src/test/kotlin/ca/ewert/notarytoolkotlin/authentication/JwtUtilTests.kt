@@ -78,7 +78,7 @@ class JwtUtilTests {
     val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
     val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
 
-    val renderedJwt: String = generateJwt2(
+    val renderedJwt: String? = generateJwt2(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile!!,
@@ -87,10 +87,15 @@ class JwtUtilTests {
     )
 
     log.info { "Rendered JWT: $renderedJwt" }
-    val jwtParts: List<String> = renderedJwt.split(".")
+
+    assertThat(renderedJwt).isNotNull()
+
+
+    val jwtParts: List<String> = renderedJwt!!.split(".")
+
 
     assertAll {
-      assertThat(renderedJwt).isNotEmpty()
+      assertThat(renderedJwt!!).isNotEmpty()
       assertThat(jwtParts).hasSize(3)
 
       val expectedHeader = """
