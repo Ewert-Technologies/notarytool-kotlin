@@ -1,5 +1,11 @@
 package ca.ewert.notarytoolkotlin.authentication
 
+import ca.ewert.notarytoolkotlin.http.json.JwtHeaderJson
+import ca.ewert.notarytoolkotlin.http.json.JwtPayloadJson
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import mu.KotlinLogging
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -13,6 +19,8 @@ private val log = KotlinLogging.logger {}
 
 /** Constant for `aud` field value in JWT */
 private const val AUDIENCE: String = "appstoreconnect-v1"
+
+private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
 /**
  * Created: 2023-06-08
@@ -37,13 +45,6 @@ class JsonWebToken internal constructor(
    */
   internal var jwtEncodedString: String? = null
     private set
-    get() {
-      if (isExpired) {
-        log.info { "Updated Web Token" }
-        updateWebToken()
-      }
-      return field
-    }
 
 
   /**
@@ -70,37 +71,41 @@ class JsonWebToken internal constructor(
 
   /**
    * Returns the Decoded Header portion of the Jason Web Token.
-   * Returns an empty string if the Jason Web Token is `null`.
    */
-  internal val decodedHeader: String
+  @OptIn(ExperimentalStdlibApi::class)
+  internal val decodedHeaderJson: JwtHeaderJson?
     get() {
       return if (jwtEncodedString != null) {
         val jwtParts = jwtEncodedString!!.split(".")
         if (jwtParts.size == 3) {
-          String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)
+          val jsonString = String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)
+          val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter<JwtHeaderJson>()
+          jsonAdapter.fromJson(jsonString)
         } else {
-          ""
+          null
         }
       } else {
-        ""
+        null
       }
     }
 
   /**
-   * Returns the Decoded Payload portion of the Jason Web Token.
-   * Returns an empty string if the Jason Web Token is `null`.
+   * Returns the Decoded Header portion of the Jason Web Token.
    */
-  internal val decodedPayload: String
+  @OptIn(ExperimentalStdlibApi::class)
+  internal val decodedPayloadJson: JwtPayloadJson?
     get() {
       return if (jwtEncodedString != null) {
         val jwtParts = jwtEncodedString!!.split(".")
         if (jwtParts.size == 3) {
-          String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)
+          val jsonString = String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)
+          val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter<JwtPayloadJson>()
+          jsonAdapter.fromJson(jsonString)
         } else {
-          ""
+          null
         }
       } else {
-        ""
+        null
       }
     }
 
@@ -132,6 +137,6 @@ class JsonWebToken internal constructor(
    * Returns `"decodedHeader, decodedPackage"`, suitable for debugging
    */
   override fun toString(): String {
-    return "$decodedHeader, $decodedPayload"
+    return "${decodedHeaderJson?.toString() ?: ""}, ${decodedPayloadJson?.toString() ?: ""}"
   }
 }

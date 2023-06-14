@@ -80,16 +80,18 @@ class JsonWebTokenTest {
         val exp: String = (jsonWebToken.expirationTime.toInstant().epochSecond).toString()
         log.info { "exp: $exp" }
 
-        val jwtPayload = jsonWebToken.decodedPayload
+        val jwtPayload = jsonWebToken.decodedPayloadJson.toString()
         log.info { "jwtPayload: $jwtPayload" }
         val expectedPayloadString = """
-        {"iss":"1234567","iat":$iat,"exp":$exp,"aud":"appstoreconnect-v1","scope":["GET /notary/v2/submissions"]}
+        {"aud":"appstoreconnect-v1","exp":$exp,"iat":$iat,"iss":"1234567","scope":["GET /notary/v2/submissions"]}
         """.trimIndent()
         assertThat(jwtPayload).isEqualTo(expectedPayloadString)
-        val jwtHeader = jsonWebToken.decodedHeader
+
+        val jwtHeader = jsonWebToken.decodedHeaderJson.toString()
+        log.info { "jwtHeader: $jwtHeader" }
         val expectedHeader = """
-        {"kid":"ABCDEFG","alg":"ES256","typ":"JWT"}
-        """.trim()
+        {"alg":"ES256","kid":"ABCDEFG","typ":"JWT"}
+        """.trimIndent()
         assertThat(jwtHeader).isEqualTo(expectedHeader)
       }
       assertThat(updatedTokenString).isNotNull()
@@ -163,60 +165,15 @@ class JsonWebTokenTest {
       Thread.sleep(75000)
 
       jsonWebToken.updateWebToken()
-
-      assertThat(jsonWebToken.isExpired).isFalse()
-    }
-  }
-
-  /**
-   * Tests that getting the web token string, automatically checks and if necessary
-   * updates it.
-   */
-  @Test
-  fun autoUpdateTest() {
-    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
-
-    assertThat(privateKeyFile).isNotNull()
-
-    val tokenLifetime: Duration = Duration.ofMinutes(1)
-
-    val jsonWebToken = JsonWebToken(
-      privateKeyId = "ABCDEFG",
-      issuerId = "1234567",
-      privateKeyFile = privateKeyFile!!,
-      tokenLifetime = tokenLifetime
-    )
-
-    assertAll {
       assertThat(jsonWebToken.issuedAtTime).isCloseTo(ZonedDateTime.now(), Duration.of(500, ChronoUnit.MILLIS))
-
-      val expectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
+      val updatedExpectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
-        expected = expectedExpirationTime,
+        expected = updatedExpectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
       )
-
       assertThat(jsonWebToken.isExpired).isFalse()
-
-      Thread.sleep(75000)
-      assertThat(jsonWebToken.isExpired).isTrue()
-
-      val updatedTokenString: String? = jsonWebToken.jwtEncodedString
-      assertThat(jsonWebToken.isExpired).isFalse()
-
-      if (updatedTokenString != null) {
-        val iat: String = (jsonWebToken.issuedAtTime.toInstant().epochSecond).toString()
-        log.info { "iat: $iat" }
-
-        val exp: String = (jsonWebToken.expirationTime.toInstant().epochSecond).toString()
-        log.info { "exp: $exp" }
-
-        val jwtPayload = jsonWebToken.decodedPayload
-        log.info { "jwtPayload: $jwtPayload" }
-        assertThat(jwtPayload).contains("\"iat\":$iat")
-        assertThat(jwtPayload).contains("\"exp\":$exp")
-      }
-      assertThat(updatedTokenString).isNotNull()
+      assertThat(jsonWebToken.decodedPayloadJson?.iat).isEqualTo(jsonWebToken.issuedAtTime.toInstant().epochSecond.toInt())
+      assertThat(jsonWebToken.decodedPayloadJson?.exp).isEqualTo(jsonWebToken.expirationTime.toInstant().epochSecond.toInt())
     }
   }
 }
