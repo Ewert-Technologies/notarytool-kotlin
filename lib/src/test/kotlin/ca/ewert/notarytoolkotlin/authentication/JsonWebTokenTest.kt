@@ -80,14 +80,14 @@ class JsonWebTokenTest {
         val exp: String = (jsonWebToken.expirationTime.toInstant().epochSecond).toString()
         log.info { "exp: $exp" }
 
-        val jwtPayload = jsonWebToken.decodedPayloadJson.toString()
+        val jwtPayload = jsonWebToken.decodedPayloadJson?.toJsonString()
         log.info { "jwtPayload: $jwtPayload" }
         val expectedPayloadString = """
         {"aud":"appstoreconnect-v1","exp":$exp,"iat":$iat,"iss":"1234567","scope":["GET /notary/v2/submissions"]}
         """.trimIndent()
         assertThat(jwtPayload).isEqualTo(expectedPayloadString)
 
-        val jwtHeader = jsonWebToken.decodedHeaderJson.toString()
+        val jwtHeader = jsonWebToken.decodedHeaderJson?.toJsonString()
         log.info { "jwtHeader: $jwtHeader" }
         val expectedHeader = """
         {"alg":"ES256","kid":"ABCDEFG","typ":"JWT"}

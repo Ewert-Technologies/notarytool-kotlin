@@ -4,27 +4,26 @@ import ca.ewert.notarytoolkotlin.http.json.JwtHeaderJson
 import ca.ewert.notarytoolkotlin.http.json.JwtPayloadJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import mu.KotlinLogging
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.time.Duration
 import java.time.ZonedDateTime
-import java.util.Base64
+import java.util.*
 
 
 /** Logging Object */
 private val log = KotlinLogging.logger {}
 
-/** Constant for `aud` field value in JWT */
-private const val AUDIENCE: String = "appstoreconnect-v1"
-
+/**
+ * Moshi json parser
+ */
 private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
 /**
  * Created: 2023-06-08
- * This class represents a [JSON Web Token](https://jwt.io/introduction), which is required for making
+ * This class represents a [JSON Web Token](https://jwt.io/introduction), configured for making
  * API calls to Apples Notary Web API.
  *
  * @property privateKeyId Apple private key ID
@@ -72,14 +71,13 @@ class JsonWebToken internal constructor(
   /**
    * Returns the Decoded Header portion of the Jason Web Token.
    */
-  @OptIn(ExperimentalStdlibApi::class)
   internal val decodedHeaderJson: JwtHeaderJson?
     get() {
       return if (jwtEncodedString != null) {
         val jwtParts = jwtEncodedString!!.split(".")
         if (jwtParts.size == 3) {
           val jsonString = String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)
-          val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter<JwtHeaderJson>()
+          val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter(JwtHeaderJson::class.java)
           jsonAdapter.fromJson(jsonString)
         } else {
           null
@@ -92,14 +90,13 @@ class JsonWebToken internal constructor(
   /**
    * Returns the Decoded Header portion of the Jason Web Token.
    */
-  @OptIn(ExperimentalStdlibApi::class)
   internal val decodedPayloadJson: JwtPayloadJson?
     get() {
       return if (jwtEncodedString != null) {
         val jwtParts = jwtEncodedString!!.split(".")
         if (jwtParts.size == 3) {
           val jsonString = String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)
-          val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter<JwtPayloadJson>()
+          val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter(JwtPayloadJson::class.java)
           jsonAdapter.fromJson(jsonString)
         } else {
           null
@@ -137,6 +134,6 @@ class JsonWebToken internal constructor(
    * Returns `"decodedHeader, decodedPackage"`, suitable for debugging
    */
   override fun toString(): String {
-    return "${decodedHeaderJson?.toString() ?: ""}, ${decodedPayloadJson?.toString() ?: ""}"
+    return "${decodedHeaderJson?.toJsonString() ?: ""}, ${decodedPayloadJson?.toJsonString() ?: ""}"
   }
 }
