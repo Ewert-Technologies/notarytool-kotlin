@@ -15,19 +15,21 @@ private val log = KotlinLogging.logger {}
 private const val AUDIENCE: String = "appstoreconnect-v1"
 
 /**
+ * Created: 2023-06-08
  * This class represents a [JSON Web Token](https://jwt.io/introduction), which is required for making
  * API calls to Apples Notary Web API.
  *
- * @param privateKeyId Apple private key ID
- * @param issuerId Apple Issuer ID
+ * @property privateKeyId Apple private key ID
+ * @property issuerId Apple Issuer ID
+ * @property privateKeyFile Private Key file `.p8' provided by Apple
+ * @property tokenLifetime Lifetime of the token, should be less than 20 minutes
  *
- * Created: 2023-06-08
  * @author vewert
  */
 class JsonWebToken internal constructor(
   private val privateKeyId: String, private val issuerId: String,
   private val privateKeyFile: Path,
-  private val tokenLifetime: Duration = Duration.ofMinutes(20)
+  private val tokenLifetime: Duration = Duration.ofMinutes(15)
 ) {
 
   /**
