@@ -8,7 +8,6 @@
  */
 
 import org.jetbrains.dokka.base.DokkaBase
-import org.jetbrains.dokka.gradle.DokkaTask
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 
 buildscript {
@@ -47,6 +46,9 @@ dependencies {
   implementation(group = "io.github.nefilim.kjwt", name="kJWT", version="0.1.6")
   implementation(group = "io.arrow-kt", name = "arrow-core", version = "1.1.5")
   implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
+  implementation(group = "com.squareup.moshi", name = "moshi", version = "1.14.0")
+  implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = "1.14.0")
+  implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = "1.14.0")
 
   // Logging
   implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
