@@ -23,11 +23,17 @@ data class JwtHeaderJson(
 ) {
 
   /**
-   * String representation of the JwtHeaderJson. The object serialized back into a json String
+   * String representation of the JwtHeaderJson. The object serialized back into a json String.
+   *
+   * @param prettyPrint Whether the json should be pretty printed, using an indent of 2
    */
-  @OptIn(ExperimentalStdlibApi::class)
-  override fun toString(): String {
-    val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter<JwtHeaderJson>()
+  fun toJsonString(prettyPrint: Boolean = false): String {
+    val jsonAdapter: JsonAdapter<JwtHeaderJson>  =
+    if (prettyPrint) {
+      moshi.adapter(JwtHeaderJson::class.java).indent("  ")
+    } else {
+      moshi.adapter(JwtHeaderJson::class.java)
+    }
     return jsonAdapter.toJson(this)
   }
 }
@@ -55,8 +61,14 @@ data class JwtPayloadJson(
    * String representation of the JwtPayloadJson. The object serialized back into a json String
    */
   @OptIn(ExperimentalStdlibApi::class)
-  override fun toString(): String {
-    val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter<JwtPayloadJson>()
+  fun toJsonString(prettyPrint: Boolean = false): String {
+    val jsonAdapter: JsonAdapter<JwtPayloadJson> =
+      if (prettyPrint) {
+        moshi.adapter(JwtPayloadJson::class.java).indent(" ")
+      } else {
+        moshi.adapter(JwtPayloadJson::class.java)
+      }
+
     return jsonAdapter.toJson(this)
   }
 }
