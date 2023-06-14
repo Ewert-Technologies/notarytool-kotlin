@@ -77,8 +77,13 @@ fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path,
   }
 }
 
+/**
+ * Generates a Json Web Token [https://jwt.io/] suitable to add to the Header when sending a request
+ * to Apple's Notary Web API. The token String is included in the request Header as:
+ * `Authorization: Bearer <json web token>`
+ */
 fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
-                 issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String {
+                 issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String? {
   val ecPrivateKey = createPrivateKey(privateKeyFile)
   val algorithm = Algorithm.ECDSA256(ecPrivateKey)
   val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
@@ -95,7 +100,7 @@ fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
     renderedToken
   } catch (jWTVerificationException: JWTVerificationException) {
     log.warn("Error creating JWT", jWTVerificationException)
-    "ERROR"
+    null //TODO Better handle Error/Exception
   }
 }
 
