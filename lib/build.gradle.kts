@@ -82,7 +82,7 @@ tasks.named<Test>("test") {
   useJUnitPlatform()
 }
 
-tasks.dokkaHtmlPartial {
+tasks.dokkaHtml {
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
     footerMessage = "(c) 2023 Ewert Technologies"
   }
