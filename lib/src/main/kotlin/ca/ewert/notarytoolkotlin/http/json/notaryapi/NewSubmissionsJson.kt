@@ -20,7 +20,7 @@ import com.squareup.moshi.Json
  * you to distinguish among submissions in service responses.
  */
 data class NewSubmissionRequestJson(
-  val notifications: List<NotificationJson>,
+  val notifications: List<NewSubmissionRequestNotificationJson>,
   val sha256: String,
   val submissionName: String
 )
@@ -32,7 +32,7 @@ data class NewSubmissionRequestJson(
  * @property channel The channel that the service uses to notify you when notarization completes. The only supported value for this key is webhook.
  * @property target The URL that the notary service accesses when notarization completes.
  */
-data class NotificationJson(
+data class NewSubmissionRequestNotificationJson(
   val channel: String,
   val target: String
 )
