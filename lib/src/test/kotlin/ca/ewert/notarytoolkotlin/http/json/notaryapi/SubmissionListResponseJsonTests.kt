@@ -72,9 +72,9 @@ class SubmissionListResponseJsonTests {
     if (submissionListResponseJson != null) {
       val dataList: List<SubmissionsDataJson> = submissionListResponseJson.submissionListResponseData
       assertThat(dataList).hasSize(3)
-      assertThat(dataList[1].attributesJson.createdDate).isEqualTo("2021-04-23T17:44:54.761Z")
-      assertThat(dataList[1].attributesJson.name).isEqualTo("OvernightTextEditor_11.6.7.zip")
-      assertThat(dataList[1].attributesJson.status).isEqualTo("Accepted")
+      assertThat(dataList[1].attributes.createdDate).isEqualTo("2021-04-23T17:44:54.761Z")
+      assertThat(dataList[1].attributes.name).isEqualTo("OvernightTextEditor_11.6.7.zip")
+      assertThat(dataList[1].attributes.status).isEqualTo("Accepted")
       assertThat(dataList[1].id).isEqualTo("cf0c235a-dad2-4c24-96eb-c876d4cb3a2d")
       assertThat(dataList[1].type).isEqualTo("submissions")
     }

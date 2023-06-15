@@ -38,12 +38,12 @@ data class SubmissionListResponseJson(
  * from Apples API. _Information that the service provides about the status of a notarization submission /
  * Data that describes one of your team’s previous submissions._
  *
- * @property attributesJson Information about (the status) of a particular submission.
+ * @property attributes Information about (the status) of a particular submission.
  * @property id The unique identifier for this submission.
  * @property type The resource type.
  */
 data class SubmissionsDataJson(
-  @Json(name = "attributes") val attributesJson: SubmissionsAttributesJson,
+  val attributes: SubmissionsAttributesJson,
   val id: String,
   val type: String
 )

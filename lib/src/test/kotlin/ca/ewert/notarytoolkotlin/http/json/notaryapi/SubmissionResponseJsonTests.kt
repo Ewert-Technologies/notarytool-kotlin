@@ -45,9 +45,9 @@ class SubmissionResponseJsonTests {
     val submissionResponseJson: SubmissionResponseJson? = jsonAdapter.fromJson(jsonString)
     log.info { submissionResponseJson.toString() }
     assertThat(submissionResponseJson).isNotNull()
-    assertThat(submissionResponseJson?.submissionResponseData?.attributesJson?.createdDate).isEqualTo("2022-06-08T01:38:09.498Z")
-    assertThat(submissionResponseJson?.submissionResponseData?.attributesJson?.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
-    assertThat(submissionResponseJson?.submissionResponseData?.attributesJson?.status).isEqualTo("Accepted")
+    assertThat(submissionResponseJson?.submissionResponseData?.attributes?.createdDate).isEqualTo("2022-06-08T01:38:09.498Z")
+    assertThat(submissionResponseJson?.submissionResponseData?.attributes?.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
+    assertThat(submissionResponseJson?.submissionResponseData?.attributes?.status).isEqualTo("Accepted")
     assertThat(submissionResponseJson?.submissionResponseData?.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
     assertThat(submissionResponseJson?.submissionResponseData?.type).isEqualTo("submissions")
   }
