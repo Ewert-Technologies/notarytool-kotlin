@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test
 private val log = KotlinLogging.logger {}
 
 /**
- * TODO: Add Comments
+ * Unit Tests for [NewSubmissionRequestJson]
  *
  *
  * @author vewert
