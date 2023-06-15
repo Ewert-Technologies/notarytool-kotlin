@@ -9,6 +9,7 @@
 
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
+import org.jetbrains.dokka.gradle.DokkaTask
 
 buildscript {
   dependencies {
@@ -84,10 +85,20 @@ tasks.named<Test>("test") {
   useJUnitPlatform()
 }
 
+tasks.withType<DokkaTask>().configureEach {
+  dokkaSourceSets {
+    configureEach {
+      includeNonPublic.set(true)
+      jdkVersion.set(11)
+    }
+  }
+}
+
 tasks.dokkaHtml {
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
     footerMessage = "(c) 2023 Ewert Technologies"
   }
+
 }
 
 
