@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import ca.ewert.notarytoolkotlin.http.json.JwtHeaderJson
-import ca.ewert.notarytoolkotlin.http.json.JwtPayloadJson
+import ca.ewert.notarytoolkotlin.http.json.jwt.JwtHeaderJson
+import ca.ewert.notarytoolkotlin.http.json.jwt.JwtPayloadJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory

@@ -1,8 +1,7 @@
-package ca.ewert.notarytoolkotlin.http.json
+package ca.ewert.notarytoolkotlin.http.json.jwt
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
