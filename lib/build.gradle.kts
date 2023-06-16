@@ -40,6 +40,8 @@ dependencies {
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
 //  api("org.apache.commons:commons-math3:3.6.1")
 
+  api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
+
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 //  implementation("com.google.guava:guava:31.1-jre")
 
