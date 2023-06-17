@@ -3,6 +3,7 @@ package ca.ewert.notarytoolkotlin.http.response
 import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.Response
+import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -17,7 +18,7 @@ import java.util.*
 open class NotaryApiResponse internal constructor(val responseMetaData: ResponseMetaData) {
 
   /** The timestamp of when the client received the Response */
-  val receivedTimestamp: ZonedDateTime = ZonedDateTime.now()
+  val receivedTimestamp: Instant = Instant.now()
 
   companion object {
     /**
@@ -26,7 +27,6 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
      */
     val HTTP_DATE_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O", Locale.US)
   }
-
 
   class ResponseMetaData internal constructor(response: Response) {
     /** The HTTP Status Code, e.g. `400` */
@@ -41,7 +41,7 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
     internal val headers: Headers
 
     /** Value of the `Date` Header */
-    val headerDate: ZonedDateTime?
+    val headerDate: Instant?
 
     /** Response Content Type */
     val contentType: MediaType?
@@ -59,7 +59,7 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
       headers = response.headers
       val parsedDate = response.headers.getDate("Date")
       headerDate = if (parsedDate != null) {
-        ZonedDateTime.ofInstant(parsedDate.toInstant(), ZoneId.of("GMT"))
+        parsedDate.toInstant()
       } else {
         null
       }

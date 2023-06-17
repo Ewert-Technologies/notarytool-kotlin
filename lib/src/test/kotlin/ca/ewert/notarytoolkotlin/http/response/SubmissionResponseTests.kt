@@ -128,17 +128,17 @@ class SubmissionResponseTests {
         assertThat(submissionResponseJson).isNotNull()
         if (submissionResponseJson != null) {
           val submissionResponse = SubmissionResponse(responseMetaData, jsonResponse = submissionResponseJson)
-          assertThat(submissionResponse.receivedTimestamp).isCloseTo(
+          assertThat(submissionResponse.receivedTimestamp.atZone(ZoneId.systemDefault())).isCloseTo(
             ZonedDateTime.now(),
             Duration.of(500, ChronoUnit.MILLIS)
           )
 
           val expectedCreatedDate: ZonedDateTime = ZonedDateTime.of(2022, 6, 8, 1, 38, 9, 498000000, ZoneId.of("Z"))
-          assertThat(submissionResponse.createdDate).isEqualTo(expectedCreatedDate)
+          assertThat(submissionResponse.createdDate).isEqualTo(expectedCreatedDate.toInstant())
           assertThat(submissionResponse.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
           assertThat(submissionResponse.status).isEqualTo(SubmissionStatus.ACCEPTED)
           assertThat(submissionResponse.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
-          log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.withZoneSameInstant(ZoneId.systemDefault())}" }
+          log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.atZone(ZoneId.systemDefault())}" }
           log.info { "content-type: ${submissionResponse.responseMetaData.contentType}" }
           assertThat(submissionResponse.responseMetaData.contentType).isEqualTo("application/octet-stream".toMediaTypeOrNull())
           log.info { "content-length ${submissionResponse.responseMetaData.contentLength}" }

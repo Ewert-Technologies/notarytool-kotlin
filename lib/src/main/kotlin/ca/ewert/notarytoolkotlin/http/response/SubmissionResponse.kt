@@ -1,6 +1,7 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
+import java.time.Instant
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
@@ -16,7 +17,7 @@ class SubmissionResponse internal constructor(
   NotaryApiResponse(responseMetaData = responseMetaData) {
 
   /** The date that submission process was started */
-  val createdDate: ZonedDateTime
+  val createdDate: Instant
 
   /**
    * The name that was specified in the submissionName field of the Submit Software call when the submission
@@ -30,9 +31,7 @@ class SubmissionResponse internal constructor(
   val id: String
 
   init {
-    createdDate =
-      ZonedDateTime.parse(jsonResponse.submissionResponseData.attributes.createdDate,
-        DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    createdDate = Instant.parse(jsonResponse.submissionResponseData.attributes.createdDate)
     name = jsonResponse.submissionResponseData.attributes.name
     status = SubmissionStatus.fromString(jsonResponse.submissionResponseData.attributes.status)
     id = jsonResponse.submissionResponseData.id
