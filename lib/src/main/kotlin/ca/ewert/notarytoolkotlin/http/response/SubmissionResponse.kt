@@ -1,0 +1,40 @@
+package ca.ewert.notarytoolkotlin.http.response
+
+import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+
+/**
+ * Response from sending a request the `Get Submission Status` Endpoint.
+ *
+ * @author vewert
+ */
+class SubmissionResponse internal constructor(
+  responseMetaData: ResponseMetaData,
+  jsonResponse: SubmissionResponseJson
+) :
+  NotaryApiResponse(responseMetaData = responseMetaData) {
+
+  /** The date that submission process was started */
+  val createdDate: ZonedDateTime
+
+  /**
+   * The name that was specified in the submissionName field of the Submit Software call when the submission
+   * was started.
+   */
+  val name: String
+
+  /** The status of the submission */
+  val status: SubmissionStatus
+
+  val id: String
+
+  init {
+    createdDate =
+      ZonedDateTime.parse(jsonResponse.submissionResponseData.attributes.createdDate,
+        DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+    name = jsonResponse.submissionResponseData.attributes.name
+    status = SubmissionStatus.fromString(jsonResponse.submissionResponseData.attributes.status)
+    id = jsonResponse.submissionResponseData.id
+  }
+}

@@ -1,6 +1,11 @@
 package ca.ewert.notarytoolkotlin.http.json.notaryapi
 
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+
+private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
 
 /**
@@ -15,7 +20,14 @@ import com.squareup.moshi.Json
 data class SubmissionResponseJson(
   @Json(name = "data") val submissionResponseData: SubmissionsDataJson,
   val meta: SubmissionsMetaJson
-)
+) {
+  companion object {
+    fun create(jsonString: String?): SubmissionResponseJson? {
+      val jsonAdapter: JsonAdapter<SubmissionResponseJson> = moshi.adapter(SubmissionResponseJson::class.java)
+      return jsonString?.let { jsonAdapter.fromJson(it) }
+    }
+  }
+}
 
 /**
  * Top level Response from making a **`Get Previous Submissions`** Request.

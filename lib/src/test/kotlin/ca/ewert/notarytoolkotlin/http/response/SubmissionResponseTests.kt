@@ -1,0 +1,152 @@
+package ca.ewert.notarytoolkotlin.http.response
+
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
+import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
+import ca.ewert.notarytoolkotlin.isCloseTo
+import mu.KotlinLogging
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.mockwebserver.MockWebServer
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.time.Duration
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
+
+private val log = KotlinLogging.logger {}
+
+/**
+ * Unit Tests for [SubmissionResponse]
+ * @author vewert
+ */
+class SubmissionResponseTests {
+
+  private var mockWebServer: MockWebServer? = null
+
+  @BeforeEach
+  fun setup() {
+    mockWebServer = MockWebServer()
+    mockWebServer!!.protocols = listOf(Protocol.HTTP_1_1, Protocol.HTTP_2)
+  }
+
+  @AfterEach
+  fun tearDown() {
+    mockWebServer?.shutdown()
+  }
+
+  @Test
+  fun basicConnectionTest() {
+    assertThat(mockWebServer).isNotNull()
+
+    val body: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Accepted"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer?.enqueue(createMockResponse(body))
+
+    mockWebServer?.start()
+    val baseUrl: HttpUrl = mockWebServer!!.url("/notary/v2/submissions")
+
+    val request = Request.Builder()
+      .url(baseUrl)
+      .get()
+      .build()
+
+    val client = OkHttpClient.Builder()
+      .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
+      .build()
+
+
+    client.newCall(request).execute().use { response: Response ->
+      log.info("Returned Response: $response")
+      assertThat(response.isSuccessful).isTrue()
+      if (!response.isSuccessful) {
+        log.warn { "Request was not successful: $request" }
+      }
+    }
+  }
+
+  @Test
+  fun test1() {
+    assertThat(mockWebServer).isNotNull()
+
+    val body: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Accepted"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer?.enqueue(createMockResponse(body))
+
+    mockWebServer?.start()
+    val baseUrl: HttpUrl = mockWebServer!!.url("/notary/v2/submissions")
+
+    val request = Request.Builder()
+      .url(baseUrl)
+      .get()
+      .build()
+
+    val client = OkHttpClient.Builder()
+      .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
+      .build()
+
+
+    client.newCall(request).execute().use { response: Response ->
+      log.info("Returned Response: $response")
+      assertThat(response.isSuccessful).isTrue()
+      if (response.isSuccessful) {
+        val responseMetaData = NotaryApiResponse.ResponseMetaData(response)
+        val jsonBody: String? = responseMetaData.rawContents
+        assertThat(jsonBody).isNotNull()
+        val submissionResponseJson: SubmissionResponseJson? = SubmissionResponseJson.create(jsonBody)
+
+        assertThat(submissionResponseJson).isNotNull()
+        if (submissionResponseJson != null) {
+          val submissionResponse = SubmissionResponse(responseMetaData, jsonResponse = submissionResponseJson)
+          assertThat(submissionResponse.receivedTimestamp).isCloseTo(
+            ZonedDateTime.now(),
+            Duration.of(500, ChronoUnit.MILLIS)
+          )
+
+          val expectedCreatedDate: ZonedDateTime = ZonedDateTime.of(2022, 6, 8, 1, 38, 9, 498000000, ZoneId.of("Z"))
+          assertThat(submissionResponse.createdDate).isEqualTo(expectedCreatedDate)
+          assertThat(submissionResponse.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+          assertThat(submissionResponse.status).isEqualTo(SubmissionStatus.ACCEPTED)
+          assertThat(submissionResponse.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
+          log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.withZoneSameInstant(ZoneId.systemDefault())}" }
+          log.info { "content-type: ${submissionResponse.responseMetaData.contentType}" }
+          assertThat(submissionResponse.responseMetaData.contentType).isEqualTo("application/octet-stream".toMediaTypeOrNull())
+          log.info { "content-length ${submissionResponse.responseMetaData.contentLength}" }
+          assertThat(submissionResponse.responseMetaData.contentLength).isEqualTo(submissionResponse.responseMetaData.rawContents?.length?.toLong())
+        }
+      } else {
+        log.warn { "Request was not successful: $request" }
+      }
+    }
+  }
+}
