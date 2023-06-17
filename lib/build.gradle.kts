@@ -61,6 +61,7 @@ dependencies {
   // Testing
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version="5.7.1")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
+  testImplementation(group = "com.squareup.okhttp3", name="mockwebserver", version = "4.11.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
