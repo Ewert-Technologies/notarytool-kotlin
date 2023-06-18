@@ -10,6 +10,7 @@ import mu.KotlinLogging
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -108,11 +109,12 @@ class SubmissionResponseTests {
 
     val request = Request.Builder()
       .url(baseUrl)
+      .header("User-Agent", "notarytool-kotlin/0.1.0")
       .get()
       .build()
 
     val client = OkHttpClient.Builder()
-      .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
+//      .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
       .build()
 
 
@@ -134,15 +136,21 @@ class SubmissionResponseTests {
           )
 
           val expectedCreatedDate: ZonedDateTime = ZonedDateTime.of(2022, 6, 8, 1, 38, 9, 498000000, ZoneId.of("Z"))
-          assertThat(submissionResponse.createdDate).isEqualTo(expectedCreatedDate.toInstant())
-          assertThat(submissionResponse.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
-          assertThat(submissionResponse.status).isEqualTo(SubmissionStatus.ACCEPTED)
-          assertThat(submissionResponse.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
+          assertThat(submissionResponse.submissionInfo.createdDate).isEqualTo(expectedCreatedDate.toInstant())
+          assertThat(submissionResponse.submissionInfo.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+          assertThat(submissionResponse.submissionInfo.status).isEqualTo(SubmissionStatus.ACCEPTED)
+          assertThat(submissionResponse.submissionInfo.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
           log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.atZone(ZoneId.systemDefault())}" }
           log.info { "content-type: ${submissionResponse.responseMetaData.contentType}" }
           assertThat(submissionResponse.responseMetaData.contentType).isEqualTo("application/octet-stream".toMediaTypeOrNull())
           log.info { "content-length ${submissionResponse.responseMetaData.contentLength}" }
           assertThat(submissionResponse.responseMetaData.contentLength).isEqualTo(submissionResponse.responseMetaData.rawContents?.length?.toLong())
+
+
+          val recordedRequest: RecordedRequest = mockWebServer!!.takeRequest()
+          log.info { "Recorded Request: $recordedRequest" }
+          log.info { "Recorded Request Headers: ${recordedRequest.headers}" }
+          log.info { "Recorded Request User-Agent ${recordedRequest.getHeader("User-Agent")}"}
         }
       } else {
         log.warn { "Request was not successful: $request" }

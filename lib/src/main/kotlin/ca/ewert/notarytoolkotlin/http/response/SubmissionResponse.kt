@@ -1,9 +1,11 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
+import mu.KotlinLogging
 import java.time.Instant
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Response from sending a request the `Get Submission Status` Endpoint.
@@ -13,27 +15,25 @@ import java.time.format.DateTimeFormatter
 class SubmissionResponse internal constructor(
   responseMetaData: ResponseMetaData,
   jsonResponse: SubmissionResponseJson
-) :
-  NotaryApiResponse(responseMetaData = responseMetaData) {
+) : NotaryApiResponse(responseMetaData = responseMetaData) {
 
-  /** The date that submission process was started */
-  val createdDate: Instant
 
-  /**
-   * The name that was specified in the submissionName field of the Submit Software call when the submission
-   * was started.
-   */
-  val name: String
+  /** Information about the status of a submission */
+  val submissionInfo: SubmissionInfo
 
-  /** The status of the submission */
-  val status: SubmissionStatus
-
-  val id: String
 
   init {
-    createdDate = Instant.parse(jsonResponse.submissionResponseData.attributes.createdDate)
-    name = jsonResponse.submissionResponseData.attributes.name
-    status = SubmissionStatus.fromString(jsonResponse.submissionResponseData.attributes.status)
-    id = jsonResponse.submissionResponseData.id
+    val createdDateText = jsonResponse.submissionResponseData.attributes.createdDate
+    val createdDate = try {
+      Instant.parse(jsonResponse.submissionResponseData.attributes.createdDate)
+    } catch (dateTimeParseException: DateTimeParseException) {
+      log.warn("Error parsing 'createdDate' ($createdDateText) from Web API response, use ", dateTimeParseException)
+      null
+    }
+    val name = jsonResponse.submissionResponseData.attributes.name
+    val status = SubmissionStatus.fromString(jsonResponse.submissionResponseData.attributes.status)
+    val id = jsonResponse.submissionResponseData.id
+
+    submissionInfo = SubmissionInfo(createdDate, createdDateText, name, status, id)
   }
 }
