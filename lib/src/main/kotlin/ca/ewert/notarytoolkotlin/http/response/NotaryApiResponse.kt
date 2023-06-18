@@ -4,8 +4,6 @@ import okhttp3.Headers
 import okhttp3.MediaType
 import okhttp3.Response
 import java.time.Instant
-import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -28,7 +26,11 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
     val HTTP_DATE_TIME: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O", Locale.US)
   }
 
+  /**
+   * Class for storing Response Metadata
+   */
   class ResponseMetaData internal constructor(response: Response) {
+
     /** The HTTP Status Code, e.g. `400` */
     val httpStatusCode: Int
 
@@ -38,7 +40,8 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
     /** The Combined HTTP Status code and message, e.g. `400 - OK` */
     val httpStatusString: String
 
-    internal val headers: Headers
+    /** Response Headers */ //TODO Decide whether to keep
+    val headers: Map<String, String>
 
     /** Value of the `Date` Header */
     val headerDate: Instant?
@@ -56,13 +59,8 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
       httpStatusCode = response.code
       httpStatusMessage = response.message
       httpStatusString = "$httpStatusCode - $httpStatusMessage"
-      headers = response.headers
-      val parsedDate = response.headers.getDate("Date")
-      headerDate = if (parsedDate != null) {
-        parsedDate.toInstant()
-      } else {
-        null
-      }
+      headers = response.headers.toMap()
+      headerDate = response.headers.getInstant("Date")
       contentType = response.body?.contentType()
       contentLength = response.body?.contentLength()
       rawContents = response.body?.string()
