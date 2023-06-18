@@ -12,6 +12,7 @@ import java.time.Instant
  * @property name The name that was specified in the submissionName field of the Submit Software call when the submission
  * was started.
  * @property status The status of the submission.
+ * @property statusText The original status as text.
  * @property id The unique identifier for this submission.
  * @author vewert
  */
@@ -20,5 +21,6 @@ data class SubmissionInfo internal constructor(
   val createdDateText: String,
   val name: String,
   val status: SubmissionStatus,
+  val statusText: String,
   val id: String
 )

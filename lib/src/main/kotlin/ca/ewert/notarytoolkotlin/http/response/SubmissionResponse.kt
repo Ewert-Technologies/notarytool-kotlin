@@ -31,9 +31,11 @@ class SubmissionResponse internal constructor(
       null
     }
     val name = jsonResponse.submissionResponseData.attributes.name
-    val status = SubmissionStatus.fromString(jsonResponse.submissionResponseData.attributes.status)
+
+    val statusText: String = jsonResponse.submissionResponseData.attributes.status
+    val status = SubmissionStatus.fromString(statusText)
     val id = jsonResponse.submissionResponseData.id
 
-    submissionInfo = SubmissionInfo(createdDate, createdDateText, name, status, id)
+    submissionInfo = SubmissionInfo(createdDate, createdDateText, name, status,statusText, id)
   }
 }
