@@ -42,7 +42,14 @@ data class SubmissionResponseJson(
 data class SubmissionListResponseJson(
   @Json(name = "data") val submissionListResponseData: List<SubmissionsDataJson>,
   val meta: SubmissionsMetaJson
-)
+) {
+  companion object {
+    fun create(jsonString: String?): SubmissionListResponseJson? {
+      val jsonAdapter: JsonAdapter<SubmissionListResponseJson> = moshi.adapter(SubmissionListResponseJson::class.java)
+      return jsonString?.let { jsonAdapter.fromJson(it) }
+    }
+  }
+}
 
 /**
  * Corresponds to [`SubmissionResponse.Data`](https://developer.apple.com/documentation/notaryapi/submissionresponse/data),
