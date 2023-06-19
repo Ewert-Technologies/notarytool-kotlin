@@ -31,8 +31,6 @@ class SubmissionResponseTests () {
     mockWebServer = MockWebServer()
   }
 
-
-
   @BeforeEach
   fun setup() {
     mockWebServer = MockWebServer()
