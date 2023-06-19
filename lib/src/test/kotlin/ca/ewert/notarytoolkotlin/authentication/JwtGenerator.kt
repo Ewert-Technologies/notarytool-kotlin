@@ -8,6 +8,7 @@ import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Duration
+import java.time.Instant
 import java.time.ZonedDateTime
 
 /** Logging Object */
@@ -38,8 +39,8 @@ class JwtGenerator {
         keyId,
         issuerId,
         privateKeyFile,
-        ZonedDateTime.now(),
-        ZonedDateTime.now().plus(Duration.ofMinutes(15))
+        Instant.now(),
+        Instant.now().plus(Duration.ofMinutes(15))
       )
       log.info { "JWT: [$jwtString]" }
     }

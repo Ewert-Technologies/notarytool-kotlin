@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Duration
-import java.time.ZonedDateTime
+import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 private val log = KotlinLogging.logger {}
@@ -59,9 +59,9 @@ class JsonWebTokenTest {
     assertThat(jsonWebToken.jwtEncodedString).isNotNull()
 
     assertAll {
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(ZonedDateTime.now(), Duration.of(500, ChronoUnit.MILLIS))
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
 
-      val expectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
+      val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
@@ -70,14 +70,14 @@ class JsonWebTokenTest {
       assertThat(jsonWebToken.isExpired).isFalse()
       assertThat(jsonWebToken.jwtEncodedString!!).isNotEmpty()
 
-      val updatedTokenString: String? = jsonWebToken.jwtEncodedString
+      val jsonTokenString: String? = jsonWebToken.jwtEncodedString
       assertThat(jsonWebToken.isExpired).isFalse()
 
-      if (updatedTokenString != null) {
-        val iat: String = (jsonWebToken.issuedAtTime.toInstant().epochSecond).toString()
+      if (jsonTokenString != null) {
+        val iat: String = (jsonWebToken.issuedAtTime.epochSecond).toString()
         log.info { "iat: $iat" }
 
-        val exp: String = (jsonWebToken.expirationTime.toInstant().epochSecond).toString()
+        val exp: String = (jsonWebToken.expirationTime.epochSecond).toString()
         log.info { "exp: $exp" }
 
         val jwtPayload = jsonWebToken.decodedPayloadJson?.toJsonString()
@@ -94,7 +94,7 @@ class JsonWebTokenTest {
         """.trimIndent()
         assertThat(jwtHeader).isEqualTo(expectedHeader)
       }
-      assertThat(updatedTokenString).isNotNull()
+      assertThat(jsonTokenString).isNotNull()
     }
   }
 
@@ -117,9 +117,9 @@ class JsonWebTokenTest {
     )
 
     assertAll {
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(ZonedDateTime.now(), Duration.of(500, ChronoUnit.MILLIS))
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
 
-      val expectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
+      val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
@@ -152,9 +152,9 @@ class JsonWebTokenTest {
     )
 
     assertAll {
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(ZonedDateTime.now(), Duration.of(500, ChronoUnit.MILLIS))
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
 
-      val expectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
+      val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
@@ -165,15 +165,15 @@ class JsonWebTokenTest {
       Thread.sleep(75000)
 
       jsonWebToken.updateWebToken()
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(ZonedDateTime.now(), Duration.of(500, ChronoUnit.MILLIS))
-      val updatedExpectedExpirationTime = ZonedDateTime.now().plus(tokenLifetime)
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
+      val updatedExpectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = updatedExpectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
       )
       assertThat(jsonWebToken.isExpired).isFalse()
-      assertThat(jsonWebToken.decodedPayloadJson?.iat).isEqualTo(jsonWebToken.issuedAtTime.toInstant().epochSecond.toInt())
-      assertThat(jsonWebToken.decodedPayloadJson?.exp).isEqualTo(jsonWebToken.expirationTime.toInstant().epochSecond.toInt())
+      assertThat(jsonWebToken.decodedPayloadJson?.iat).isEqualTo(jsonWebToken.issuedAtTime.epochSecond.toInt())
+      assertThat(jsonWebToken.decodedPayloadJson?.exp).isEqualTo(jsonWebToken.expirationTime.epochSecond.toInt())
     }
   }
 }

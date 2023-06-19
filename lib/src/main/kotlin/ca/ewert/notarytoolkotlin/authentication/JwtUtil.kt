@@ -83,7 +83,7 @@ fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path,
  * `Authorization: Bearer <json web token>`
  */
 fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
-                 issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String? {
+                 issuedDate: Instant, expiryDate: Instant): String? {
   val ecPrivateKey = createPrivateKey(privateKeyFile)
   val algorithm = Algorithm.ECDSA256(ecPrivateKey)
   val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
@@ -92,8 +92,8 @@ fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
     val renderedToken: String = com.auth0.jwt.JWT.create()
       .withIssuer(issuerId)
       .withKeyId(privateKeyId)
-      .withIssuedAt(issuedDate.toInstant())
-      .withExpiresAt(expiryDate.toInstant())
+      .withIssuedAt(issuedDate)
+      .withExpiresAt(expiryDate)
       .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
       .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
       .sign(algorithm)

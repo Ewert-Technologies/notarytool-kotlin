@@ -82,8 +82,8 @@ class JwtUtilTests {
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile!!,
-      issuedDate,
-      expiryDate
+      issuedDate.toInstant(),
+      expiryDate.toInstant()
     )
 
     log.info { "Rendered JWT: $renderedJwt" }
@@ -95,7 +95,7 @@ class JwtUtilTests {
 
 
     assertAll {
-      assertThat(renderedJwt!!).isNotEmpty()
+      assertThat(renderedJwt).isNotEmpty()
       assertThat(jwtParts).hasSize(3)
 
       val expectedHeader = """

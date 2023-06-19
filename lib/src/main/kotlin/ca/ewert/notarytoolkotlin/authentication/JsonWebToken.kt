@@ -9,6 +9,8 @@ import mu.KotlinLogging
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.time.Duration
+import java.time.Instant
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
@@ -28,7 +30,7 @@ private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
  *
  * @property privateKeyId Apple private key ID
  * @property issuerId Apple Issuer ID
- * @property privateKeyFile Private Key file `.p8' provided by Apple
+ * @property privateKeyFile Private Key file `.p8` provided by Apple
  * @property tokenLifetime Lifetime of the token, should be less than 20 minutes
  *
  * @author vewert
@@ -49,13 +51,13 @@ class JsonWebToken internal constructor(
   /**
    * The issued at Timestamp, set to current time during initialization
    */
-  internal lateinit var issuedAtTime: ZonedDateTime
+  internal lateinit var issuedAtTime: Instant
     private set
 
   /**
    * The expiration Timestamp
    */
-  internal lateinit var expirationTime: ZonedDateTime
+  internal lateinit var expirationTime: Instant
     private set
 
   /**
@@ -64,8 +66,8 @@ class JsonWebToken internal constructor(
   internal val isExpired: Boolean
     get() {
       log.info { "Now: ${ZonedDateTime.now()}" }
-      log.info { "Expiration Date: $expirationTime" }
-      return ZonedDateTime.now().isAfter(expirationTime)
+      log.info { "Expiration Date: ${expirationTime.atZone(ZoneId.systemDefault())}" }
+      return Instant.now().isAfter(expirationTime)
     }
 
   /**
@@ -125,7 +127,7 @@ class JsonWebToken internal constructor(
    * the token.
    */
   internal fun updateWebToken() {
-    issuedAtTime = ZonedDateTime.now()
+    issuedAtTime = Instant.now()
     expirationTime = issuedAtTime.plus(tokenLifetime)
     generateWebToken()
   }
