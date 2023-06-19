@@ -25,19 +25,23 @@ private val log = KotlinLogging.logger {}
  * Unit Tests for [SubmissionResponse]
  * @author vewert
  */
-class SubmissionResponseTests {
+class SubmissionResponseTests () {
+  private var mockWebServer: MockWebServer
+  init {
+    mockWebServer = MockWebServer()
+  }
 
-  private var mockWebServer: MockWebServer? = null
+
 
   @BeforeEach
   fun setup() {
     mockWebServer = MockWebServer()
-    mockWebServer!!.protocols = listOf(Protocol.HTTP_1_1, Protocol.HTTP_2)
+    mockWebServer.protocols = listOf(Protocol.HTTP_1_1, Protocol.HTTP_2)
   }
 
   @AfterEach
   fun tearDown() {
-    mockWebServer?.shutdown()
+    mockWebServer.shutdown()
   }
 
   @Test
@@ -59,10 +63,10 @@ class SubmissionResponseTests {
     }
     """.trimIndent()
 
-    mockWebServer?.enqueue(createMockResponse(body))
+    mockWebServer.enqueue(createMockResponse(body))
 
-    mockWebServer?.start()
-    val baseUrl: HttpUrl = mockWebServer!!.url("/notary/v2/submissions")
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("/notary/v2/submissions")
 
     val request = Request.Builder()
       .url(baseUrl)
@@ -102,10 +106,10 @@ class SubmissionResponseTests {
     }
     """.trimIndent()
 
-    mockWebServer?.enqueue(createMockResponse(body))
+    mockWebServer.enqueue(createMockResponse(body))
 
-    mockWebServer?.start()
-    val baseUrl: HttpUrl = mockWebServer!!.url("/notary/v2/submissions")
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("/notary/v2/submissions")
 
     val request = Request.Builder()
       .url(baseUrl)
@@ -147,7 +151,7 @@ class SubmissionResponseTests {
           assertThat(submissionResponse.responseMetaData.contentLength).isEqualTo(submissionResponse.responseMetaData.rawContents?.length?.toLong())
 
 
-          val recordedRequest: RecordedRequest = mockWebServer!!.takeRequest()
+          val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
           log.info { "Recorded Request: $recordedRequest" }
           log.info { "Recorded Request Headers: ${recordedRequest.headers}" }
           log.info { "Recorded Request User-Agent ${recordedRequest.getHeader("User-Agent")}"}
