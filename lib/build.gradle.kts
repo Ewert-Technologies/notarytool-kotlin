@@ -25,7 +25,7 @@ plugins {
   idea
   `java-library`
   id("org.jetbrains.kotlin.jvm") version "1.8.21"
-  id("com.github.ben-manes.versions") version "0.46.0"
+  id("com.github.ben-manes.versions") version "0.47.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
 }
 
@@ -37,25 +37,24 @@ repositories {
 // Library Dependencies
 dependencies {
 
-  // These dependencies are exported to consumers, that is to say found on their compile classpath.
-//  api("org.apache.commons:commons-math3:3.6.1")
+  val moshiVersion = "1.15.0"
 
-  api(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
+  // These dependencies are exported to consumers, that is to say found on their compile classpath.
+  api(group = "io.arrow-kt", name = "arrow-core", version = "1.2.0")
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
-//  implementation("com.google.guava:guava:31.1-jre")
 
   // Other
+  implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
   implementation(group = "io.github.nefilim.kjwt", name="kJWT", version="0.1.6")
-  implementation(group = "io.arrow-kt", name = "arrow-core", version = "1.1.5")
   implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
-  implementation(group = "com.squareup.moshi", name = "moshi", version = "1.14.0")
-  implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = "1.14.0")
-  implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = "1.14.0")
+  implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
+  implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
+  implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
 
   // Logging
   implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
-  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.7")
+  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
 
 
   // Testing
