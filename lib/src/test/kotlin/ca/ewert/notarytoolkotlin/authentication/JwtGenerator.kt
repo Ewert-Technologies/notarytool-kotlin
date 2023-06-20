@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Duration
 import java.time.Instant
-import java.time.ZonedDateTime
 
 /** Logging Object */
 private val log = KotlinLogging.logger {}
@@ -35,7 +34,7 @@ class JwtGenerator {
     assertThat(privateKeyFile).isNotNull()
 
     if (privateKeyFile != null) {
-      val jwtString = generateJwt2(
+      val jwtString = generateJwt(
         keyId,
         issuerId,
         privateKeyFile,

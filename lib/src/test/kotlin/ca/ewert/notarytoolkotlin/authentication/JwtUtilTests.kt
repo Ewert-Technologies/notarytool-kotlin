@@ -1,22 +1,24 @@
 package ca.ewert.notarytoolkotlin.authentication
 
+import arrow.core.getOrElse
 import assertk.assertAll
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
+import ca.ewert.notarytoolkotlin.isLeft
 import ca.ewert.notarytoolkotlin.resourceToPath
+import ca.ewert.notarytoolkotlin.isRight
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.time.Duration
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.Base64
+import java.util.*
 
 private val log = KotlinLogging.logger {}
 
@@ -34,51 +36,13 @@ class JwtUtilTests {
   @Test
   fun generateJwtTest1() {
     val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
-    assertThat(privateKeyFile).isNotNull()
-
-    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
-    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
-
-    val renderedJwt: String = generateJwt(
-      privateKeyId = "ABCDE12345",
-      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
-      issuedDate,
-      expiryDate
-    )
-
-    log.info { "Rendered JWT: $renderedJwt" }
-    val jwtParts: List<String> = renderedJwt.split(".")
-
-    assertAll {
-      assertThat(renderedJwt).isNotEmpty()
-      assertThat(jwtParts).hasSize(3)
-
-      val expectedHeader = """
-      {"alg":"ES256","typ":"JWT","kid":"ABCDE12345"}
-      """
-      assertThat(String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)).isEqualTo(expectedHeader.trim())
-
-      val expectedPayload = """
-      {"iss":"70c5de5f-f737-47e2-e043-5b8c7c22a4d9","iat":1686651900,"exp":1686652800,"aud":"appstoreconnect-v1"}
-      """
-      assertThat(String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)).isEqualTo(expectedPayload.trim())
-    }
-  }
-
-  /**
-   * Tests creating a rendered JWT String, which can be used when making api requests.
-   */
-  @Test
-  fun generateJwtTest2() {
-    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
 
     assertThat(privateKeyFile).isNotNull()
 
     val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
     val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
 
-    val renderedJwt: String? = generateJwt2(
+    val result = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile!!,
@@ -86,16 +50,25 @@ class JwtUtilTests {
       expiryDate.toInstant()
     )
 
+    assertThat(result).isRight()
+
+    val renderedJwt: String = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant()
+    ).getOrElse { "" }
+
     log.info { "Rendered JWT: $renderedJwt" }
 
     assertThat(renderedJwt).isNotNull()
+    assertThat(renderedJwt).isNotEmpty()
 
 
-    val jwtParts: List<String> = renderedJwt!!.split(".")
-
-
+    val jwtParts: List<String> = renderedJwt.split(".")
     assertAll {
-      assertThat(renderedJwt).isNotEmpty()
+
       assertThat(jwtParts).hasSize(3)
 
       val expectedHeader = """

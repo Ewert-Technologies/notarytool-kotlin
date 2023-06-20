@@ -1,10 +1,13 @@
 package ca.ewert.notarytoolkotlin.authentication
 
 import arrow.core.Either
+import arrow.core.left
+import arrow.core.raise.either
+import arrow.core.raise.ensure
+import arrow.core.right
+import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.JWTVerificationException
-import io.github.nefilim.kjwt.JWT
-import io.github.nefilim.kjwt.sign
+import com.auth0.jwt.exceptions.JWTCreationException
 import mu.KLogger
 import mu.KotlinLogging
 import java.nio.file.Path
@@ -12,12 +15,11 @@ import java.security.KeyFactory
 import java.security.interfaces.ECPrivateKey
 import java.security.spec.EncodedKeySpec
 import java.security.spec.PKCS8EncodedKeySpec
-import java.time.Duration
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
 import java.util.*
+import kotlin.io.path.absolutePathString
+import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
 /** Logger Object **/
@@ -54,37 +56,18 @@ enum class Scope(val scopeValue: String) {
   }
 }
 
-
 /**
  * Generates a Json Web Token [https://jwt.io/] suitable to add to the Header when sending a request
  * to Apple's Notary Web API. The token String is included in the request Header as:
  * `Authorization: Bearer <json web token>`
+ *
+ * @return Either the Json Web Token String, or [JsonWebTokenError] containing an error message
  */
-fun generateJwt(privateKeyId: String, issuerId: String, privateKeyFile: Path,
-                issuedDate: ZonedDateTime, expiryDate: ZonedDateTime): String {
-  val jwt = JWT.es256(privateKeyId) {
-    issuer(issuerId)
-    issuedAt(LocalDateTime.ofInstant(issuedDate.toInstant(), ZONE_UTC))
-    expiresAt(LocalDateTime.ofInstant(expiryDate.toInstant(), ZONE_UTC))
-    claim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
-  }
-
-  val ecPrivateKey = createPrivateKey(privateKeyFile)
-
-  return when (val result = jwt.sign(ecPrivateKey)) {
-    is Either.Left -> result.value.toString()
-    is Either.Right -> result.value.rendered
-  }
-}
-
-/**
- * Generates a Json Web Token [https://jwt.io/] suitable to add to the Header when sending a request
- * to Apple's Notary Web API. The token String is included in the request Header as:
- * `Authorization: Bearer <json web token>`
- */
-fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
-                 issuedDate: Instant, expiryDate: Instant): String? {
-  val ecPrivateKey = createPrivateKey(privateKeyFile)
+fun generateJwt(
+  privateKeyId: String, issuerId: String, privateKeyFile: Path,
+  issuedDate: Instant, expiryDate: Instant
+): Either<JsonWebTokenError, String> = either {
+  val ecPrivateKey = createPrivateKey(privateKeyFile).bind()
   val algorithm = Algorithm.ECDSA256(ecPrivateKey)
   val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
 
@@ -97,10 +80,13 @@ fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
       .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
       .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
       .sign(algorithm)
-    renderedToken
-  } catch (jWTVerificationException: JWTVerificationException) {
-    log.warn("Error creating JWT", jWTVerificationException)
-    null //TODO Better handle Error/Exception
+    renderedToken.right()
+  } catch (illegalArgumentException: IllegalArgumentException) {
+    log.warn("Error creating JWT", illegalArgumentException)
+    JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null").left()
+  } catch (jwtCreationException: JWTCreationException) {
+    log.warn("Error creating JWT", jwtCreationException)
+    JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}").left()
   }
 }
 
@@ -111,11 +97,12 @@ fun generateJwt2(privateKeyId: String, issuerId: String, privateKeyFile: Path,
  * a [KeyFactory] to generate the Private Key, using the *"EC"* algorithm.
  *
  * @param privateKeyFile A Private Key file (`.p8`), provided by Apple
- * @return The generated Private Key, suitable for signing the JWT.
+ * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFound]
  */
-internal fun createPrivateKey(privateKeyFile: Path): ECPrivateKey {
+internal fun createPrivateKey(privateKeyFile: Path): Either<JsonWebTokenError, ECPrivateKey> = either {
+  ensure(privateKeyFile.exists()) { JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}'  does not exist") }
   val privateKeyString = parsePrivateKeyString(privateKeyFile = privateKeyFile)
-  return createPrivateKey(privateKeyString)
+  createPrivateKey(privateKeyString)
 }
 
 /**
