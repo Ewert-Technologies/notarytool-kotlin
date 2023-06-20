@@ -40,7 +40,7 @@ dependencies {
   val moshiVersion = "1.15.0"
 
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
-  api(group = "io.arrow-kt", name = "arrow-core", version = "1.2.0")
+  api(group = "io.arrow-kt", name = "arrow-core", version = "1.2.0-RC")
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 
