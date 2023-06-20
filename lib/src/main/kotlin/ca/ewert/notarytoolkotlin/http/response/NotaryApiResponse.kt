@@ -1,11 +1,14 @@
 package ca.ewert.notarytoolkotlin.http.response
 
-import okhttp3.Headers
+
+import mu.KotlinLogging
 import okhttp3.MediaType
 import okhttp3.Response
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
+
+private val log = KotlinLogging.logger {}
 
 /**
  * Super class for all Notary Api Response Classes
@@ -56,6 +59,7 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
     val rawContents: String?
 
     init {
+      log.info { "Inside init" }
       httpStatusCode = response.code
       httpStatusMessage = response.message
       httpStatusString = "$httpStatusCode - $httpStatusMessage"
