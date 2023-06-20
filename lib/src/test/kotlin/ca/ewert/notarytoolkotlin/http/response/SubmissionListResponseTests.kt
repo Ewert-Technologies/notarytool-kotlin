@@ -163,10 +163,6 @@ class SubmissionListResponseTests {
           assertThat(submissionListResponse.submissionInfo[1].name).isEqualTo("OvernightTextEditor_11.6.7.zip")
           assertThat(submissionListResponse.submissionInfo[1].status).isEqualTo(SubmissionStatus.ACCEPTED)
         }
-
-
-
-
       } else {
         log.warn { "Request was not successful: $request" }
       }
