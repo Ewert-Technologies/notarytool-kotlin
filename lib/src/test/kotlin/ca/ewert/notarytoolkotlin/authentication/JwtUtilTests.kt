@@ -3,13 +3,11 @@ package ca.ewert.notarytoolkotlin.authentication
 import arrow.core.getOrElse
 import assertk.assertAll
 import assertk.assertThat
-import assertk.assertions.hasSize
-import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEmpty
-import assertk.assertions.isNotNull
-import ca.ewert.notarytoolkotlin.isLeft
+import assertk.assertions.*
+import ca.ewert.notarytoolkotlin.*
 import ca.ewert.notarytoolkotlin.resourceToPath
-import ca.ewert.notarytoolkotlin.isRight
+import com.github.michaelbull.result.getOr
+import com.github.michaelbull.result.unwrap
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -50,7 +48,10 @@ class JwtUtilTests {
       expiryDate.toInstant()
     )
 
-    assertThat(result).isRight()
+    assertThat(result.unwrap()).isInstanceOf<String>()
+    assertThat(result).isOk()
+    assertThat(result).isOkAnd().isEmpty()
+    assertThat(result).isErr()
 
     val renderedJwt: String = generateJwt(
       privateKeyId = "ABCDE12345",
@@ -58,7 +59,7 @@ class JwtUtilTests {
       privateKeyFile = privateKeyFile!!,
       issuedDate.toInstant(),
       expiryDate.toInstant()
-    ).getOrElse { "" }
+    ).getOr("")
 
     log.info { "Rendered JWT: $renderedJwt" }
 

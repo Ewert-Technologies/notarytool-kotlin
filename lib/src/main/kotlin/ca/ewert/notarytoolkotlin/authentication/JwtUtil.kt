@@ -1,13 +1,9 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import arrow.core.Either
-import arrow.core.left
-import arrow.core.raise.either
-import arrow.core.raise.ensure
-import arrow.core.right
 import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
+import com.github.michaelbull.result.*
 import mu.KLogger
 import mu.KotlinLogging
 import java.nio.file.Path
@@ -66,28 +62,85 @@ enum class Scope(val scopeValue: String) {
 fun generateJwt(
   privateKeyId: String, issuerId: String, privateKeyFile: Path,
   issuedDate: Instant, expiryDate: Instant
-): Either<JsonWebTokenError, String> = either {
-  val ecPrivateKey = createPrivateKey(privateKeyFile).bind()
-  val algorithm = Algorithm.ECDSA256(ecPrivateKey)
-  val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
+): Result<String, JsonWebTokenError> {
 
-  return try {
-    val renderedToken: String = com.auth0.jwt.JWT.create()
-      .withIssuer(issuerId)
-      .withKeyId(privateKeyId)
-      .withIssuedAt(issuedDate)
-      .withExpiresAt(expiryDate)
-      .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
-      .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
-      .sign(algorithm)
-    renderedToken.right()
-  } catch (illegalArgumentException: IllegalArgumentException) {
-    log.warn("Error creating JWT", illegalArgumentException)
-    JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null").left()
-  } catch (jwtCreationException: JWTCreationException) {
-    log.warn("Error creating JWT", jwtCreationException)
-    JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}").left()
+  val res = createPrivateKey(privateKeyFile)
+  return res.flatMap {
+    val algorithm = Algorithm.ECDSA256(it)
+    val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
+    try {
+      val renderedToken: String = com.auth0.jwt.JWT.create()
+        .withIssuer(issuerId)
+        .withKeyId(privateKeyId)
+        .withIssuedAt(issuedDate)
+        .withExpiresAt(expiryDate)
+        .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
+        .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
+        .sign(algorithm)
+      Ok(renderedToken)
+    } catch (illegalArgumentException: IllegalArgumentException) {
+      log.warn("Error creating JWT", illegalArgumentException)
+      Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
+    } catch (jwtCreationException: JWTCreationException) {
+      log.warn("Error creating JWT", jwtCreationException)
+      Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
+    }
   }
+
+
+//  val res = createPrivateKey(privateKeyFile)
+
+//  createPrivateKey(privateKeyFile).mapEither(
+//    { ecPrivateKey ->
+//      {
+//        val algorithm = Algorithm.ECDSA256(ecPrivateKey)
+//        val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
+//        try {
+//          val renderedToken: String = com.auth0.jwt.JWT.create()
+//            .withIssuer(issuerId)
+//            .withKeyId(privateKeyId)
+//            .withIssuedAt(issuedDate)
+//            .withExpiresAt(expiryDate)
+//            .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
+//            .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
+//            .sign(algorithm)
+//          Ok(renderedToken)
+//        } catch (illegalArgumentException: IllegalArgumentException) {
+//          log.warn("Error creating JWT", illegalArgumentException)
+//          Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
+//        } catch (jwtCreationException: JWTCreationException) {
+//          log.warn("Error creating JWT", jwtCreationException)
+//          Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
+//        }
+//      }
+//    },
+//    { jsonWebTokenError -> Err(jsonWebTokenError) }
+//  )
+
+//  return when (val privateKeyResult = createPrivateKey(privateKeyFile)) {
+//    is Ok -> {
+//      val algorithm = Algorithm.ECDSA256(privateKeyResult.value)
+//      val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
+//      try {
+//        val renderedToken: String = com.auth0.jwt.JWT.create()
+//          .withIssuer(issuerId)
+//          .withKeyId(privateKeyId)
+//          .withIssuedAt(issuedDate)
+//          .withExpiresAt(expiryDate)
+//          .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
+//          .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
+//          .sign(algorithm)
+//        Ok(renderedToken)
+//      } catch (illegalArgumentException: IllegalArgumentException) {
+//        log.warn("Error creating JWT", illegalArgumentException)
+//        Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
+//      } catch (jwtCreationException: JWTCreationException) {
+//        log.warn("Error creating JWT", jwtCreationException)
+//        Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
+//      }
+//    }
+//    is Err -> privateKeyResult
+//  }
 }
 
 /**
@@ -99,11 +152,15 @@ fun generateJwt(
  * @param privateKeyFile A Private Key file (`.p8`), provided by Apple
  * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFound]
  */
-internal fun createPrivateKey(privateKeyFile: Path): Either<JsonWebTokenError, ECPrivateKey> = either {
-  ensure(privateKeyFile.exists()) { JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}'  does not exist") }
-  val privateKeyString = parsePrivateKeyString(privateKeyFile = privateKeyFile)
-  createPrivateKey(privateKeyString)
+internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWebTokenError> {
+  return if (privateKeyFile.exists()) {
+    val privateKeyString = parsePrivateKeyString(privateKeyFile = privateKeyFile)
+    Ok(createPrivateKey(privateKeyString))
+  } else {
+    Err(JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
+  }
 }
+
 
 /**
  * Parses out the Private Key String, from a `.p8` file passed in. It strips off the

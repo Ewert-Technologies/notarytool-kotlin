@@ -3,6 +3,8 @@ package ca.ewert.notarytoolkotlin.authentication
 import arrow.core.getOrElse
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtHeaderJson
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtPayloadJson
+import com.github.michaelbull.result.getOr
+import com.github.michaelbull.result.getOrElse
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -120,7 +122,7 @@ class JsonWebToken internal constructor(
    * Generates the Web Token and stores it as a String.
    */
   private fun generateWebToken() {
-    jwtEncodedString = generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).getOrElse { "" } //FIXME
+    jwtEncodedString = generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).getOrElse{ "" } //FIXME
   }
 
   /**
