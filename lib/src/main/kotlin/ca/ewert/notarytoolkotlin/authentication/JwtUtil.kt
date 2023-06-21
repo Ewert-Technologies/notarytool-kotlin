@@ -12,7 +12,6 @@ import java.security.interfaces.ECPrivateKey
 import java.security.spec.EncodedKeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Instant
-import java.time.ZoneId
 import java.util.*
 import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
@@ -30,9 +29,6 @@ private const val AUDIENCE_CLAIM_VALUE: String = "appstoreconnect-v1"
 
 /** Constant for the `scope` claim name in the JWT */
 private const val SCOPE_CLAIM_NAME: String = "scope"
-
-/** Constant for the UTC Time Zone */
-private val ZONE_UTC: ZoneId = ZoneId.of("UTC")
 
 /**
  * Enum of possible scope values
@@ -97,12 +93,8 @@ fun generateJwt(
  * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFound]
  */
 internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWebTokenError> {
-  return if (privateKeyFile.exists()) {
-    val privateKeyString = parsePrivateKeyString(privateKeyFile = privateKeyFile)
-    Ok(createPrivateKey(privateKeyString))
-  } else {
-    Err(JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
-  }
+  val privateKeyStringResult = parsePrivateKeyString(privateKeyFile = privateKeyFile)
+  return privateKeyStringResult.map { privateKeyString: String -> createPrivateKey(privateKeyString) }
 }
 
 
@@ -110,12 +102,15 @@ internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWe
  * Parses out the Private Key String, from a `.p8` file passed in. It strips off the
  * `"-----BEGIN PRIVATE KEY-----"` and `"-----END PRIVATE KEY-----"` from the beginning and end,
  * and returns Private Key section, with line endings removed.
- *
  * @param privateKeyFile A Private Key file (`.p8`), provided by Apple
+ * @return The Private Key [String] or a [JsonWebTokenError.PrivateKeyNotFound]
  */
-internal fun parsePrivateKeyString(privateKeyFile: Path): String {
-  return privateKeyFile.useLines { lines ->
-    lines.filter { !it.matches(Regex("-*\\w+ PRIVATE KEY-*")) }.joinToString(separator = "")
+internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWebTokenError> {
+  return if (privateKeyFile.exists()) {
+    Ok(privateKeyFile.useLines { lines ->
+      lines.filter { !it.matches(Regex("-*\\w+ PRIVATE KEY-*")) }.joinToString(separator = "")})
+  } else {
+    Err(JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
   }
 }
 

@@ -1,13 +1,17 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import arrow.core.getOrElse
-import assertk.assertAll
 import assertk.assertThat
-import assertk.assertions.*
-import ca.ewert.notarytoolkotlin.*
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotNull
+import assertk.fail
+import ca.ewert.notarytoolkotlin.hasMessage
+import ca.ewert.notarytoolkotlin.isErrAnd
+import ca.ewert.notarytoolkotlin.isOkAnd
 import ca.ewert.notarytoolkotlin.resourceToPath
-import com.github.michaelbull.result.getOr
-import com.github.michaelbull.result.unwrap
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -40,7 +44,7 @@ class JwtUtilTests {
     val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
     val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
 
-    val result = generateJwt(
+    val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile!!,
@@ -48,39 +52,111 @@ class JwtUtilTests {
       expiryDate.toInstant()
     )
 
-    assertThat(result.unwrap()).isInstanceOf<String>()
-    assertThat(result).isOk()
-    assertThat(result).isOkAnd().isEmpty()
-    assertThat(result).isErr()
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      fail(AssertionError("Generating Web Token failed: ${jsonWebTokenError.msg}"))
+    }
 
-    val renderedJwt: String = generateJwt(
-      privateKeyId = "ABCDE12345",
-      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
-      issuedDate.toInstant(),
-      expiryDate.toInstant()
-    ).getOr("")
+    generateJwtResult.onSuccess { renderedJwt ->
+      assertThat(renderedJwt).isNotEmpty()
 
-    log.info { "Rendered JWT: $renderedJwt" }
+      log.info { "Rendered JWT: $renderedJwt" }
 
-    assertThat(renderedJwt).isNotNull()
-    assertThat(renderedJwt).isNotEmpty()
-
-
-    val jwtParts: List<String> = renderedJwt.split(".")
-    assertAll {
-
+      val jwtParts: List<String> = renderedJwt.split(".")
       assertThat(jwtParts).hasSize(3)
 
       val expectedHeader = """
       {"kid":"ABCDE12345","alg":"ES256","typ":"JWT"}
-      """
-      assertThat(String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)).isEqualTo(expectedHeader.trim())
+      """.trim()
+      assertThat(
+        String(
+          Base64.getDecoder().decode(jwtParts[0]),
+          StandardCharsets.UTF_8
+        )
+      ).isEqualTo(expectedHeader.trim())
 
       val expectedPayload = """
       {"iss":"70c5de5f-f737-47e2-e043-5b8c7c22a4d9","iat":1686651900,"exp":1686652800,"aud":"appstoreconnect-v1","scope":["GET /notary/v2/submissions"]}
-      """
-      assertThat(String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)).isEqualTo(expectedPayload.trim())
+      """.trim()
+      assertThat(
+        String(
+          Base64.getDecoder().decode(jwtParts[1]),
+          StandardCharsets.UTF_8
+        )
+      ).isEqualTo(expectedPayload.trim())
+    }
+  }
+
+  /**
+   * Tests attempting to create a rendered JWT String, with a Private Key file, that doesn't exist
+   */
+  @Test
+  fun generateJwtTest2() {
+    val privateKeyFile: Path = Paths.get("notExist.file")
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile,
+      issuedDate.toInstant(),
+      expiryDate.toInstant()
+    )
+
+    val expectedMsg =
+      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist"
+    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+  }
+
+  /**
+   * Tests attempting to create a rendered JWT String, where the privateKeyId and issuerId are empty. The rendered String
+   * should create successfully, but wouldn't actually be successful.
+   */
+  @Test
+  fun generateJwtTest3() {
+    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "",
+      issuerId = "",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant()
+    )
+
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      fail(AssertionError("Generating Web Token failed: ${jsonWebTokenError.msg}"))
+    }
+
+    generateJwtResult.onSuccess { renderedJwt ->
+      assertThat(renderedJwt).isNotEmpty()
+      val jwtParts: List<String> = renderedJwt.split(".")
+      assertThat(jwtParts).hasSize(3)
+
+      val expectedHeader = """
+      {"kid":"","alg":"ES256","typ":"JWT"}
+      """.trim()
+      assertThat(
+        String(
+          Base64.getDecoder().decode(jwtParts[0]),
+          StandardCharsets.UTF_8
+        )
+      ).isEqualTo(expectedHeader.trim())
+
+      val expectedPayload = """
+      {"iss":"","iat":1686651900,"exp":1686652800,"aud":"appstoreconnect-v1","scope":["GET /notary/v2/submissions"]}
+      """.trim()
+      assertThat(
+        String(
+          Base64.getDecoder().decode(jwtParts[1]),
+          StandardCharsets.UTF_8
+        )
+      ).isEqualTo(expectedPayload.trim())
     }
   }
 
@@ -90,12 +166,12 @@ class JwtUtilTests {
    */
   @Test
   fun parsePrivateKeyFromFileTest1() {
-    val expectedPrivateKeyString = "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
+    val expectedPrivateKeyString =
+      "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
     val privateKeyFile = this::class.java.getResource("/privateKey1.p8")?.toURI()?.let { Paths.get(it) }
     assertThat(privateKeyFile).isNotNull()
     if (privateKeyFile != null) {
-      val privateKeyString = parsePrivateKeyString(privateKeyFile)
-      assertThat(privateKeyString).isEqualTo(expectedPrivateKeyString)
+      assertThat(parsePrivateKeyString(privateKeyFile)).isOkAnd().isEqualTo(expectedPrivateKeyString)
     }
   }
 
@@ -105,12 +181,12 @@ class JwtUtilTests {
    */
   @Test
   fun parsePrivateKeyFromFileTest2() {
-    val expectedPrivateKeyString = "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
+    val expectedPrivateKeyString =
+      "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
     val privateKeyFile = this::class.java.getResource("/privateKey2.p8")?.toURI()?.let { Paths.get(it) }
     assertThat(privateKeyFile).isNotNull()
     if (privateKeyFile != null) {
-      val privateKeyString = parsePrivateKeyString(privateKeyFile)
-      assertThat(privateKeyString).isEqualTo(expectedPrivateKeyString)
+      assertThat(parsePrivateKeyString(privateKeyFile)).isOkAnd().isEqualTo(expectedPrivateKeyString)
     }
   }
 
@@ -121,12 +197,23 @@ class JwtUtilTests {
    */
   @Test
   fun parsePrivateKeyFromFileTest3() {
-    val expectedPrivateKeyString = "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
+    val expectedPrivateKeyString =
+      "UmhvbmN1cyBuYXRvcXVlIGNvbW1vZG8gc29kYWxlcyBoZW5kcmVyaXQgcXVhbS4VyB2YXJpdXMgZmFjaWxpc2lzIG5vbiBsb3JlbS4gVmVsIGludGVyZHVtIHZlbCB0GVsZXJpc3F1ZSBpYWN1bGlzIGFlbmVhbiBtYXVyaXMgdml0YWUuIERpY3R1bSBhbE1cy4gVGF"
     val privateKeyFile = this::class.java.getResource("/privateKey3.p8")?.toURI()?.let { Paths.get(it) }
     assertThat(privateKeyFile).isNotNull()
     if (privateKeyFile != null) {
-      val privateKeyString = parsePrivateKeyString(privateKeyFile)
-      assertThat(privateKeyString).isEqualTo(expectedPrivateKeyString)
+      assertThat(parsePrivateKeyString(privateKeyFile)).isOkAnd().isEqualTo(expectedPrivateKeyString)
     }
+  }
+
+  /**
+   * Tests passing in a file, that doesn't exist. Verifies that an Error result is returned.
+   */
+  @Test
+  fun parsePrivateKeyFromFileTest4() {
+    val expectedMsg =
+      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist"
+    val privateKeyFile = Paths.get("./noFile.file")
+    assertThat(parsePrivateKeyString(privateKeyFile)).isErrAnd().hasMessage(expectedMsg)
   }
 }
