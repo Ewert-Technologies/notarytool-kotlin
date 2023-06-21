@@ -41,6 +41,7 @@ dependencies {
 
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
   api(group = "io.arrow-kt", name = "arrow-core", version = "1.2.0-RC")
+  api(group = "com.michael-bull.kotlin-result", name = "kotlin-result", version = "1.1.18")
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 
