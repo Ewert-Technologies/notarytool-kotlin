@@ -1,10 +1,10 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import arrow.core.getOrElse
+import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtHeaderJson
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtPayloadJson
-import com.github.michaelbull.result.getOr
-import com.github.michaelbull.result.getOrElse
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,6 +15,7 @@ import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 
@@ -38,30 +39,68 @@ private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
  *
  * @author vewert
  */
-class JsonWebToken internal constructor(
-  private val privateKeyId: String, private val issuerId: String,
+class JsonWebToken private constructor(
+  private val privateKeyId: String,
+  private val issuerId: String,
   private val privateKeyFile: Path,
-  private val tokenLifetime: Duration = Duration.ofMinutes(15)
+  private val tokenLifetime: Duration = Duration.ofMinutes(15),
+  issuedAtTimeParam: Instant,
+  expirationTimeParam: Instant,
+  signedTokenParam: String
 ) {
 
-  /**
-   * The JSON Web Token as an encoding String, suitable for use with the Apple Notary API
-   */
-  internal var jwtEncodedString: String? = null
-    private set
-
+  companion object {
+    fun create(
+      privateKeyId: String,
+      issuerId: String,
+      privateKeyFile: Path,
+      tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES)
+    ): Result<JsonWebToken, JsonWebTokenError> {
+      return generateJwt(
+        privateKeyId,
+        issuerId,
+        privateKeyFile,
+        Instant.now(),
+        Instant.now().plus(tokenLifetime)
+      ).map { jwtString ->
+        JsonWebToken(
+          privateKeyId,
+          issuerId,
+          privateKeyFile,
+          tokenLifetime,
+          Instant.now(),
+          Instant.now().plus(tokenLifetime),
+          jwtString
+        )
+      }
+    }
+  }
 
   /**
    * The issued at Timestamp, set to current time during initialization
    */
-  internal lateinit var issuedAtTime: Instant
+  internal var issuedAtTime: Instant
     private set
 
   /**
-   * The expiration Timestamp
+   * The expiration Timestamp, based on the [issuedAtTime] and [tokenLifetime]
    */
-  internal lateinit var expirationTime: Instant
+  internal var expirationTime: Instant
     private set
+
+  /**
+   * The signed JSON Web Token as an encoding String, suitable for use with the Apple Notary API
+   */
+  internal var signedToken: String
+    private set
+
+  init {
+    issuedAtTime = issuedAtTimeParam
+    log.info { "Issued: $issuedAtTime" }
+    expirationTime = expirationTimeParam
+    log.info { "Expiry: $expirationTime" }
+    signedToken = signedTokenParam
+  }
 
   /**
    * Checks if the current Web Token is expired
@@ -78,15 +117,11 @@ class JsonWebToken internal constructor(
    */
   internal val decodedHeaderJson: JwtHeaderJson?
     get() {
-      return if (jwtEncodedString != null) {
-        val jwtParts = jwtEncodedString!!.split(".")
-        if (jwtParts.size == 3) {
-          val jsonString = String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)
-          val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter(JwtHeaderJson::class.java)
-          jsonAdapter.fromJson(jsonString)
-        } else {
-          null
-        }
+      val jwtParts = signedToken.split(".")
+      return if (jwtParts.size == 3) {
+        val jsonString = String(Base64.getDecoder().decode(jwtParts[0]), StandardCharsets.UTF_8)
+        val jsonAdapter: JsonAdapter<JwtHeaderJson> = moshi.adapter(JwtHeaderJson::class.java)
+        jsonAdapter.fromJson(jsonString)
       } else {
         null
       }
@@ -97,42 +132,29 @@ class JsonWebToken internal constructor(
    */
   internal val decodedPayloadJson: JwtPayloadJson?
     get() {
-      return if (jwtEncodedString != null) {
-        val jwtParts = jwtEncodedString!!.split(".")
-        if (jwtParts.size == 3) {
-          val jsonString = String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)
-          val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter(JwtPayloadJson::class.java)
-          jsonAdapter.fromJson(jsonString)
-        } else {
-          null
-        }
+      val jwtParts = signedToken.split(".")
+      return if (jwtParts.size == 3) {
+        val jsonString = String(Base64.getDecoder().decode(jwtParts[1]), StandardCharsets.UTF_8)
+        val jsonAdapter: JsonAdapter<JwtPayloadJson> = moshi.adapter(JwtPayloadJson::class.java)
+        jsonAdapter.fromJson(jsonString)
       } else {
         null
       }
     }
 
   /**
-   * Initializes a JsonWebToken object.
-   */
-  init {
-    updateWebToken()
-  }
-
-  /**
-   * Generates the Web Token and stores it as a String.
-   */
-  private fun generateWebToken() {
-    jwtEncodedString = generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).getOrElse{ "" } //FIXME
-  }
-
-  /**
-   * Updates the Web Token, by updated the issuedTime and expiryTime and then re-generating
+   * Updates the Web Token by updating the issuedTime and expiryTime and then re-generating
    * the token.
+   *
+   * @return Returns the value of the updated token String if successful or an [JsonWebTokenError]
    */
-  internal fun updateWebToken() {
+  internal fun updateWebToken(): Result<String, JsonWebTokenError> {
     issuedAtTime = Instant.now()
     expirationTime = issuedAtTime.plus(tokenLifetime)
-    generateWebToken()
+    return generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).map { jwtString ->
+      signedToken = jwtString
+      jwtString
+    }
   }
 
   /**

@@ -1,10 +1,11 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import assertk.assertAll
 import assertk.assertThat
 import assertk.assertions.*
 import ca.ewert.notarytoolkotlin.isCloseTo
+import ca.ewert.notarytoolkotlin.isOk
 import ca.ewert.notarytoolkotlin.resourceToPath
+import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -47,18 +48,17 @@ class JsonWebTokenTest {
 
     assertThat(privateKeyFile).isNotNull()
 
-    val tokenLifetime: Duration = Duration.ofMinutes(1)
+    val tokenLifetime: Duration = Duration.ofMinutes(5)
 
-    val jsonWebToken = JsonWebToken(
+    val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
       tokenLifetime = tokenLifetime
     )
+    assertThat(jsonWebTokenResult).isOk()
 
-    assertThat(jsonWebToken.jwtEncodedString).isNotNull()
-
-    assertAll {
+    jsonWebTokenResult.onSuccess { jsonWebToken ->
       assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
 
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
@@ -66,35 +66,29 @@ class JsonWebTokenTest {
         expected = expectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
       )
-
       assertThat(jsonWebToken.isExpired).isFalse()
-      assertThat(jsonWebToken.jwtEncodedString!!).isNotEmpty()
+      assertThat(jsonWebToken.signedToken).isNotEmpty()
 
-      val jsonTokenString: String? = jsonWebToken.jwtEncodedString
-      assertThat(jsonWebToken.isExpired).isFalse()
+      log.info { "Issued: ${jsonWebToken.issuedAtTime.truncatedTo(ChronoUnit.SECONDS)}" }
+      val iat: String = (jsonWebToken.issuedAtTime.truncatedTo(ChronoUnit.SECONDS).epochSecond).toString()
+      log.info { "iat: $iat" }
 
-      if (jsonTokenString != null) {
-        val iat: String = (jsonWebToken.issuedAtTime.epochSecond).toString()
-        log.info { "iat: $iat" }
+      val exp: String = (jsonWebToken.expirationTime.truncatedTo(ChronoUnit.SECONDS).epochSecond).toString()
+      log.info { "exp: $exp" }
 
-        val exp: String = (jsonWebToken.expirationTime.epochSecond).toString()
-        log.info { "exp: $exp" }
-
-        val jwtPayload = jsonWebToken.decodedPayloadJson?.toJsonString()
-        log.info { "jwtPayload: $jwtPayload" }
-        val expectedPayloadString = """
+      val jwtPayload = jsonWebToken.decodedPayloadJson?.toJsonString()
+      log.info { "jwtPayload: $jwtPayload" }
+      val expectedPayloadString = """
         {"aud":"appstoreconnect-v1","exp":$exp,"iat":$iat,"iss":"1234567","scope":["GET /notary/v2/submissions"]}
         """.trimIndent()
-        assertThat(jwtPayload).isEqualTo(expectedPayloadString)
+      assertThat(jwtPayload).isEqualTo(expectedPayloadString)
 
-        val jwtHeader = jsonWebToken.decodedHeaderJson?.toJsonString()
-        log.info { "jwtHeader: $jwtHeader" }
-        val expectedHeader = """
+      val jwtHeader = jsonWebToken.decodedHeaderJson?.toJsonString()
+      log.info { "jwtHeader: $jwtHeader" }
+      val expectedHeader = """
         {"alg":"ES256","kid":"ABCDEFG","typ":"JWT"}
         """.trimIndent()
-        assertThat(jwtHeader).isEqualTo(expectedHeader)
-      }
-      assertThat(jsonTokenString).isNotNull()
+      assertThat(jwtHeader).isEqualTo(expectedHeader)
     }
   }
 
@@ -109,26 +103,24 @@ class JsonWebTokenTest {
 
     val tokenLifetime: Duration = Duration.ofMinutes(1)
 
-    val jsonWebToken = JsonWebToken(
+    val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
       tokenLifetime = tokenLifetime
     )
 
-    assertAll {
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
+    assertThat(jsonWebTokenResult).isOk()
 
+    jsonWebTokenResult.onSuccess { jsonWebToken ->
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
         tolerance = Duration.of(500, ChronoUnit.MILLIS)
       )
-
       assertThat(jsonWebToken.isExpired).isFalse()
-
       Thread.sleep(75000)
-
       assertThat(jsonWebToken.isExpired).isTrue()
     }
   }
@@ -144,14 +136,16 @@ class JsonWebTokenTest {
 
     val tokenLifetime: Duration = Duration.ofMinutes(1)
 
-    val jsonWebToken = JsonWebToken(
+    val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
       tokenLifetime = tokenLifetime
     )
 
-    assertAll {
+    assertThat(jsonWebTokenResult).isOk()
+
+    jsonWebTokenResult.onSuccess { jsonWebToken ->
       assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
 
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
@@ -161,10 +155,12 @@ class JsonWebTokenTest {
       )
 
       assertThat(jsonWebToken.isExpired).isFalse()
-
       Thread.sleep(75000)
+      assertThat(jsonWebToken.isExpired).isTrue()
 
-      jsonWebToken.updateWebToken()
+      val updateResult = jsonWebToken.updateWebToken()
+      assertThat(updateResult).isOk()
+
       assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
       val updatedExpectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(

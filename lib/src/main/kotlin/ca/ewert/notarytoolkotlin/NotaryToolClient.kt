@@ -4,6 +4,7 @@ import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
+import com.github.michaelbull.result.get
 import mu.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -51,7 +52,7 @@ class NotaryToolClient(
   private val jsonWebToken: JsonWebToken
 
   init {
-    jsonWebToken = JsonWebToken(privateKeyId, issuerId, privateKeyFile, tokenLifetime)
+    jsonWebToken = JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime).get()!! //FIXME
   }
 
 
@@ -96,7 +97,7 @@ class NotaryToolClient(
       val request: Request = Request.Builder()
         .url(url)
         .header("User-Agent", "notarytool-kotlin/0.1.0")
-        .header("Authorization", "Bearer ${jsonWebToken.jwtEncodedString}")
+        .header("Authorization", "Bearer ${jsonWebToken.signedToken}")
         .get()
         .build()
 

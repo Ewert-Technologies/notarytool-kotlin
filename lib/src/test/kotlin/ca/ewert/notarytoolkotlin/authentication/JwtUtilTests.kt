@@ -41,7 +41,7 @@ class JwtUtilTests {
 
     assertThat(privateKeyFile).isNotNull()
 
-    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 12, 223331800, ZoneId.of("GMT"))
     val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
 
     val generateJwtResult = generateJwt(
@@ -75,7 +75,7 @@ class JwtUtilTests {
       ).isEqualTo(expectedHeader.trim())
 
       val expectedPayload = """
-      {"iss":"70c5de5f-f737-47e2-e043-5b8c7c22a4d9","iat":1686651900,"exp":1686652800,"aud":"appstoreconnect-v1","scope":["GET /notary/v2/submissions"]}
+      {"iss":"70c5de5f-f737-47e2-e043-5b8c7c22a4d9","iat":1686651912,"exp":1686652812,"aud":"appstoreconnect-v1","scope":["GET /notary/v2/submissions"]}
       """.trim()
       assertThat(
         String(
