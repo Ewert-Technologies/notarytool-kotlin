@@ -40,7 +40,6 @@ dependencies {
   val moshiVersion = "1.15.0"
 
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
-  api(group = "io.arrow-kt", name = "arrow-core", version = "1.2.0-RC")
   api(group = "com.michael-bull.kotlin-result", name = "kotlin-result", version = "1.1.18")
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
@@ -56,7 +55,6 @@ dependencies {
   // Logging
   implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
-
 
   // Testing
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version="5.7.1")
