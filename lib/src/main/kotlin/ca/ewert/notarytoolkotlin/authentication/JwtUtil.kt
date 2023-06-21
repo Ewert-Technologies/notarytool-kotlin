@@ -64,8 +64,7 @@ fun generateJwt(
   issuedDate: Instant, expiryDate: Instant
 ): Result<String, JsonWebTokenError> {
 
-  val res = createPrivateKey(privateKeyFile)
-  return res.flatMap {
+  return createPrivateKey(privateKeyFile).flatMap {
     val algorithm = Algorithm.ECDSA256(it)
     val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
     try {
@@ -86,61 +85,6 @@ fun generateJwt(
       Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
     }
   }
-
-
-//  val res = createPrivateKey(privateKeyFile)
-
-//  createPrivateKey(privateKeyFile).mapEither(
-//    { ecPrivateKey ->
-//      {
-//        val algorithm = Algorithm.ECDSA256(ecPrivateKey)
-//        val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
-//        try {
-//          val renderedToken: String = com.auth0.jwt.JWT.create()
-//            .withIssuer(issuerId)
-//            .withKeyId(privateKeyId)
-//            .withIssuedAt(issuedDate)
-//            .withExpiresAt(expiryDate)
-//            .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
-//            .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
-//            .sign(algorithm)
-//          Ok(renderedToken)
-//        } catch (illegalArgumentException: IllegalArgumentException) {
-//          log.warn("Error creating JWT", illegalArgumentException)
-//          Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
-//        } catch (jwtCreationException: JWTCreationException) {
-//          log.warn("Error creating JWT", jwtCreationException)
-//          Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
-//        }
-//      }
-//    },
-//    { jsonWebTokenError -> Err(jsonWebTokenError) }
-//  )
-
-//  return when (val privateKeyResult = createPrivateKey(privateKeyFile)) {
-//    is Ok -> {
-//      val algorithm = Algorithm.ECDSA256(privateKeyResult.value)
-//      val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
-//      try {
-//        val renderedToken: String = com.auth0.jwt.JWT.create()
-//          .withIssuer(issuerId)
-//          .withKeyId(privateKeyId)
-//          .withIssuedAt(issuedDate)
-//          .withExpiresAt(expiryDate)
-//          .withClaim(AUDIENCE_CLAIM_NAME, AUDIENCE_CLAIM_VALUE)
-//          .withArrayClaim(SCOPE_CLAIM_NAME, scopeArray)
-//          .sign(algorithm)
-//        Ok(renderedToken)
-//      } catch (illegalArgumentException: IllegalArgumentException) {
-//        log.warn("Error creating JWT", illegalArgumentException)
-//        Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
-//      } catch (jwtCreationException: JWTCreationException) {
-//        log.warn("Error creating JWT", jwtCreationException)
-//        Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
-//      }
-//    }
-//    is Err -> privateKeyResult
-//  }
 }
 
 /**
