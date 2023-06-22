@@ -17,10 +17,14 @@ import java.nio.file.Path
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 
+/** Logger for [NotaryToolClient] class */
 private val log = KotlinLogging.logger {}
 
 /**
- * Client used to make requests to Apple's Notary Web API.
+ * Client used to make requests to Apple's Notary Web API. The client can be used to:
+ * - Submit software to be notarized
+ * - Check the status of a specific notarization submission: [getSubmissionStatus]
+ * - View a history of submissions: [getPreviousSubmissions]
  *
  * @property privateKeyId Apple private key ID
  * @property issuerId Apple Issuer ID
@@ -30,7 +34,8 @@ private val log = KotlinLogging.logger {}
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
  * `https://appstoreconnect.apple.com/notary/v2`
  * @property connectTimeout Sets the default connect timeout for the connection. The default value is **10 seconds**
- * @author vewert
+ * @property userAgent Custom user agent to use when sending requests. The default is `notarytool-kotlin/X.Y.Z`
+ * @author Victor Ewert
  */
 class NotaryToolClient(
   private val privateKeyId: String,
@@ -38,21 +43,41 @@ class NotaryToolClient(
   private val privateKeyFile: Path,
   private val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
   private val baseUrlString: String = BASE_URL_STRING,
-  private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS)
+  private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
+  private val userAgent: String = USER_AGENT_VALUE
 ) {
 
   companion object {
+
+    /**
+     * Constant for the base URL of Apple's notary web client
+     */
     private const val BASE_URL_STRING = "https://appstoreconnect.apple.com/notary/v2"
 
-    private const val ENDPOINT_STRING = "submissionss"
+    /**
+     * The name of the endpoint to send requests to
+     */
+    private const val ENDPOINT_STRING = "submissions"
 
+    /**
+     * Default value for the User-Agent, i.e. `notarytool-kotlin/0.1.0`
+     */
     private const val USER_AGENT_VALUE = "notarytool-kotlin/0.1.0"
   }
 
+  /**
+   * The HttpClient used to make the Requests
+   */
   private val httpClient: OkHttpClient = OkHttpClient.Builder().connectTimeout(connectTimeout).build()
 
+  /**
+   * The Base Url, to send the Requests to.
+   */
   private val baseUrl: HttpUrl? = baseUrlString.toHttpUrlOrNull()
 
+  /**
+   * Json Web Token object used for authentication, when sending a Request
+   */
   private val jsonWebTokenResult: Result<JsonWebToken, JsonWebTokenError> =
     JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime)
 
@@ -60,6 +85,7 @@ class NotaryToolClient(
   /**
    * Fetch the status of a software notarization submission.
    * Calls the [Get Submission Status](https://developer.apple.com/documentation/notaryapi/get_submission_status)
+   * Endpoint.
    *
    * Use this function to fetch the status of a submission request. Supply the identifier that was received in the id
    * field of the response to the Submit Software function.
@@ -79,8 +105,9 @@ class NotaryToolClient(
   /**
    * Fetch a list of your team’s previous notarization submissions.
    * Calls the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions)
+   * Endpoint.
    *
-   * Use this function to get the list of submissions associated with your team. The response contains List of values
+   * Use this function to get the list of submissions associated with your team. The response contains a List of values
    * that include the unique identifier for the submission, the date the submission was initiated,
    * the name of the associated file that was uploaded, and the status of the submission.
    * The response returns information about only the 100 most recent submissions.
@@ -102,7 +129,7 @@ class NotaryToolClient(
           log.info { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url)
-            .header("User-Agent", USER_AGENT_VALUE)
+            .header("User-Agent", userAgent)
             .header("Authorization", "Bearer ${jsonWebToken.signedToken}")
             .get()
             .build()
@@ -129,15 +156,13 @@ class NotaryToolClient(
                 )
               )
             }
-
-
           }
         } else {
           Err(NotaryToolError.GeneralError("URL Path was null"))
         }
       }
 
-      is Err -> Err(NotaryToolError.GeneralError("URL Path was null"))
+      is Err -> Err(NotaryToolError.GeneralError("Base URL was null"))
     }
   }
 }
