@@ -1,7 +1,12 @@
 package ca.ewert.notarytoolkotlin.http.json.notaryapi
 
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
@@ -14,6 +19,8 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
  * from Apple's API. _You receive a structure of this type in response to a call to
  * the `Get Submission Status` endpoint._
  *
+ * Instances can be created by parsing the json response
+ *
  * @property submissionResponseData `SubmissionResponse.Data` Data that describes the status of the submission request.
  * @property meta `SubmissionResponse.Meta` An empty object that you can ignore.
  */
@@ -22,9 +29,30 @@ data class SubmissionResponseJson(
   val meta: SubmissionsMetaJson
 ) {
   companion object {
-    fun create(jsonString: String?): SubmissionResponseJson? {
-      val jsonAdapter: JsonAdapter<SubmissionResponseJson> = moshi.adapter(SubmissionResponseJson::class.java)
-      return jsonString?.let { jsonAdapter.fromJson(it) }
+
+    /**
+     * Creates a [SubmissionResponseJson] from the json String.
+     *
+     * @return A [SubmissionResponseJson] or a [NotaryToolError.JsonParseError]
+     */
+    @JvmStatic
+    fun create(jsonString: String?): Result<SubmissionResponseJson, NotaryToolError.JsonParseError> {
+      return if (!jsonString.isNullOrEmpty()) {
+        val jsonAdapter: JsonAdapter<SubmissionResponseJson> =
+          moshi.adapter(SubmissionResponseJson::class.java).failOnUnknown()
+        try {
+          val submissionResponseJson = jsonAdapter.fromJson(jsonString)
+          if (submissionResponseJson != null) {
+            Ok(submissionResponseJson)
+          } else {
+            Err(NotaryToolError.JsonParseError("Error creating Json Object.", jsonString))
+          }
+        } catch (jsonDataException: JsonDataException) {
+          Err(NotaryToolError.JsonParseError("Error parsing json: ${jsonDataException.message}.", jsonString))
+        }
+      } else {
+        Err(NotaryToolError.JsonParseError("Json String is <null> or empty.", jsonString))
+      }
     }
   }
 }
@@ -44,9 +72,30 @@ data class SubmissionListResponseJson(
   val meta: SubmissionsMetaJson
 ) {
   companion object {
-    fun create(jsonString: String?): SubmissionListResponseJson? {
-      val jsonAdapter: JsonAdapter<SubmissionListResponseJson> = moshi.adapter(SubmissionListResponseJson::class.java)
-      return jsonString?.let { jsonAdapter.fromJson(it) }
+
+    /**
+     * Creates a [SubmissionListResponseJson] from the json String.
+     *
+     * @return A [SubmissionListResponseJson] or a [NotaryToolError.JsonParseError]
+     */
+    @JvmStatic
+    fun create(jsonString: String?): Result<SubmissionListResponseJson, NotaryToolError.JsonParseError> {
+      return if (!jsonString.isNullOrEmpty()) {
+        val jsonAdapter: JsonAdapter<SubmissionListResponseJson> =
+          moshi.adapter(SubmissionListResponseJson::class.java).failOnUnknown().lenient()
+        try {
+          val submissionListResponseJson = jsonAdapter.fromJson(jsonString)
+          if (submissionListResponseJson != null) {
+            Ok(submissionListResponseJson)
+          } else {
+            Err(NotaryToolError.JsonParseError("Error creating Json Object.", jsonString))
+          }
+        } catch (jsonDataException: JsonDataException) {
+          Err(NotaryToolError.JsonParseError("Error parsing json: ${jsonDataException.message}.", jsonString))
+        }
+      } else {
+        Err(NotaryToolError.JsonParseError("Json String is <null> or empty.", jsonString))
+      }
     }
   }
 }
