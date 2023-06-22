@@ -1,10 +1,12 @@
 package ca.ewert.notarytoolkotlin
 
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
+import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
-import com.github.michaelbull.result.get
+import com.github.michaelbull.result.*
 import mu.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -42,18 +44,17 @@ class NotaryToolClient(
   companion object {
     private const val BASE_URL_STRING = "https://appstoreconnect.apple.com/notary/v2"
 
-    private const val ENDPOINT_STRING = "submissions"
+    private const val ENDPOINT_STRING = "submissionss"
+
+    private const val USER_AGENT_VALUE = "notarytool-kotlin/0.1.0"
   }
 
   private val httpClient: OkHttpClient = OkHttpClient.Builder().connectTimeout(connectTimeout).build()
 
   private val baseUrl: HttpUrl? = baseUrlString.toHttpUrlOrNull()
 
-  private val jsonWebToken: JsonWebToken
-
-  init {
-    jsonWebToken = JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime).get()!! //FIXME
-  }
+  private val jsonWebTokenResult: Result<JsonWebToken, JsonWebTokenError> =
+    JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime)
 
 
   /**
@@ -86,37 +87,57 @@ class NotaryToolClient(
    *
    * If you need information about just one submission, and you have the associated identifier,
    * use [getSubmissionStatus] instead.
+   *
+   * @return A [SubmissionListResponse] or a [NotaryToolError]
    */
-  fun getPreviousSubmissions(): SubmissionListResponse? {
-    if (jsonWebToken.isExpired) {
-      jsonWebToken.updateWebToken()
-    }
-    if (baseUrl != null) {
-      val url = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
-      log.info { "URL String: $url" }
-      val request: Request = Request.Builder()
-        .url(url)
-        .header("User-Agent", "notarytool-kotlin/0.1.0")
-        .header("Authorization", "Bearer ${jsonWebToken.signedToken}")
-        .get()
-        .build()
+  fun getPreviousSubmissions(): Result<SubmissionListResponse, NotaryToolError> {
+    return when (jsonWebTokenResult) {
+      is Ok -> {
+        val jsonWebToken = jsonWebTokenResult.value
+        if (jsonWebToken.isExpired) {
+          jsonWebToken.updateWebToken()
+        }
+        if (baseUrl != null) {
+          val url = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
+          log.info { "URL String: $url" }
+          val request: Request = Request.Builder()
+            .url(url)
+            .header("User-Agent", USER_AGENT_VALUE)
+            .header("Authorization", "Bearer ${jsonWebToken.signedToken}")
+            .get()
+            .build()
 
-      httpClient.newCall(request).execute().use { response: Response ->
-        log.info { "Response from ${response.request.url}: $response" }
-        val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
-        log.info { "Response body: ${responseMetaData.rawContents}" }
-        val submissionListResponseJson: SubmissionListResponseJson? =
-          SubmissionListResponseJson.create(responseMetaData.rawContents)
+          httpClient.newCall(request).execute().use { response: Response ->
+            log.info { "Response from ${response.request.url}: $response" }
+            val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+            log.info { "Response body: ${responseMetaData.rawContents}" }
+            if (response.isSuccessful) {
+              val submissionListResponseJsonResult = SubmissionListResponseJson.create(responseMetaData.rawContents)
+              submissionListResponseJsonResult.map { submissionListResponseJson ->
+                SubmissionListResponse(responseMetaData, submissionListResponseJson)
+              }
+            } else {
+              if (response.code == 404) {
+                log.warn { "404 error when sending request to: $url" }
+              }
+              Err(
+                NotaryToolError.HttpError(
+                  "Response was unsuccessful",
+                  response.code,
+                  response.message,
+                  url.toString()
+                )
+              )
+            }
 
-        if (submissionListResponseJson != null) {
-          return SubmissionListResponse(responseMetaData, submissionListResponseJson)
+
+          }
         } else {
-          return null
+          Err(NotaryToolError.GeneralError("URL Path was null"))
         }
       }
-    } else {
-      return null
+
+      is Err -> Err(NotaryToolError.GeneralError("URL Path was null"))
     }
   }
-
 }
