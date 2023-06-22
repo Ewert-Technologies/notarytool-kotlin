@@ -7,6 +7,7 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
@@ -89,7 +90,10 @@ tasks.named<Test>("test") {
 tasks.withType<DokkaTask>().configureEach {
   dokkaSourceSets {
     configureEach {
-      includeNonPublic.set(true)
+      documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC,
+        DokkaConfiguration.Visibility.PROTECTED, DokkaConfiguration.Visibility.INTERNAL,
+        DokkaConfiguration.Visibility.PRIVATE))
+//      documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
       jdkVersion.set(11)
     }
   }
