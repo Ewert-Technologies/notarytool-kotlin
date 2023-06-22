@@ -21,10 +21,10 @@ class SubmissionListResponse internal constructor(
   /**
    * The notary service’s response to a request for information about your team’s previous submissions
    */
-  val submissionInfo: List<SubmissionInfo>
+  val submissionInfoList: List<SubmissionInfo>
 
   init {
-    submissionInfo = jsonResponse.submissionListResponseData.map { submissionsDataJson ->
+    submissionInfoList = jsonResponse.submissionListResponseData.map { submissionsDataJson ->
       val createdDateText = submissionsDataJson.attributes.createdDate
       val createdDate = try {
         Instant.parse(submissionsDataJson.attributes.createdDate)
