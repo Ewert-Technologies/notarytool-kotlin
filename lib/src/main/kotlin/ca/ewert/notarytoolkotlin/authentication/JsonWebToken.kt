@@ -27,6 +27,7 @@ private val log = KotlinLogging.logger {}
  */
 private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
+
 /**
  * Created: 2023-06-08
  * This class represents a [JSON Web Token](https://jwt.io/introduction), configured for making
@@ -39,37 +40,52 @@ private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
  *
  * @author vewert
  */
-class JsonWebToken private constructor(
+internal class JsonWebToken private constructor(
   private val privateKeyId: String,
   private val issuerId: String,
   private val privateKeyFile: Path,
   private val tokenLifetime: Duration = Duration.ofMinutes(15),
-  issuedAtTimeParam: Instant,
-  expirationTimeParam: Instant,
-  signedTokenParam: String
+  _issuedAtTime: Instant,
+  _expirationTime: Instant,
+  _signedToken: String
 ) {
 
-  companion object {
+  internal companion object {
+    /**
+     * Factor function to create an Instance of [JsonWebToken] that returns
+     * a Result containing a [JsonWebToken] or a [JsonWebTokenError]
+     *
+     * @param privateKeyId Private Key ID, provided by Apple
+     * @param issuerId Team Issuer ID provided by Appple
+     * @param privateKeyFile Private Key file `.p8` provided by Apple
+     * @param tokenLifetime Lifetime for the token, should be less than 20 minutes,
+     * default value is 15 minutes
+     *
+     * @return An instance of [JsonWebToken] or a [JsonWebTokenError]
+     */
+    @JvmStatic
     fun create(
       privateKeyId: String,
       issuerId: String,
       privateKeyFile: Path,
       tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES)
     ): Result<JsonWebToken, JsonWebTokenError> {
+      val issued = Instant.now()
+      val expiry = issued.plus(tokenLifetime)
       return generateJwt(
         privateKeyId,
         issuerId,
         privateKeyFile,
-        Instant.now(),
-        Instant.now().plus(tokenLifetime)
+        issued,
+        expiry
       ).map { jwtString ->
         JsonWebToken(
           privateKeyId,
           issuerId,
           privateKeyFile,
           tokenLifetime,
-          Instant.now(),
-          Instant.now().plus(tokenLifetime),
+          issued,
+          expiry,
           jwtString
         )
       }
@@ -95,11 +111,11 @@ class JsonWebToken private constructor(
     private set
 
   init {
-    issuedAtTime = issuedAtTimeParam
-    log.info { "Issued: $issuedAtTime" }
-    expirationTime = expirationTimeParam
-    log.info { "Expiry: $expirationTime" }
-    signedToken = signedTokenParam
+    this.issuedAtTime = _issuedAtTime
+    log.info { "Issued: ${this.issuedAtTime}" }
+    this.expirationTime = _expirationTime
+    log.info { "Expiry: ${this.expirationTime}" }
+    this.signedToken = _signedToken
   }
 
   /**
@@ -146,14 +162,13 @@ class JsonWebToken private constructor(
    * Updates the Web Token by updating the issuedTime and expiryTime and then re-generating
    * the token.
    *
-   * @return Returns the value of the updated token String if successful or an [JsonWebTokenError]
+   * @return [JsonWebTokenError] if there is an error
    */
-  internal fun updateWebToken(): Result<String, JsonWebTokenError> {
+  internal fun updateWebToken(): Result<Unit, JsonWebTokenError> {
     issuedAtTime = Instant.now()
     expirationTime = issuedAtTime.plus(tokenLifetime)
     return generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).map { jwtString ->
       signedToken = jwtString
-      jwtString
     }
   }
 
