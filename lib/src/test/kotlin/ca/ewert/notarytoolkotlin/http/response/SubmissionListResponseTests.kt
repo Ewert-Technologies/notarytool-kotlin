@@ -6,6 +6,8 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
+import ca.ewert.notarytoolkotlin.isOk
+import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import okhttp3.*
 import okhttp3.mockwebserver.MockWebServer
@@ -154,14 +156,15 @@ class SubmissionListResponseTests {
         val responseMetaData = NotaryApiResponse.ResponseMetaData(response)
         val jsonBody: String? = responseMetaData.rawContents
         assertThat(jsonBody).isNotNull()
-        val submissionListResponseJson: SubmissionListResponseJson? = SubmissionListResponseJson.create(jsonBody)
-        assertThat(submissionListResponseJson).isNotNull()
-        if (submissionListResponseJson != null) {
+        val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonBody)
+
+        assertThat(submissionListResponseJsonResult).isOk()
+        submissionListResponseJsonResult.onSuccess { submissionListResponseJson ->
           val submissionListResponse = SubmissionListResponse(responseMetaData, submissionListResponseJson)
-          assertThat(submissionListResponse.submissionInfo).hasSize(3)
-          assertThat(submissionListResponse.submissionInfo[1].id).isEqualTo("cf0c235a-dad2-4c24-96eb-c876d4cb3a2d")
-          assertThat(submissionListResponse.submissionInfo[1].name).isEqualTo("OvernightTextEditor_11.6.7.zip")
-          assertThat(submissionListResponse.submissionInfo[1].status).isEqualTo(SubmissionStatus.ACCEPTED)
+          assertThat(submissionListResponse.submissionInfoList).hasSize(3)
+          assertThat(submissionListResponse.submissionInfoList[1].id).isEqualTo("cf0c235a-dad2-4c24-96eb-c876d4cb3a2d")
+          assertThat(submissionListResponse.submissionInfoList[1].name).isEqualTo("OvernightTextEditor_11.6.7.zip")
+          assertThat(submissionListResponse.submissionInfoList[1].status).isEqualTo(SubmissionStatus.ACCEPTED)
         }
       } else {
         log.warn { "Request was not successful: $request" }

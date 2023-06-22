@@ -6,6 +6,8 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.isCloseTo
+import ca.ewert.notarytoolkotlin.isOk
+import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -22,7 +24,7 @@ import java.time.temporal.ChronoUnit
 private val log = KotlinLogging.logger {}
 
 /**
- * Unit Tests for [SubmissionResponse]
+ * Unit Tests for [SubmissionStatusResponse]
  * @author vewert
  */
 class SubmissionResponseTests () {
@@ -115,9 +117,7 @@ class SubmissionResponseTests () {
       .get()
       .build()
 
-    val client = OkHttpClient.Builder()
-//      .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
-      .build()
+    val client = OkHttpClient.Builder().build()
 
 
     client.newCall(request).execute().use { response: Response ->
@@ -127,11 +127,12 @@ class SubmissionResponseTests () {
         val responseMetaData = NotaryApiResponse.ResponseMetaData(response)
         val jsonBody: String? = responseMetaData.rawContents
         assertThat(jsonBody).isNotNull()
-        val submissionResponseJson: SubmissionResponseJson? = SubmissionResponseJson.create(jsonBody)
+        val submissionResponseJsonResult = SubmissionResponseJson.create(jsonBody)
 
-        assertThat(submissionResponseJson).isNotNull()
-        if (submissionResponseJson != null) {
-          val submissionResponse = SubmissionResponse(responseMetaData, jsonResponse = submissionResponseJson)
+        assertThat(submissionResponseJsonResult).isOk()
+
+        submissionResponseJsonResult.onSuccess { submissionResponseJson ->
+          val submissionResponse = SubmissionStatusResponse(responseMetaData, jsonResponse = submissionResponseJson)
           assertThat(submissionResponse.receivedTimestamp.atZone(ZoneId.systemDefault())).isCloseTo(
             ZonedDateTime.now(),
             Duration.of(500, ChronoUnit.MILLIS)
