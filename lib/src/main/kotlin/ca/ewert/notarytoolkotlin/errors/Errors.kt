@@ -16,7 +16,8 @@ sealed interface NotaryToolError {
 
   data class GeneralError(override val msg: String) : NotaryToolError
 
-  data class HttpError(override val msg: String, val httpStatusCode: Int, val httpStatusMsg: String, val requestUrl: String = "") : NotaryToolError
+  data class HttpError(override val msg: String, val httpStatusCode: Int, val httpStatusMsg: String,
+                       val requestUrl: String = "", val bodyContent: String?) : NotaryToolError
 }
 
 sealed interface JsonWebTokenError : NotaryToolError {
