@@ -3,8 +3,11 @@ package ca.ewert.notarytoolkotlin.authentication
 import assertk.assertThat
 import assertk.assertions.isNotNull
 import ca.ewert.notarytoolkotlin.TestValuesReader
+import ca.ewert.notarytoolkotlin.isOk
 import ca.ewert.notarytoolkotlin.resourceToPath
+import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Duration
@@ -25,6 +28,7 @@ class JwtGenerator {
    * Generates and logs a JWT String
    */
   @Test
+  @Tag("Private")
   fun generateJwt() {
     val testValuesReader = TestValuesReader()
     val keyId: String = testValuesReader.getKeyId()
@@ -34,14 +38,15 @@ class JwtGenerator {
     assertThat(privateKeyFile).isNotNull()
 
     if (privateKeyFile != null) {
-      val jwtString = generateJwt(
+      val generateJwtResult = generateJwt(
         keyId,
         issuerId,
         privateKeyFile,
         Instant.now(),
         Instant.now().plus(Duration.ofMinutes(15))
       )
-      log.info { "JWT: [$jwtString]" }
+      assertThat(generateJwtResult).isOk()
+      generateJwtResult.onSuccess { jwtString -> log.info { "JWT: [$jwtString]" }}
     }
   }
 }
