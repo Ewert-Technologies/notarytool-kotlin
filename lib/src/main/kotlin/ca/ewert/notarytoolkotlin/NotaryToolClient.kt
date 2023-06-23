@@ -34,7 +34,7 @@ private val log = KotlinLogging.logger {}
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
  * `https://appstoreconnect.apple.com/notary/v2`
  * @property connectTimeout Sets the default connect timeout for the connection. The default value is **10 seconds**
- * @property userAgent Custom user agent to use when sending requests. The default is `notarytool-kotlin/X.Y.Z`
+ * @property userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/X.Y.Z`
  * @author Victor Ewert
  */
 class NotaryToolClient(
@@ -150,9 +150,10 @@ class NotaryToolClient(
               Err(
                 NotaryToolError.HttpError(
                   "Response was unsuccessful",
-                  response.code,
-                  response.message,
-                  url.toString()
+                  responseMetaData.httpStatusCode,
+                  responseMetaData.httpStatusMessage,
+                  url.toString(),
+                  responseMetaData.rawContents
                 )
               )
             }
