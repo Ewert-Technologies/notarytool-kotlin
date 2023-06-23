@@ -1,15 +1,29 @@
 package ca.ewert.notarytoolkotlin.errors
 
 /**
- * Parent class of all Error types
+ * Parent Type of all Errors.
  *
- * @author vewert
+ * @author Victor Ewert
  */
 sealed interface NotaryToolError {
+
+  /** Error Message */
   val msg: String
 
+  /**
+   * Parent of all Errors related to working with Json Web Token
+   */
   sealed interface JsonWebTokenError : NotaryToolError {
+
+    /**
+     * Error for when the Private Key (`.p8`) file cannot be found
+     */
     data class PrivateKeyNotFound(override val msg: String) : JsonWebTokenError
+
+    /**
+     * Error for when there is a problem generating the Json Web Token.
+     * The [msg] contains details about the error.
+     */
     data class TokenCreationError(override val msg: String) : JsonWebTokenError
   }
 
