@@ -6,19 +6,19 @@ import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
-import ca.ewert.notarytoolkotlin.http.response.createMockResponse
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
+import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
+import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.Protocol
-import okhttp3.internal.userAgent
 import okhttp3.mockwebserver.MockWebServer
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Instant
@@ -28,10 +28,7 @@ import java.time.ZonedDateTime
 private val log = KotlinLogging.logger {}
 
 /**
- * TODO: Add Comments
- * <br/>
- * Created: 2023-06-19
- * @author vewert
+ * Unit Tests for the [NotaryToolClient]
  */
 class NotaryToolClientTests {
 
@@ -55,6 +52,8 @@ class NotaryToolClientTests {
   }
 
   @Test
+  @Tag("MockServer")
+  @DisplayName("getPreviousSubmissions - Success Test")
   fun test1() {
     val responseBody: String = """
     {
@@ -90,15 +89,15 @@ class NotaryToolClientTests {
       "meta": {}
     }""".trimIndent()
 
-    mockWebServer.enqueue(createMockResponse(responseBody))
+    mockWebServer.enqueue(createMockResponse200(responseBody))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("")
 
 
     val notaryToolClient = NotaryToolClient(
-      privateKeyId = TestValuesReader().getKeyId(),
-      issuerId = TestValuesReader().getIssueId(),
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
       privateKeyFile = privateKeyFile!!,
       baseUrlString = baseUrl.toString()
     )
@@ -123,6 +122,41 @@ class NotaryToolClientTests {
         else -> log.warn { error.msg }
       }
       fail(AssertionError("Request failed with: $error"))
+    }
+  }
+
+  @Test
+  @Tag("MockServer")
+  @DisplayName("getPreviousSubmissions - 401 Test")
+  fun test2() {
+    mockWebServer.enqueue(createMockResponse401())
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString()
+    )
+
+    val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
+
+    assertThat(getPreviousSubmissionsResult).isErr()
+
+    getPreviousSubmissionsResult.onFailure { error ->
+      log.info { "onFailure(): $error" }
+      when (error) {
+        is JsonWebTokenError.TokenCreationError -> log.warn { error.msg }
+        is NotaryToolError.HttpError ->  {
+          log.warn { "An HTTP Error occurred. " +
+              "Code: ${error.httpStatusCode} - ${error.httpStatusMsg}, " +
+              "for request to: ${error.requestUrl}. Response Body: '${error.bodyContent}'" }
+          assertThat(error.httpStatusCode).isEqualTo(401)
+        }
+        else -> log.warn { error.msg }
+      }
     }
   }
 }

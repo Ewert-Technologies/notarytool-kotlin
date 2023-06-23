@@ -9,6 +9,7 @@ import com.github.michaelbull.result.onSuccess
 import mu.KotlinLogging
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import java.time.Duration
@@ -96,6 +97,7 @@ class JsonWebTokenTest {
    * Tests that the [JsonWebToken] expires correctly
    */
   @Test
+  @Tag("Slow")
   fun expiryTest() {
     val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
 
@@ -129,6 +131,7 @@ class JsonWebTokenTest {
    * Tests that the [JsonWebToken] can be updated
    */
   @Test
+  @Tag("Slow")
   fun updateTest() {
     val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
 
