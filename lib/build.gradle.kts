@@ -11,10 +11,12 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 buildscript {
   dependencies {
     classpath("org.jetbrains.dokka:dokka-base:1.8.20")
+    classpath("org.gradle.toolchains:foojay-resolver:0.5.0")
   }
 }
 
@@ -66,8 +68,14 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
   toolchain {
-    languageVersion.set(JavaLanguageVersion.of(17))
+    languageVersion.set(JavaLanguageVersion.of(11))
     vendor.set(JvmVendorSpec.AZUL)
+  }
+}
+
+kotlin {
+  jvmToolchain {
+    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
   }
 }
 
@@ -118,6 +126,7 @@ tasks.register("buildInfo") {
   logger.quiet("Project version: ${project.version}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
+  logger.quiet("java.version: ${JavaVersion.current()}")
 }
 
 
