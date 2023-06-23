@@ -8,6 +8,11 @@ package ca.ewert.notarytoolkotlin.errors
 sealed interface NotaryToolError {
   val msg: String
 
+  sealed interface JsonWebTokenError : NotaryToolError {
+    data class PrivateKeyNotFound(override val msg: String) : JsonWebTokenError
+    data class TokenCreationError(override val msg: String) : JsonWebTokenError
+  }
+
   /**
    * @property msg The error message
    * @property jsonString The json String that was used when attempting to parse
@@ -20,10 +25,7 @@ sealed interface NotaryToolError {
                        val requestUrl: String = "", val bodyContent: String?) : NotaryToolError
 }
 
-sealed interface JsonWebTokenError : NotaryToolError {
-  data class PrivateKeyNotFound(override val msg: String) : JsonWebTokenError
-  data class TokenCreationError(override val msg: String) : JsonWebTokenError
-}
+
 
 
 

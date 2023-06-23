@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin
 
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
-import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse

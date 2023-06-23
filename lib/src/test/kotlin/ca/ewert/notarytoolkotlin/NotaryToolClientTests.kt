@@ -3,7 +3,7 @@ package ca.ewert.notarytoolkotlin
 import assertk.assertThat
 import assertk.assertions.*
 import assertk.fail
-import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200

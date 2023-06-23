@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import ca.ewert.notarytoolkotlin.errors.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.*
