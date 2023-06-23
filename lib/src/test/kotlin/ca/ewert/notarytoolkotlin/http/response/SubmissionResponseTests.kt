@@ -63,7 +63,7 @@ class SubmissionResponseTests () {
     }
     """.trimIndent()
 
-    mockWebServer.enqueue(createMockResponse(body))
+    mockWebServer.enqueue(createMockResponse200(body))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("/notary/v2/submissions")
@@ -106,7 +106,7 @@ class SubmissionResponseTests () {
     }
     """.trimIndent()
 
-    mockWebServer.enqueue(createMockResponse(body))
+    mockWebServer.enqueue(createMockResponse200(body))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("/notary/v2/submissions")
