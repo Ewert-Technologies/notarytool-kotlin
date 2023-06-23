@@ -152,7 +152,7 @@ class NotaryToolClientTests {
         is NotaryToolError.HttpError ->  {
           log.warn { "An HTTP Error occurred. " +
               "Code: ${error.httpStatusCode} - ${error.httpStatusMsg}, " +
-              "for request to: ${error.requestUrl}. Response Body: '${error.bodyContent}'" }
+              "for request to: ${error.requestUrl}. Response Body: '${error.contentBody}'" }
           assertThat(error.httpStatusCode).isEqualTo(401)
         }
         else -> log.warn { error.msg }

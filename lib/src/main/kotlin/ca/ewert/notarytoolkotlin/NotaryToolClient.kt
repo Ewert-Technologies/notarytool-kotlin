@@ -144,18 +144,44 @@ class NotaryToolClient(
                 SubmissionListResponse(responseMetaData, submissionListResponseJson)
               }
             } else {
-              if (response.code == 404) {
-                log.warn { "404 error when sending request to: $url" }
+              when (response.code) {
+                in 400 .. 499 -> {
+                  if (response.code == 404) {
+                    log.warn { "404 error when sending request to: $url" }
+                  }
+                  Err(
+                    NotaryToolError.HttpError.ClientError4xx(
+                      "Response was unsuccessful",
+                      responseMetaData.httpStatusCode,
+                      responseMetaData.httpStatusMessage,
+                      url.toString(),
+                      responseMetaData.rawContents
+                    )
+                  )
+                }
+                in 500 .. 599 -> {
+                  Err(
+                    NotaryToolError.HttpError.ServerError5xx(
+                      "Response was unsuccessful",
+                      responseMetaData.httpStatusCode,
+                      responseMetaData.httpStatusMessage,
+                      url.toString(),
+                      responseMetaData.rawContents
+                    )
+                  )
+                }
+                else -> {
+                  Err(
+                    NotaryToolError.HttpError.OtherError(
+                      "Response was unsuccessful",
+                      responseMetaData.httpStatusCode,
+                      responseMetaData.httpStatusMessage,
+                      url.toString(),
+                      responseMetaData.rawContents
+                    )
+                  )
+                }
               }
-              Err(
-                NotaryToolError.HttpError(
-                  "Response was unsuccessful",
-                  responseMetaData.httpStatusCode,
-                  responseMetaData.httpStatusMessage,
-                  url.toString(),
-                  responseMetaData.rawContents
-                )
-              )
             }
           }
         } else {

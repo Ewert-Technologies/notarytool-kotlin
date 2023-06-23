@@ -13,6 +13,30 @@ sealed interface NotaryToolError {
     data class TokenCreationError(override val msg: String) : JsonWebTokenError
   }
 
+  sealed interface HttpError: NotaryToolError {
+    val httpStatusCode: Int
+    val httpStatusMsg: String
+    val requestUrl: String
+    val contentBody: String?
+
+    data class InvalidSubmissionId (override val msg: String, override val httpStatusCode: Int = 404,
+                                   override val httpStatusMsg: String, override val requestUrl: String = "",
+                                   override val contentBody: String?) : HttpError
+
+    data class ClientError4xx(override val msg: String, override val httpStatusCode: Int,
+                              override val httpStatusMsg: String, override val requestUrl: String = "",
+                              override val contentBody: String?) : HttpError
+
+    data class ServerError5xx(override val msg: String, override val httpStatusCode: Int,
+                              override val httpStatusMsg: String, override val requestUrl: String = "",
+                              override val contentBody: String?) : HttpError
+
+    data class OtherError(override val msg: String, override val httpStatusCode: Int,
+                              override val httpStatusMsg: String, override val requestUrl: String = "",
+                              override val contentBody: String?) : HttpError
+
+  }
+
   /**
    * @property msg The error message
    * @property jsonString The json String that was used when attempting to parse
@@ -21,8 +45,7 @@ sealed interface NotaryToolError {
 
   data class GeneralError(override val msg: String) : NotaryToolError
 
-  data class HttpError(override val msg: String, val httpStatusCode: Int, val httpStatusMsg: String,
-                       val requestUrl: String = "", val bodyContent: String?) : NotaryToolError
+
 }
 
 
