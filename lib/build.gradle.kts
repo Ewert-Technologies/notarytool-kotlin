@@ -69,7 +69,7 @@ dependencies {
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(11))
-    vendor.set(JvmVendorSpec.AZUL)
+    vendor.set(JvmVendorSpec.ADOPTIUM)
   }
 }
 
