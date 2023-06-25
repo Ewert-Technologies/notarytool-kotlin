@@ -22,5 +22,5 @@ data class SubmissionInfo internal constructor(
   val name: String,
   val status: SubmissionStatus,
   val statusText: String,
-  val id: String
+  val id: SubmissionId
 )

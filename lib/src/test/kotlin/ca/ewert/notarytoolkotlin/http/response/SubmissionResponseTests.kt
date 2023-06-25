@@ -140,7 +140,7 @@ class SubmissionResponseTests () {
 
           val expectedCreatedDate: ZonedDateTime = ZonedDateTime.of(2022, 6, 8, 1, 38, 9, 498000000, ZoneId.of("Z"))
           assertThat(submissionResponse.submissionInfo.createdDate).isEqualTo(expectedCreatedDate.toInstant())
-          assertThat(submissionResponse.submissionInfo.id).isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+          assertThat(submissionResponse.submissionInfo.id).isEqualTo(SubmissionId("2efe2717-52ef-43a5-96dc-0797e4ca1041"))
           assertThat(submissionResponse.submissionInfo.status).isEqualTo(SubmissionStatus.ACCEPTED)
           assertThat(submissionResponse.submissionInfo.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
           log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.atZone(ZoneId.systemDefault())}" }

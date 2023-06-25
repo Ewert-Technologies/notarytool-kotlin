@@ -38,7 +38,7 @@ class SubmissionListResponse internal constructor(
       val status = SubmissionStatus.fromString(statusText)
       val id = submissionsDataJson.id
 
-      SubmissionInfo(createdDate, createdDateText, name, status, statusText, id)
+      SubmissionInfo(createdDate, createdDateText, name, status, statusText, SubmissionId(id))
     }
   }
 }

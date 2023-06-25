@@ -24,7 +24,7 @@ class SubmissionIdTests {
   fun validTest() {
     val submissionIdResult =
       SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
-    assertThat(submissionIdResult).isOkAnd().prop(SubmissionId::submissionId)
+    assertThat(submissionIdResult).isOkAnd().prop(SubmissionId::id)
       .isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
   }
 
