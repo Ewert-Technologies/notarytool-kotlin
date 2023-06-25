@@ -57,6 +57,8 @@ sealed interface NotaryToolError {
    */
   data class JsonParseError(override val msg: String, val jsonString: String?) : NotaryToolError
 
+  data class MalformedSubmissionIdError(override val msg: String, val invalidId: String) : NotaryToolError
+
   data class GeneralError(override val msg: String) : NotaryToolError
 
 
