@@ -7,7 +7,7 @@ import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
 import com.github.michaelbull.result.*
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient

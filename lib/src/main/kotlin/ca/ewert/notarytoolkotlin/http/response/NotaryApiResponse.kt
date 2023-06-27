@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.MediaType
 import okhttp3.Response
 import java.time.Instant

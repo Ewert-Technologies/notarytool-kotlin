@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.InputStream
 import java.util.Properties
 

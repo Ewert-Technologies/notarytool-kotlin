@@ -3,7 +3,7 @@
  */
 package ca.ewert.notarytoolkotlin
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val log = KotlinLogging.logger{}
 

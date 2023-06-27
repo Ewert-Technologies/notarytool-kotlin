@@ -8,7 +8,7 @@ import assertk.assertions.isTrue
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.isOk
 import com.github.michaelbull.result.onSuccess
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.*
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach

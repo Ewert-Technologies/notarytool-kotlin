@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
 import java.time.format.DateTimeParseException
 

@@ -4,8 +4,8 @@ import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.*
-import mu.KLogger
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KLogger
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Path
 import java.security.KeyFactory
 import java.security.interfaces.ECPrivateKey

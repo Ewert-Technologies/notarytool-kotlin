@@ -12,7 +12,7 @@ import ca.ewert.notarytoolkotlin.isOkAnd
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path

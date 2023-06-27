@@ -10,7 +10,7 @@ import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.Protocol
 import okhttp3.mockwebserver.MockWebServer

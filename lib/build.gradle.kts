@@ -55,7 +55,8 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
 
   // Logging
-  implementation(group = "io.github.microutils", name = "kotlin-logging-jvm", version = "3.0.5")
+  implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "4.0.0")
+  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.7")
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
 
   // Testing

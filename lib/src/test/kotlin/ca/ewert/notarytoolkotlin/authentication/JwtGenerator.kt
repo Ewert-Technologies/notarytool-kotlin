@@ -6,7 +6,7 @@ import ca.ewert.notarytoolkotlin.TestValuesReader
 import ca.ewert.notarytoolkotlin.isOk
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onSuccess
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path

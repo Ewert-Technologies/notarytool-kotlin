@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin.http.response
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.mockwebserver.MockResponse
 import java.time.Instant
 import java.time.ZoneId

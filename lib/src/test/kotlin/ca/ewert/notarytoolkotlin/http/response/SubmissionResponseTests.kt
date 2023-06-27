@@ -8,7 +8,7 @@ import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.isCloseTo
 import ca.ewert.notarytoolkotlin.isOk
 import com.github.michaelbull.result.onSuccess
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.mockwebserver.MockWebServer
