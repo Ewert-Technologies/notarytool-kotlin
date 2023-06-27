@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 buildscript {
   dependencies {
     classpath("org.jetbrains.dokka:dokka-base:1.8.20")
-    classpath("org.gradle.toolchains:foojay-resolver:0.5.0")
   }
 }
 
