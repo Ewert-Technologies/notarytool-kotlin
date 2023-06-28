@@ -44,7 +44,6 @@ sealed interface NotaryToolError {
       override val msg: String,
     ) : UserInputError
 
-
     /**
      * Top-level parent of all Errors related to creating or using the Json Web Token.
      * These error are most likely caused by an invalid issuerId, private key id,
