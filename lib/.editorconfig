@@ -2,4 +2,4 @@ root = true
 
 [*.{kt,kts,kt.spec,kts.spec}]
 indent_size = 2
-disabled_rules = standard:no-consecutive-blank-lines
+no-consecutive-blank-lines = false
