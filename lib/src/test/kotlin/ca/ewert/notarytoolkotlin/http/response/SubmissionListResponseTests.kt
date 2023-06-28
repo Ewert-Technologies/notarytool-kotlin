@@ -9,7 +9,11 @@ import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.isOk
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
-import okhttp3.*
+import okhttp3.HttpUrl
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.Request
+import okhttp3.Response
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

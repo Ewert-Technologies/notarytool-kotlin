@@ -1,7 +1,10 @@
 package ca.ewert.notarytoolkotlin
 
 import assertk.assertThat
-import assertk.assertions.*
+import assertk.assertions.endsWith
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.matches
 import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
@@ -108,7 +111,8 @@ class NotaryToolClientTests {
       assertThat(submissionListResponse.submissionInfoList[2].status).isEqualTo(SubmissionStatus.INVALID)
       val expectedCreatedDate: Instant =
         ZonedDateTime.of(2021, 4, 23, 17, 44, 54, 761000000, ZoneId.of("GMT")).toInstant()
-      assertThat(submissionListResponse.submissionInfoList[1].createdDate ?: Instant.now()).isEqualTo(expectedCreatedDate)
+      assertThat(submissionListResponse.submissionInfoList[1].createdDate ?: Instant.now())
+        .isEqualTo(expectedCreatedDate)
 
       val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
       assertThat(recordedRequest.getHeader("User-Agent") ?: "").matches(Regex("notarytool-kotlin/\\d+\\.\\d+\\.\\d+"))
@@ -157,6 +161,7 @@ class NotaryToolClientTests {
           }
           assertThat(error.httpStatusCode).isEqualTo(401)
         }
+
         else -> log.warn { error.msg }
       }
     }
