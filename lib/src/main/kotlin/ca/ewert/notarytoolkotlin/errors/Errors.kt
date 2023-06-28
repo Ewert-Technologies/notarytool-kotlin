@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.errors
 
 /**
- * Parent Type of all Errors.
+ * Top-level parent of all notarytool-kotlin Erro
  *
  * @author Victor Ewert
  */
@@ -9,6 +9,10 @@ sealed interface NotaryToolError {
 
   /** Error Message */
   val msg: String
+
+  sealed interface UserInputError: NotaryToolError {
+
+  }
 
   /**
    * Parent of all Errors related to working with Json Web Token
