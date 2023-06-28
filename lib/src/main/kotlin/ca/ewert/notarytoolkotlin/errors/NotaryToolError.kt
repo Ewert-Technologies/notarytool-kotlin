@@ -93,12 +93,27 @@ sealed interface NotaryToolError {
     }
   }
 
+  /**
+   * Top-level parent of HTTP Errors received from the App Store Connect API Web Service
+   *
+   * @property httpStatusCode The HTTP status code.
+   * @property httpStatusMsg The HTTP status message.
+   * @property requestUrl The URL used in the request.
+   * @property contentBody The body of the request.
+   * @author Victor Ewert
+   */
   sealed interface HttpError : NotaryToolError {
     val httpStatusCode: Int
     val httpStatusMsg: String
     val requestUrl: String
     val contentBody: String?
 
+    /**
+     * A Client Error response, in the range of 400 to 499. *"The request contains bad syntax
+     * or cannot be fulfilled."*
+     *
+     * @author Victor Ewert
+     */
     data class ClientError4xx(
       override val msg: String,
       override val httpStatusCode: Int,
@@ -107,6 +122,12 @@ sealed interface NotaryToolError {
       override val contentBody: String?,
     ) : HttpError
 
+    /**
+     * A Server Error response, in the range of 500 to 599. *"The server failed to fulfil
+     * an apparently valid request."*
+     *
+     * @author Victor Ewert
+     */
     data class ServerError5xx(
       override val msg: String,
       override val httpStatusCode: Int,
@@ -115,6 +136,11 @@ sealed interface NotaryToolError {
       override val contentBody: String?,
     ) : HttpError
 
+    /**
+     * Any other HTTP Error.
+     *
+     * @author Victor Ewert
+     */
     data class OtherError(
       override val msg: String,
       override val httpStatusCode: Int,
@@ -125,10 +151,20 @@ sealed interface NotaryToolError {
   }
 
   /**
+   * An error caused when there is a problem parsing the json content sent by
+   * the App Store Connect API Web Service. This should only occur if the Web API
+   * changes.
+   *
    * @property msg The error message
    * @property jsonString The json String that was used when attempting to parse
+   * @author Victor Ewert
    */
   data class JsonParseError(override val msg: String, val jsonString: String?) : NotaryToolError
 
+  /**
+   * Any other error.
+   *
+   * @author Victor Ewert
+   */
   data class GeneralError(override val msg: String) : NotaryToolError
 }
