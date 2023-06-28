@@ -6,6 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.fail
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.hasMessage
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd
@@ -106,6 +107,9 @@ class JwtUtilTests {
     val expectedMsg =
       "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist"
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError)
+    }
   }
 
   /**
@@ -182,6 +186,10 @@ class JwtUtilTests {
     val expectedMsg =
       "The private key format is invalid: 'Illegal base64 character 20'"
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
+    }
   }
 
   /**
@@ -206,6 +214,9 @@ class JwtUtilTests {
     val expectedMsg =
       "The private key format is invalid: 'java.security.InvalidKeyException: invalid key format'"
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
+    }
   }
 
   /**
@@ -230,6 +241,9 @@ class JwtUtilTests {
     val expectedMsg =
       "The private key format is invalid: 'java.security.InvalidKeyException: IOException : Short read of DER length'"
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
+    }
   }
 
   /**
@@ -254,6 +268,9 @@ class JwtUtilTests {
     val expectedMsg =
       "The private key format is invalid: 'java.security.InvalidKeyException: IOException : null'"
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+    generateJwtResult.onFailure { jsonWebTokenError ->
+      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
+    }
   }
 
   /**

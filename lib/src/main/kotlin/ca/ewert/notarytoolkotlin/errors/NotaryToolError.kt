@@ -25,7 +25,7 @@ sealed interface NotaryToolError {
       /**
        * Error for when the Private Key (`.p8`) file cannot be found
        */
-      data class PrivateKeyNotFound(override val msg: String) : JsonWebTokenError
+      data class PrivateKeyNotFoundError(override val msg: String) : JsonWebTokenError
 
       data class InvalidPrivateKeyError(override val msg: String) : JsonWebTokenError
 

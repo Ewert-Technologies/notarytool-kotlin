@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.authentication
 
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFound
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
@@ -99,7 +99,7 @@ fun generateJwt(
  * a [KeyFactory] to generate the Private Key, using the *"EC"* algorithm.
  *
  * @param privateKeyFile A Private Key file (`.p8`), provided by Apple
- * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFound]
+ * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFoundError]
  */
 internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWebTokenError> {
   return parsePrivateKeyString(privateKeyFile = privateKeyFile).andThen { privateKeyFileString: String ->
@@ -114,7 +114,7 @@ internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWe
  * `"-----BEGIN PRIVATE KEY-----"` and `"-----END PRIVATE KEY-----"` from the beginning and end,
  * and returns Private Key section, with line endings removed.
  * @param privateKeyFile A Private Key file (`.p8`), provided by Apple
- * @return The Private Key [String] or a [JsonWebTokenError.PrivateKeyNotFound]
+ * @return The Private Key [String] or a [JsonWebTokenError.PrivateKeyNotFoundError]
  */
 internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWebTokenError> {
   return if (privateKeyFile.exists()) {
@@ -124,7 +124,7 @@ internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWeb
       },
     )
   } else {
-    Err(PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
+    Err(PrivateKeyNotFoundError("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
   }
 }
 
