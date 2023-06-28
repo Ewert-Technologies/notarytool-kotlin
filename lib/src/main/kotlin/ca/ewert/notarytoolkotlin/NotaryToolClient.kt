@@ -84,7 +84,6 @@ class NotaryToolClient(
   private val jsonWebTokenResult: Result<JsonWebToken, JsonWebTokenError> =
     JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime)
 
-
   /**
    * Fetch the status of a software notarization submission.
    * Calls the [Get Submission Status](https://developer.apple.com/documentation/notaryapi/get_submission_status)

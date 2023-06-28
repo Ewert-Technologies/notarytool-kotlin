@@ -18,7 +18,6 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.*
 
-
 /** Logging Object */
 private val log = KotlinLogging.logger {}
 
@@ -26,7 +25,6 @@ private val log = KotlinLogging.logger {}
  * Moshi json parser
  */
 private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
-
 
 /**
  * Created: 2023-06-08

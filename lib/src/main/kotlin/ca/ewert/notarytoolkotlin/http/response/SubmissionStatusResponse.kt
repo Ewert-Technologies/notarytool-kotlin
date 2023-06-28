@@ -17,10 +17,8 @@ class SubmissionStatusResponse internal constructor(
   jsonResponse: SubmissionResponseJson,
 ) : NotaryApiResponse(responseMetaData = responseMetaData) {
 
-
   /** Information about the status of a submission */
   val submissionInfo: SubmissionInfo
-
 
   init {
     val createdDateText = jsonResponse.submissionResponseData.attributes.createdDate

@@ -1,6 +1,5 @@
 package ca.ewert.notarytoolkotlin.http.response
 
-
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.MediaType
 import okhttp3.Response

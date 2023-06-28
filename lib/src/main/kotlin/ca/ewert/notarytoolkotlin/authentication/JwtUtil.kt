@@ -24,7 +24,6 @@ import kotlin.io.path.useLines
 /** Logger Object **/
 private val log: KLogger = KotlinLogging.logger {}
 
-
 /** Constant for the `aud` claim name in the JWT */
 private const val AUDIENCE_CLAIM_NAME = "aud"
 
@@ -103,7 +102,6 @@ internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWe
   val privateKeyStringResult = parsePrivateKeyString(privateKeyFile = privateKeyFile)
   return privateKeyStringResult.map { privateKeyString: String -> createPrivateKey(privateKeyString) }
 }
-
 
 /**
  * Parses out the Private Key String, from a `.p8` file passed in. It strips off the

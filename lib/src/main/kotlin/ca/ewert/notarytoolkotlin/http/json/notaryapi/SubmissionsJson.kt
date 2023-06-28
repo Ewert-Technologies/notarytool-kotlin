@@ -12,7 +12,6 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
-
 /**
  * Top level Response from making a **`Get Submission Status`** Request.
  * Corresponds to [`SubmissionResponse`](https://developer.apple.com/documentation/notaryapi/submissionresponse),
@@ -115,7 +114,6 @@ data class SubmissionsDataJson(
   val id: String,
   val type: String,
 )
-
 
 /**
  * Corresponds to [`SubmissionResponse.Data.Attributes`](https://developer.apple.com/documentation/notaryapi/submissionresponse/data/attributes),
