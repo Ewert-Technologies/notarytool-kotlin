@@ -48,7 +48,7 @@ dependencies {
 
   // Other
   implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
-  implementation(group = "io.github.nefilim.kjwt", name="kJWT", version="0.1.6")
+  implementation(group = "io.github.nefilim.kjwt", name = "kJWT", version = "0.1.6")
   implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
@@ -60,9 +60,9 @@ dependencies {
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
 
   // Testing
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version="5.9.3")
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.3")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
-  testImplementation(group = "com.squareup.okhttp3", name="mockwebserver", version = "4.11.0")
+  testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -96,16 +96,19 @@ tasks.named<Test>("test") {
 }
 
 kotlinter {
-  version = "0.49.1"
   reporters = arrayOf("html", "json")
 }
 
 tasks.withType<DokkaTask>().configureEach {
   dokkaSourceSets {
     configureEach {
-      documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC,
-        DokkaConfiguration.Visibility.PROTECTED, DokkaConfiguration.Visibility.INTERNAL,
-        DokkaConfiguration.Visibility.PRIVATE))
+      documentedVisibilities.set(
+        setOf(
+          DokkaConfiguration.Visibility.PUBLIC,
+          DokkaConfiguration.Visibility.PROTECTED, DokkaConfiguration.Visibility.INTERNAL,
+          DokkaConfiguration.Visibility.PRIVATE
+        )
+      )
 //      documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
       jdkVersion.set(11)
     }
