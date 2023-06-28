@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.*
 import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401

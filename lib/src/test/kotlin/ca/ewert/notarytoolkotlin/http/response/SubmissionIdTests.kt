@@ -37,7 +37,7 @@ class SubmissionIdTests {
   fun invalidTest1() {
     val submissionIdResult =
       SubmissionId.of("Hello World")
-    assertThat(submissionIdResult).isErrAnd().prop(NotaryToolError.MalformedSubmissionIdError::invalidId)
+    assertThat(submissionIdResult).isErrAnd().prop(NotaryToolError.UserInputError.MalformedSubmissionIdError::invalidId)
       .isEqualTo("Hello World")
   }
 
@@ -50,7 +50,7 @@ class SubmissionIdTests {
   fun invalidTest2() {
     val submissionIdResult =
       SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ve1041")
-    assertThat(submissionIdResult).isErrAnd().prop(NotaryToolError.MalformedSubmissionIdError::invalidId)
+    assertThat(submissionIdResult).isErrAnd().prop(NotaryToolError.UserInputError.MalformedSubmissionIdError::invalidId)
       .isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ve1041")
   }
 }

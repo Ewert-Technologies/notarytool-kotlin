@@ -1,6 +1,8 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFound
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.Err
@@ -81,10 +83,10 @@ fun generateJwt(
       Ok(renderedToken)
     } catch (illegalArgumentException: IllegalArgumentException) {
       log.warn("Error creating JWT", illegalArgumentException)
-      Err(JsonWebTokenError.TokenCreationError("Error creating JWT, provided algorithm is null"))
+      Err(TokenCreationError("Error creating JWT, provided algorithm is null"))
     } catch (jwtCreationException: JWTCreationException) {
       log.warn("Error creating JWT", jwtCreationException)
-      Err(JsonWebTokenError.TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
+      Err(TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
     }
   }
 }
@@ -118,7 +120,7 @@ internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWeb
       },
     )
   } else {
-    Err(JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
+    Err(PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
   }
 }
 
