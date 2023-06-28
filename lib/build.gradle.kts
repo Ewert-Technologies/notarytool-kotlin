@@ -29,6 +29,7 @@ plugins {
   id("org.jetbrains.kotlin.jvm") version "1.8.21"
   id("com.github.ben-manes.versions") version "0.47.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
+  id("org.jmailen.kotlinter")
 }
 
 // Repositories for Library Dependencies
@@ -93,6 +94,10 @@ val company: String by project
 //
 tasks.named<Test>("test") {
   useJUnitPlatform()
+}
+
+kotlinter {
+  reporters = arrayOf("checkstyle", "plain", "html")
 }
 
 tasks.withType<DokkaTask>().configureEach {

@@ -1,0 +1,2 @@
+[*.{java,kt,kts,scala,rs,xml,kt.spec,kts.spec}]
+indent_size = 2
