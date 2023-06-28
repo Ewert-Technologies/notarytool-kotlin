@@ -74,7 +74,8 @@ class SubmissionListResponseTests {
         }
       ],
       "meta": {}
-    }""".trimIndent()
+    }
+    """.trimIndent()
 
     mockWebServer.enqueue(createMockResponse200(responseBody))
 
@@ -133,7 +134,8 @@ class SubmissionListResponseTests {
         }
       ],
       "meta": {}
-    }""".trimIndent()
+    }
+    """.trimIndent()
 
     mockWebServer.enqueue(createMockResponse200(responseBody))
 

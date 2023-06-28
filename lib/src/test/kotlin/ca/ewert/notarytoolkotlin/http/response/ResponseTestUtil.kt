@@ -20,7 +20,7 @@ private val log = KotlinLogging.logger {}
 fun createMockResponse200(body: String): MockResponse {
   val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
     .format(NotaryApiResponse.HTTP_DATE_TIME)
-  log.info {"Header Date String: $headerDateString" }
+  log.info { "Header Date String: $headerDateString" }
   return MockResponse().setResponseCode(200)
     .addHeader("Server", "daiquiri/3.0.0")
     .addHeader("Content-Type", "application/octet-stream")
@@ -42,7 +42,7 @@ fun createMockResponse401(): MockResponse {
 
     Request ID: TYPN6E62TY76LDJXYZTMLQRK7I.0.0
   """.trimIndent()
-  log.info {"Header Date String: $headerDateString" }
+  log.info { "Header Date String: $headerDateString" }
   return MockResponse().setResponseCode(401)
     .addHeader("Server", "daiquiri/3.0.0")
     .addHeader("Content-Type", "text/plain")

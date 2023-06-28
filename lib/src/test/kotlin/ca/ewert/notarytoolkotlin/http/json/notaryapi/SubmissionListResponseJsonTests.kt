@@ -29,7 +29,6 @@ class SubmissionListResponseJsonTests {
   private val jsonAdapter: JsonAdapter<SubmissionListResponseJson> =
     moshi.adapter(SubmissionListResponseJson::class.java)
 
-
   /**
    * Tests converting a sample valid SubmissionListResponse json String to a [SubmissionListResponseJson]
    * directly using adapter
@@ -69,7 +68,7 @@ class SubmissionListResponseJsonTests {
         ],
         "meta": {}
       }
-      """.trimIndent()
+    """.trimIndent()
 
     val submissionListResponseJson: SubmissionListResponseJson? = jsonAdapter.fromJson(jsonString)
     log.info(submissionListResponseJson.toString())
@@ -125,7 +124,7 @@ class SubmissionListResponseJsonTests {
         ],
         "meta": {}
       }
-      """.trimIndent()
+    """.trimIndent()
 
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
 

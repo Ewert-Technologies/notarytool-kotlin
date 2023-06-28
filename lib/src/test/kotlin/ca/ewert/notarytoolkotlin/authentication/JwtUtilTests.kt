@@ -49,7 +49,7 @@ class JwtUtilTests {
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile!!,
       issuedDate.toInstant(),
-      expiryDate.toInstant()
+      expiryDate.toInstant(),
     )
 
     generateJwtResult.onFailure { jsonWebTokenError ->
@@ -70,8 +70,8 @@ class JwtUtilTests {
       assertThat(
         String(
           Base64.getDecoder().decode(jwtParts[0]),
-          StandardCharsets.UTF_8
-        )
+          StandardCharsets.UTF_8,
+        ),
       ).isEqualTo(expectedHeader.trim())
 
       val expectedPayload = """
@@ -80,8 +80,8 @@ class JwtUtilTests {
       assertThat(
         String(
           Base64.getDecoder().decode(jwtParts[1]),
-          StandardCharsets.UTF_8
-        )
+          StandardCharsets.UTF_8,
+        ),
       ).isEqualTo(expectedPayload.trim())
     }
   }
@@ -100,7 +100,7 @@ class JwtUtilTests {
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
       privateKeyFile = privateKeyFile,
       issuedDate.toInstant(),
-      expiryDate.toInstant()
+      expiryDate.toInstant(),
     )
 
     val expectedMsg =
@@ -126,7 +126,7 @@ class JwtUtilTests {
       issuerId = "",
       privateKeyFile = privateKeyFile!!,
       issuedDate.toInstant(),
-      expiryDate.toInstant()
+      expiryDate.toInstant(),
     )
 
     generateJwtResult.onFailure { jsonWebTokenError ->
@@ -144,8 +144,8 @@ class JwtUtilTests {
       assertThat(
         String(
           Base64.getDecoder().decode(jwtParts[0]),
-          StandardCharsets.UTF_8
-        )
+          StandardCharsets.UTF_8,
+        ),
       ).isEqualTo(expectedHeader.trim())
 
       val expectedPayload = """
@@ -154,8 +154,8 @@ class JwtUtilTests {
       assertThat(
         String(
           Base64.getDecoder().decode(jwtParts[1]),
-          StandardCharsets.UTF_8
-        )
+          StandardCharsets.UTF_8,
+        ),
       ).isEqualTo(expectedPayload.trim())
     }
   }

@@ -62,5 +62,4 @@ class NewSubmissionResponseJsonTests {
     assertThat(newSubmissionResponseJson?.newSubmissionResponseData?.type)
       .isEqualTo("newSubmissions")
   }
-
 }

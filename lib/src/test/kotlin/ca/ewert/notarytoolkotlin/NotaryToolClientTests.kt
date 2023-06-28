@@ -3,8 +3,8 @@ package ca.ewert.notarytoolkotlin
 import assertk.assertThat
 import assertk.assertions.*
 import assertk.fail
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
@@ -87,19 +87,19 @@ class NotaryToolClientTests {
         }
       ],
       "meta": {}
-    }""".trimIndent()
+    }
+    """.trimIndent()
 
     mockWebServer.enqueue(createMockResponse200(responseBody))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("")
 
-
     val notaryToolClient = NotaryToolClient(
       privateKeyId = "A8B3X24VG1",
       issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
       privateKeyFile = privateKeyFile!!,
-      baseUrlString = baseUrl.toString()
+      baseUrlString = baseUrl.toString(),
     )
 
     val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
@@ -138,7 +138,7 @@ class NotaryToolClientTests {
       privateKeyId = "A8B3X24VG1",
       issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
       privateKeyFile = privateKeyFile!!,
-      baseUrlString = baseUrl.toString()
+      baseUrlString = baseUrl.toString(),
     )
 
     val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
@@ -149,10 +149,12 @@ class NotaryToolClientTests {
       log.info { "onFailure(): $error" }
       when (error) {
         is JsonWebTokenError.TokenCreationError -> log.warn { error.msg }
-        is NotaryToolError.HttpError ->  {
-          log.warn { "An HTTP Error occurred. " +
+        is NotaryToolError.HttpError -> {
+          log.warn {
+            "An HTTP Error occurred. " +
               "Code: ${error.httpStatusCode} - ${error.httpStatusMsg}, " +
-              "for request to: ${error.requestUrl}. Response Body: '${error.contentBody}'" }
+              "for request to: ${error.requestUrl}. Response Body: '${error.contentBody}'"
+          }
           assertThat(error.httpStatusCode).isEqualTo(401)
         }
         else -> log.warn { error.msg }

@@ -27,7 +27,7 @@ private val log = KotlinLogging.logger {}
  * Unit Tests for [SubmissionStatusResponse]
  * @author vewert
  */
-class SubmissionResponseTests () {
+class SubmissionResponseTests() {
   private var mockWebServer: MockWebServer
   init {
     mockWebServer = MockWebServer()
@@ -77,7 +77,6 @@ class SubmissionResponseTests () {
       .protocols(listOf(Protocol.HTTP_1_1, Protocol.HTTP_2))
       .build()
 
-
     client.newCall(request).execute().use { response: Response ->
       log.info("Returned Response: $response")
       assertThat(response.isSuccessful).isTrue()
@@ -119,7 +118,6 @@ class SubmissionResponseTests () {
 
     val client = OkHttpClient.Builder().build()
 
-
     client.newCall(request).execute().use { response: Response ->
       log.info("Returned Response: $response")
       assertThat(response.isSuccessful).isTrue()
@@ -135,7 +133,7 @@ class SubmissionResponseTests () {
           val submissionResponse = SubmissionStatusResponse(responseMetaData, jsonResponse = submissionResponseJson)
           assertThat(submissionResponse.receivedTimestamp.atZone(ZoneId.systemDefault())).isCloseTo(
             ZonedDateTime.now(),
-            Duration.of(500, ChronoUnit.MILLIS)
+            Duration.of(500, ChronoUnit.MILLIS),
           )
 
           val expectedCreatedDate: ZonedDateTime = ZonedDateTime.of(2022, 6, 8, 1, 38, 9, 498000000, ZoneId.of("Z"))
@@ -149,11 +147,10 @@ class SubmissionResponseTests () {
           log.info { "content-length ${submissionResponse.responseMetaData.contentLength}" }
           assertThat(submissionResponse.responseMetaData.contentLength).isEqualTo(submissionResponse.responseMetaData.rawContents?.length?.toLong())
 
-
           val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
           log.info { "Recorded Request: $recordedRequest" }
           log.info { "Recorded Request Headers: ${recordedRequest.headers}" }
-          log.info { "Recorded Request User-Agent ${recordedRequest.getHeader("User-Agent")}"}
+          log.info { "Recorded Request User-Agent ${recordedRequest.getHeader("User-Agent")}" }
         }
       } else {
         log.warn { "Request was not successful: $request" }

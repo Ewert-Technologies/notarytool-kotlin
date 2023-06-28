@@ -33,7 +33,7 @@ class NewSubmissionRequestJsonTests {
     val newSubmissionRequestJson = NewSubmissionRequestJson(
       listOf(newSubmissionRequestNotificationJson),
       sha256 = "68d561c564ef61f718e99a81b13bcb52af11b7ac9baf538af3ea0c83326fb6a1",
-      submissionName = "OvernightTextEditor_11.6.8.zip"
+      submissionName = "OvernightTextEditor_11.6.8.zip",
     )
 
     val jsonString = jsonAdapter.toJson(newSubmissionRequestJson)
@@ -63,7 +63,7 @@ class NewSubmissionRequestJsonTests {
     val newSubmissionRequestJson = NewSubmissionRequestJson(
       emptyList(),
       sha256 = "68d561c564ef61f718e99a81b13bcb52af11b7ac9baf538af3ea0c83326fb6a1",
-      submissionName = "OvernightTextEditor_11.6.8.zip"
+      submissionName = "OvernightTextEditor_11.6.8.zip",
     )
 
     val jsonString = jsonAdapter.toJson(newSubmissionRequestJson)
@@ -79,6 +79,4 @@ class NewSubmissionRequestJsonTests {
 
     assertThat(jsonString).isEqualTo(expectedJsonString)
   }
-
-
 }

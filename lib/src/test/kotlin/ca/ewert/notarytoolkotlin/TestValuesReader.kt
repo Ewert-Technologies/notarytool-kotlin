@@ -55,4 +55,3 @@ class TestValuesReader {
     return properties.getProperty("issuerId", "")
   }
 }
-

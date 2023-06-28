@@ -55,7 +55,7 @@ class JsonWebTokenTest {
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
-      tokenLifetime = tokenLifetime
+      tokenLifetime = tokenLifetime,
     )
     assertThat(jsonWebTokenResult).isOk()
 
@@ -65,7 +65,7 @@ class JsonWebTokenTest {
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
-        tolerance = Duration.of(500, ChronoUnit.MILLIS)
+        tolerance = Duration.of(500, ChronoUnit.MILLIS),
       )
       assertThat(jsonWebToken.isExpired).isFalse()
       assertThat(jsonWebToken.signedToken).isNotEmpty()
@@ -81,14 +81,14 @@ class JsonWebTokenTest {
       log.info { "jwtPayload: $jwtPayload" }
       val expectedPayloadString = """
         {"aud":"appstoreconnect-v1","exp":$exp,"iat":$iat,"iss":"1234567","scope":["GET /notary/v2/submissions"]}
-        """.trimIndent()
+      """.trimIndent()
       assertThat(jwtPayload).isEqualTo(expectedPayloadString)
 
       val jwtHeader = jsonWebToken.decodedHeaderJson?.toJsonString()
       log.info { "jwtHeader: $jwtHeader" }
       val expectedHeader = """
         {"alg":"ES256","kid":"ABCDEFG","typ":"JWT"}
-        """.trimIndent()
+      """.trimIndent()
       assertThat(jwtHeader).isEqualTo(expectedHeader)
     }
   }
@@ -109,7 +109,7 @@ class JsonWebTokenTest {
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
-      tokenLifetime = tokenLifetime
+      tokenLifetime = tokenLifetime,
     )
 
     assertThat(jsonWebTokenResult).isOk()
@@ -119,7 +119,7 @@ class JsonWebTokenTest {
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
-        tolerance = Duration.of(500, ChronoUnit.MILLIS)
+        tolerance = Duration.of(500, ChronoUnit.MILLIS),
       )
       assertThat(jsonWebToken.isExpired).isFalse()
       Thread.sleep(75000)
@@ -143,7 +143,7 @@ class JsonWebTokenTest {
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
       privateKeyFile = privateKeyFile!!,
-      tokenLifetime = tokenLifetime
+      tokenLifetime = tokenLifetime,
     )
 
     assertThat(jsonWebTokenResult).isOk()
@@ -154,7 +154,7 @@ class JsonWebTokenTest {
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
-        tolerance = Duration.of(500, ChronoUnit.MILLIS)
+        tolerance = Duration.of(500, ChronoUnit.MILLIS),
       )
 
       assertThat(jsonWebToken.isExpired).isFalse()
@@ -168,7 +168,7 @@ class JsonWebTokenTest {
       val updatedExpectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = updatedExpectedExpirationTime,
-        tolerance = Duration.of(500, ChronoUnit.MILLIS)
+        tolerance = Duration.of(500, ChronoUnit.MILLIS),
       )
       assertThat(jsonWebToken.isExpired).isFalse()
       assertThat(jsonWebToken.decodedPayloadJson?.iat).isEqualTo(jsonWebToken.issuedAtTime.epochSecond.toInt())

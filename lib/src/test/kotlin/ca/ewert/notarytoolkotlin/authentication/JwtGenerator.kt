@@ -43,10 +43,10 @@ class JwtGenerator {
         issuerId,
         privateKeyFile,
         Instant.now(),
-        Instant.now().plus(Duration.ofMinutes(15))
+        Instant.now().plus(Duration.ofMinutes(15)),
       )
       assertThat(generateJwtResult).isOk()
-      generateJwtResult.onSuccess { jwtString -> log.info { "JWT: [$jwtString]" }}
+      generateJwtResult.onSuccess { jwtString -> log.info { "JWT: [$jwtString]" } }
     }
   }
 }
