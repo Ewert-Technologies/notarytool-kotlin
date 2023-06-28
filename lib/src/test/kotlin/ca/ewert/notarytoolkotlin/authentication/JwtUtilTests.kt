@@ -161,6 +161,102 @@ class JwtUtilTests {
   }
 
   /**
+   * Tests attempting to create a rendered JWT String, with an invalid Private Key file
+   * The private key file contains plain text, instead of a Base64 encoded key.
+   */
+  @Test
+  fun generateJwtTest4() {
+    val privateKeyFile: Path? = resourceToPath("/privateKey4.p8")
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant(),
+    )
+    val expectedMsg =
+      "The private key format is invalid: 'Illegal base64 character 20'"
+    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+  }
+
+  /**
+   * Tests attempting to create a rendered JWT String, with an invalid Private Key file
+   * The private key Base64 text that is too long.
+   */
+  @Test
+  fun generateJwtTest5() {
+    val privateKeyFile: Path? = resourceToPath("/privateKey5.p8")
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant(),
+    )
+    val expectedMsg =
+      "The private key format is invalid: 'java.security.InvalidKeyException: invalid key format'"
+    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+  }
+
+  /**
+   * Tests attempting to create a rendered JWT String, with an invalid Private Key file
+   * The private key text is empty.
+   */
+  @Test
+  fun generateJwtTest6() {
+    val privateKeyFile: Path? = resourceToPath("/privateKey6.p8")
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant(),
+    )
+    val expectedMsg =
+      "The private key format is invalid: 'java.security.InvalidKeyException: IOException : Short read of DER length'"
+    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+  }
+
+  /**
+   * Tests attempting to create a rendered JWT String, with an invalid Private Key file
+   * The private key Base64 text that is too short.
+   */
+  @Test
+  fun generateJwtTest7() {
+    val privateKeyFile: Path? = resourceToPath("/privateKey7.p8")
+    val issuedDate: ZonedDateTime = ZonedDateTime.of(2023, 6, 13, 10, 25, 0, 0, ZoneId.of("UTC"))
+    val expiryDate: ZonedDateTime = issuedDate.plus(15, ChronoUnit.MINUTES)
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val generateJwtResult = generateJwt(
+      privateKeyId = "ABCDE12345",
+      issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
+      privateKeyFile = privateKeyFile!!,
+      issuedDate.toInstant(),
+      expiryDate.toInstant(),
+    )
+    val expectedMsg =
+      "The private key format is invalid: 'java.security.InvalidKeyException: IOException : null'"
+    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+  }
+
+  /**
    * Tests parsing out the Private Key String, from Apples Private Key File (`.p8` file)
    * Tests case were Header and Footer parts are included.
    */

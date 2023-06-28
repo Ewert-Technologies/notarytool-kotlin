@@ -27,6 +27,8 @@ sealed interface NotaryToolError {
        */
       data class PrivateKeyNotFound(override val msg: String) : JsonWebTokenError
 
+      data class InvalidPrivateKeyError(override val msg: String) : JsonWebTokenError
+
       /**
        * Error for when there is a problem generating the Json Web Token.
        * The [msg] contains details about the error.

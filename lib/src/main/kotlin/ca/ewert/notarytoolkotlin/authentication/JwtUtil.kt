@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KLogger
@@ -101,8 +102,11 @@ fun generateJwt(
  * @return The generated Private Key, suitable for signing the JWT or an [JsonWebTokenError.PrivateKeyNotFound]
  */
 internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWebTokenError> {
-  val privateKeyStringResult = parsePrivateKeyString(privateKeyFile = privateKeyFile)
-  return privateKeyStringResult.map { privateKeyString: String -> createPrivateKey(privateKeyString) }
+  return parsePrivateKeyString(privateKeyFile = privateKeyFile).andThen { privateKeyFileString: String ->
+    createPrivateKey(
+      privateKeyFileString,
+    )
+  }.map { ecPrivateKey -> ecPrivateKey }
 }
 
 /**
@@ -133,11 +137,20 @@ internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWeb
  * @param keyString The private key as a Base64 String, e.g. from a `.p8`
  * @return The generate Private Key, suitable for signing the JWT.
  */
-internal fun createPrivateKey(keyString: String): ECPrivateKey {
+internal fun createPrivateKey(keyString: String): Result<ECPrivateKey, JsonWebTokenError> {
   val keyBytes: ByteArray = keyString.toByteArray()
   log.debug { "keyBytes: $ keyBytes" }
-  val keyBytesBase64Decoded: ByteArray = Base64.getDecoder().decode(keyBytes)
-  log.debug { "keyBytesBase64String: $keyBytesBase64Decoded" }
-  val pkcS8EncodedKeySpec = PKCS8EncodedKeySpec(keyBytesBase64Decoded)
-  return KeyFactory.getInstance("EC").generatePrivate(pkcS8EncodedKeySpec) as ECPrivateKey
+
+  return try {
+    val keyBytesBase64Decoded: ByteArray = Base64.getDecoder().decode(keyBytes)
+    log.debug { "keyBytesBase64String: $keyBytesBase64Decoded" }
+    val pkcS8EncodedKeySpec = PKCS8EncodedKeySpec(keyBytesBase64Decoded)
+    Ok(KeyFactory.getInstance("EC").generatePrivate(pkcS8EncodedKeySpec) as ECPrivateKey)
+  } catch (exception: Exception) {
+    log.warn(exception) { "Error creating ECPrivateKey" }
+    Err(
+      JsonWebTokenError
+        .InvalidPrivateKeyError(msg = "The private key format is invalid: '${exception.message ?: "N/A"}'"),
+    )
+  }
 }
