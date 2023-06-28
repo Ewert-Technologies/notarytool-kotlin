@@ -26,7 +26,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
  */
 data class SubmissionResponseJson(
   @Json(name = "data") val submissionResponseData: SubmissionsDataJson,
-  val meta: SubmissionsMetaJson
+  val meta: SubmissionsMetaJson,
 ) {
   companion object {
 
@@ -69,7 +69,7 @@ data class SubmissionResponseJson(
  */
 data class SubmissionListResponseJson(
   @Json(name = "data") val submissionListResponseData: List<SubmissionsDataJson>,
-  val meta: SubmissionsMetaJson
+  val meta: SubmissionsMetaJson,
 ) {
   companion object {
 
@@ -113,7 +113,7 @@ data class SubmissionListResponseJson(
 data class SubmissionsDataJson(
   val attributes: SubmissionsAttributesJson,
   val id: String,
-  val type: String
+  val type: String,
 )
 
 
@@ -132,7 +132,7 @@ data class SubmissionsDataJson(
 data class SubmissionsAttributesJson(
   val createdDate: String,
   val name: String,
-  val status: String
+  val status: String,
 )
 
 /**

@@ -1,12 +1,15 @@
 package ca.ewert.notarytoolkotlin
 
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
-import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -44,7 +47,7 @@ class NotaryToolClient(
   private val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
   private val baseUrlString: String = BASE_URL_STRING,
   private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
-  private val userAgent: String = USER_AGENT_VALUE
+  private val userAgent: String = USER_AGENT_VALUE,
 ) {
 
   companion object {
@@ -99,7 +102,6 @@ class NotaryToolClient(
    * to start a new submission.
    */
   fun getSubmissionStatus(submissionId: String) {
-
   }
 
   /**
@@ -145,7 +147,7 @@ class NotaryToolClient(
               }
             } else {
               when (response.code) {
-                in 400 .. 499 -> {
+                in 400..499 -> {
                   if (response.code == 404) {
                     log.warn { "404 error when sending request to: $url" }
                   }
@@ -155,21 +157,23 @@ class NotaryToolClient(
                       responseMetaData.httpStatusCode,
                       responseMetaData.httpStatusMessage,
                       url.toString(),
-                      responseMetaData.rawContents
-                    )
+                      responseMetaData.rawContents,
+                    ),
                   )
                 }
-                in 500 .. 599 -> {
+
+                in 500..599 -> {
                   Err(
                     NotaryToolError.HttpError.ServerError5xx(
                       "Response was unsuccessful",
                       responseMetaData.httpStatusCode,
                       responseMetaData.httpStatusMessage,
                       url.toString(),
-                      responseMetaData.rawContents
-                    )
+                      responseMetaData.rawContents,
+                    ),
                   )
                 }
+
                 else -> {
                   Err(
                     NotaryToolError.HttpError.OtherError(
@@ -177,8 +181,8 @@ class NotaryToolClient(
                       responseMetaData.httpStatusCode,
                       responseMetaData.httpStatusMessage,
                       url.toString(),
-                      responseMetaData.rawContents
-                    )
+                      responseMetaData.rawContents,
+                    ),
                   )
                 }
               }

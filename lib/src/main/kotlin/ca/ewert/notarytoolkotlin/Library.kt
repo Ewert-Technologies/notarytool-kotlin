@@ -5,7 +5,7 @@ package ca.ewert.notarytoolkotlin
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 
-private val log = KotlinLogging.logger{}
+private val log = KotlinLogging.logger {}
 
 /**
  * This is a test Library Class, created by the gradle template.
@@ -21,7 +21,7 @@ public class Library {
    * @return Always returns true
    */
   public fun someLibraryMethod(name: String?): Boolean {
-    log.info {"Hello notarytool-kotlin"}
+    log.info { "Hello notarytool-kotlin" }
     return true
   }
 }

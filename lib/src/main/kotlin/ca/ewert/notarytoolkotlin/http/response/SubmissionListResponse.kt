@@ -15,7 +15,7 @@ private val log = KotlinLogging.logger {}
  */
 class SubmissionListResponse internal constructor(
   responseMetaData: ResponseMetaData,
-  jsonResponse: SubmissionListResponseJson
+  jsonResponse: SubmissionListResponseJson,
 ) : NotaryApiResponse(responseMetaData) {
 
   /**

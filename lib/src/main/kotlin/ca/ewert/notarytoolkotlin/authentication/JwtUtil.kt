@@ -3,7 +3,11 @@ package ca.ewert.notarytoolkotlin.authentication
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
-import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.flatMap
+import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Path
@@ -38,7 +42,8 @@ enum class Scope(val scopeValue: String) {
   /**
    * Scope value of `GET /notary/v2/submissions`
    */
-  GET_SUBMISSIONS("GET /notary/v2/submissions");
+  GET_SUBMISSIONS("GET /notary/v2/submissions"),
+  ;
 
   /**
    * To String method for the Enum. Returns the [scopeValue]
@@ -56,10 +61,12 @@ enum class Scope(val scopeValue: String) {
  * @return Either the Json Web Token String, or [JsonWebTokenError] containing an error message
  */
 fun generateJwt(
-  privateKeyId: String, issuerId: String, privateKeyFile: Path,
-  issuedDate: Instant, expiryDate: Instant
+  privateKeyId: String,
+  issuerId: String,
+  privateKeyFile: Path,
+  issuedDate: Instant,
+  expiryDate: Instant,
 ): Result<String, JsonWebTokenError> {
-
   return createPrivateKey(privateKeyFile).flatMap {
     val algorithm = Algorithm.ECDSA256(it)
     val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
@@ -107,13 +114,15 @@ internal fun createPrivateKey(privateKeyFile: Path): Result<ECPrivateKey, JsonWe
  */
 internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWebTokenError> {
   return if (privateKeyFile.exists()) {
-    Ok(privateKeyFile.useLines { lines ->
-      lines.filter { !it.matches(Regex("-*\\w+ PRIVATE KEY-*")) }.joinToString(separator = "")})
+    Ok(
+      privateKeyFile.useLines { lines ->
+        lines.filter { !it.matches(Regex("-*\\w+ PRIVATE KEY-*")) }.joinToString(separator = "")
+      },
+    )
   } else {
     Err(JsonWebTokenError.PrivateKeyNotFound("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
   }
 }
-
 
 /**
  * Creates an [ECPrivateKey] from the Private Key String passed in. The

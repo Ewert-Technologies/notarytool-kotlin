@@ -43,7 +43,9 @@ open class NotaryApiResponse internal constructor(val responseMetaData: Response
     /** The Combined HTTP Status code and message, e.g. `400 - OK` */
     val httpStatusString: String
 
-    /** Response Headers */ //TODO Decide whether to keep
+    /** Response Headers
+     * //TODO Decide whether to keep
+     */
     val headers: Map<String, String>
 
     /** Value of the `Date` Header */

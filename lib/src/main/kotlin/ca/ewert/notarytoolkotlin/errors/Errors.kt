@@ -10,9 +10,7 @@ sealed interface NotaryToolError {
   /** Error Message */
   val msg: String
 
-  sealed interface UserInputError: NotaryToolError {
-
-  }
+  sealed interface UserInputError : NotaryToolError
 
   /**
    * Parent of all Errors related to working with Json Web Token
@@ -31,28 +29,43 @@ sealed interface NotaryToolError {
     data class TokenCreationError(override val msg: String) : JsonWebTokenError
   }
 
-  sealed interface HttpError: NotaryToolError {
+  sealed interface HttpError : NotaryToolError {
     val httpStatusCode: Int
     val httpStatusMsg: String
     val requestUrl: String
     val contentBody: String?
 
-    data class InvalidSubmissionId (override val msg: String, override val httpStatusCode: Int = 404,
-                                   override val httpStatusMsg: String, override val requestUrl: String = "",
-                                   override val contentBody: String?) : HttpError
+    data class InvalidSubmissionId(
+      override val msg: String,
+      override val httpStatusCode: Int = 404,
+      override val httpStatusMsg: String,
+      override val requestUrl: String = "",
+      override val contentBody: String?,
+    ) : HttpError
 
-    data class ClientError4xx(override val msg: String, override val httpStatusCode: Int,
-                              override val httpStatusMsg: String, override val requestUrl: String = "",
-                              override val contentBody: String?) : HttpError
+    data class ClientError4xx(
+      override val msg: String,
+      override val httpStatusCode: Int,
+      override val httpStatusMsg: String,
+      override val requestUrl: String = "",
+      override val contentBody: String?,
+    ) : HttpError
 
-    data class ServerError5xx(override val msg: String, override val httpStatusCode: Int,
-                              override val httpStatusMsg: String, override val requestUrl: String = "",
-                              override val contentBody: String?) : HttpError
+    data class ServerError5xx(
+      override val msg: String,
+      override val httpStatusCode: Int,
+      override val httpStatusMsg: String,
+      override val requestUrl: String = "",
+      override val contentBody: String?,
+    ) : HttpError
 
-    data class OtherError(override val msg: String, override val httpStatusCode: Int,
-                              override val httpStatusMsg: String, override val requestUrl: String = "",
-                              override val contentBody: String?) : HttpError
-
+    data class OtherError(
+      override val msg: String,
+      override val httpStatusCode: Int,
+      override val httpStatusMsg: String,
+      override val requestUrl: String = "",
+      override val contentBody: String?,
+    ) : HttpError
   }
 
   /**
@@ -64,11 +77,4 @@ sealed interface NotaryToolError {
   data class MalformedSubmissionIdError(override val msg: String, val invalidId: String) : NotaryToolError
 
   data class GeneralError(override val msg: String) : NotaryToolError
-
-
 }
-
-
-
-
-

@@ -18,7 +18,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
 data class JwtHeaderJson(
   val alg: String,
   val kid: String,
-  val typ: String
+  val typ: String,
 ) {
 
   /**
@@ -27,12 +27,12 @@ data class JwtHeaderJson(
    * @param prettyPrint Whether the json should be pretty printed, using an indent of 2
    */
   fun toJsonString(prettyPrint: Boolean = false): String {
-    val jsonAdapter: JsonAdapter<JwtHeaderJson>  =
-    if (prettyPrint) {
-      moshi.adapter(JwtHeaderJson::class.java).indent("  ")
-    } else {
-      moshi.adapter(JwtHeaderJson::class.java)
-    }
+    val jsonAdapter: JsonAdapter<JwtHeaderJson> =
+      if (prettyPrint) {
+        moshi.adapter(JwtHeaderJson::class.java).indent("  ")
+      } else {
+        moshi.adapter(JwtHeaderJson::class.java)
+      }
     return jsonAdapter.toJson(this)
   }
 }
@@ -53,7 +53,7 @@ data class JwtPayloadJson(
   val exp: Int,
   val iat: Int,
   val iss: String,
-  val scope: List<String>
+  val scope: List<String>,
 ) {
 
   /**

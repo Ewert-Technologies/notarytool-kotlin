@@ -5,8 +5,6 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 
-
-
 /**
  * Wrapper around the `submissionId`, used by Apple's Notary API.
  * The identifier that you receive from the notary service when you post to

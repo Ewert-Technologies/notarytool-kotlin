@@ -22,7 +22,7 @@ import com.squareup.moshi.Json
 data class NewSubmissionRequestJson(
   val notifications: List<NewSubmissionRequestNotificationJson>,
   val sha256: String,
-  val submissionName: String
+  val submissionName: String,
 )
 
 /**
@@ -34,7 +34,7 @@ data class NewSubmissionRequestJson(
  */
 data class NewSubmissionRequestNotificationJson(
   val channel: String,
-  val target: String
+  val target: String,
 )
 
 /**
@@ -48,7 +48,7 @@ data class NewSubmissionRequestNotificationJson(
  */
 data class NewSubmissionResponseJson(
   @Json(name = "data") val newSubmissionResponseData: NewSubmissionsDataJson,
-  val meta: NewSubmissionsMetaJson
+  val meta: NewSubmissionsMetaJson,
 )
 
 /**
@@ -62,7 +62,7 @@ data class NewSubmissionResponseJson(
 data class NewSubmissionsDataJson(
   val attributes: NewSubmissionsAttributesJson,
   val id: String,
-  val type: String
+  val type: String,
 )
 
 /**
@@ -80,7 +80,7 @@ data class NewSubmissionsAttributesJson(
   val awsSecretAccessKey: String,
   val awsSessionToken: String,
   val bucket: String,
-  @Json(name = "object") val objectKey: String
+  @Json(name = "object") val objectKey: String,
 )
 
 /**

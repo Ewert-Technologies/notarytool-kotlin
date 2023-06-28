@@ -14,7 +14,7 @@ private val log = KotlinLogging.logger {}
  */
 class SubmissionStatusResponse internal constructor(
   responseMetaData: ResponseMetaData,
-  jsonResponse: SubmissionResponseJson
+  jsonResponse: SubmissionResponseJson,
 ) : NotaryApiResponse(responseMetaData = responseMetaData) {
 
 
@@ -36,6 +36,6 @@ class SubmissionStatusResponse internal constructor(
     val status = SubmissionStatus.fromString(statusText)
     val id = jsonResponse.submissionResponseData.id
 
-    submissionInfo = SubmissionInfo(createdDate, createdDateText, name, status,statusText, SubmissionId(id))
+    submissionInfo = SubmissionInfo(createdDate, createdDateText, name, status, statusText, SubmissionId(id))
   }
 }

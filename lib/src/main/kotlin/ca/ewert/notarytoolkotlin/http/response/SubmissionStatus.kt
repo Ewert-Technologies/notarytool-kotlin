@@ -31,7 +31,8 @@ enum class SubmissionStatus(val displayName: String) {
    * When the submission status returned from the API doesn't match
    * a known status
    */
-  UNKNOWN("Unknown");
+  UNKNOWN("Unknown"),
+  ;
 
   override fun toString(): String {
     return displayName
@@ -48,8 +49,9 @@ enum class SubmissionStatus(val displayName: String) {
     fun fromString(stringValue: String): SubmissionStatus {
       return when {
         stringValue.equals(ACCEPTED.displayName, true) -> ACCEPTED
-        (stringValue.equals(IN_PROGRESS.displayName, true))
-            || (stringValue.equals("In-Progress", true)) -> IN_PROGRESS
+        (stringValue.equals(IN_PROGRESS.displayName, true)) ||
+          (stringValue.equals("In-Progress", true)) -> IN_PROGRESS
+
         stringValue.equals(INVALID.displayName, true) -> INVALID
         stringValue.equals(REJECTED.displayName, true) -> REJECTED
         else -> UNKNOWN

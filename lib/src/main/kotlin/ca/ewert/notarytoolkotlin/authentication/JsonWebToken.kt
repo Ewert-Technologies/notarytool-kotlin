@@ -1,6 +1,5 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtHeaderJson
 import ca.ewert.notarytoolkotlin.http.json.jwt.JwtPayloadJson
@@ -48,7 +47,7 @@ internal class JsonWebToken private constructor(
   private val tokenLifetime: Duration = Duration.ofMinutes(15),
   _issuedAtTime: Instant,
   _expirationTime: Instant,
-  _signedToken: String
+  _signedToken: String,
 ) {
 
   internal companion object {
@@ -69,7 +68,7 @@ internal class JsonWebToken private constructor(
       privateKeyId: String,
       issuerId: String,
       privateKeyFile: Path,
-      tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES)
+      tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
     ): Result<JsonWebToken, JsonWebTokenError> {
       val issued = Instant.now()
       val expiry = issued.plus(tokenLifetime)
@@ -78,7 +77,7 @@ internal class JsonWebToken private constructor(
         issuerId,
         privateKeyFile,
         issued,
-        expiry
+        expiry,
       ).map { jwtString ->
         JsonWebToken(
           privateKeyId,
@@ -87,7 +86,7 @@ internal class JsonWebToken private constructor(
           tokenLifetime,
           issued,
           expiry,
-          jwtString
+          jwtString,
         )
       }
     }

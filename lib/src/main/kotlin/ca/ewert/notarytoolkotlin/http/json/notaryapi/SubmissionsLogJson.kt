@@ -13,7 +13,7 @@ import com.squareup.moshi.Json
  */
 data class SubmissionLogUrlResponseJson(
   @Json(name = "data") val submissionLogResponseData: SubmissionsLogDataJson,
-  val meta: SubmissionsLogMetaJson
+  val meta: SubmissionsLogMetaJson,
 )
 
 /**
@@ -29,7 +29,7 @@ data class SubmissionLogUrlResponseJson(
 data class SubmissionsLogDataJson(
   val attributes: SubmissionsLogAttributesJson,
   val id: String,
-  val type: String
+  val type: String,
 )
 
 /**
@@ -42,7 +42,7 @@ data class SubmissionsLogDataJson(
  * another call to the Get Submission Log endpoint.
  */
 data class SubmissionsLogAttributesJson(
-  val developerLogUrl: String
+  val developerLogUrl: String,
 )
 
 /**
