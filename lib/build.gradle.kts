@@ -11,7 +11,6 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 buildscript {
   dependencies {
@@ -98,7 +97,7 @@ tasks.named<Test>("test") {
 
 kotlinter {
   version = "0.49.1"
-  reporters = arrayOf("checkstyle", "plain", "html")
+  reporters = arrayOf("html", "json")
 }
 
 tasks.withType<DokkaTask>().configureEach {
