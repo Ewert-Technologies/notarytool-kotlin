@@ -97,6 +97,7 @@ tasks.named<Test>("test") {
 }
 
 kotlinter {
+  version = "0.49.1"
   reporters = arrayOf("checkstyle", "plain", "html")
 }
 
