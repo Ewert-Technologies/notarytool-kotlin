@@ -81,7 +81,7 @@ class NotaryToolClient(
   /**
    * The HttpClient used to make the Requests
    */
-  private val httpClient: OkHttpClient = OkHttpClient.Builder().connectTimeout(connectTimeout).build()
+  private val httpClient: OkHttpClient = OkHttpClient.Builder().connectTimeout(duration = connectTimeout).build()
 
   /**
    * The Base Url, to send the Requests to.
@@ -92,7 +92,12 @@ class NotaryToolClient(
    * Json Web Token object used for authentication, when sending a Request
    */
   private val jsonWebTokenResult: Result<JsonWebToken, JsonWebTokenError> =
-    JsonWebToken.create(privateKeyId, issuerId, privateKeyFile, tokenLifetime)
+    JsonWebToken.create(
+      privateKeyId = privateKeyId,
+      issuerId = issuerId,
+      privateKeyFile = privateKeyFile,
+      tokenLifetime = tokenLifetime,
+    )
 
   /**
    * Fetch the status of a software notarization submission.
@@ -131,42 +136,46 @@ class NotaryToolClient(
   fun getPreviousSubmissions(): Result<SubmissionListResponse, NotaryToolError> {
     return when (jsonWebTokenResult) {
       is Ok -> {
-        val jsonWebToken = jsonWebTokenResult.value
+        val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {
           jsonWebToken.updateWebToken()
         }
         if (baseUrl != null) {
-          val url = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
+          val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
           log.info { "URL String: $url" }
           val request: Request = Request.Builder()
-            .url(url)
-            .header("User-Agent", userAgent)
-            .header("Authorization", "Bearer ${jsonWebToken.signedToken}")
+            .url(url = url)
+            .header(name = "User-Agent", value = userAgent)
+            .header(name = "Authorization", value = "Bearer ${jsonWebToken.signedToken}")
             .get()
             .build()
 
-          httpClient.newCall(request).execute().use { response: Response ->
+          httpClient.newCall(request = request).execute().use { response: Response ->
             log.info { "Response from ${response.request.url}: $response" }
             val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
             log.info { "Response body: ${responseMetaData.rawContents}" }
             if (response.isSuccessful) {
-              val submissionListResponseJsonResult = SubmissionListResponseJson.create(responseMetaData.rawContents)
-              submissionListResponseJsonResult.map { submissionListResponseJson ->
-                SubmissionListResponse(responseMetaData, submissionListResponseJson)
-              }
+              SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)
+                .map { submissionListResponseJson: SubmissionListResponseJson ->
+                  SubmissionListResponse(responseMetaData = responseMetaData, jsonResponse = submissionListResponseJson)
+                }
             } else {
               when (response.code) {
+                401, 403 -> {
+                  Err(JsonWebTokenError.AuthenticationError("Web Service could not authenticate the request."))
+                }
+
                 in 400..499 -> {
                   if (response.code == 404) {
                     log.warn { "404 error when sending request to: $url" }
                   }
                   Err(
                     NotaryToolError.HttpError.ClientError4xx(
-                      "Response was unsuccessful",
-                      responseMetaData.httpStatusCode,
-                      responseMetaData.httpStatusMessage,
-                      url.toString(),
-                      responseMetaData.rawContents,
+                      msg = "Response was unsuccessful.",
+                      httpStatusCode = responseMetaData.httpStatusCode,
+                      httpStatusMsg = responseMetaData.httpStatusMessage,
+                      requestUrl = url.toString(),
+                      contentBody = responseMetaData.rawContents,
                     ),
                   )
                 }
@@ -174,11 +183,11 @@ class NotaryToolClient(
                 in 500..599 -> {
                   Err(
                     NotaryToolError.HttpError.ServerError5xx(
-                      "Response was unsuccessful",
-                      responseMetaData.httpStatusCode,
-                      responseMetaData.httpStatusMessage,
-                      url.toString(),
-                      responseMetaData.rawContents,
+                      msg = "Response was unsuccessful.",
+                      httpStatusCode = responseMetaData.httpStatusCode,
+                      httpStatusMsg = responseMetaData.httpStatusMessage,
+                      requestUrl = url.toString(),
+                      contentBody = responseMetaData.rawContents,
                     ),
                   )
                 }
@@ -186,11 +195,11 @@ class NotaryToolClient(
                 else -> {
                   Err(
                     NotaryToolError.HttpError.OtherError(
-                      "Response was unsuccessful",
-                      responseMetaData.httpStatusCode,
-                      responseMetaData.httpStatusMessage,
-                      url.toString(),
-                      responseMetaData.rawContents,
+                      msg = "Response was unsuccessful.",
+                      httpStatusCode = responseMetaData.httpStatusCode,
+                      httpStatusMsg = responseMetaData.httpStatusMessage,
+                      requestUrl = url.toString(),
+                      contentBody = responseMetaData.rawContents,
                     ),
                   )
                 }
@@ -198,11 +207,11 @@ class NotaryToolClient(
             }
           }
         } else {
-          Err(NotaryToolError.GeneralError("URL Path was null"))
+          Err(NotaryToolError.GeneralError(msg = "URL Path was null"))
         }
       }
 
-      is Err -> Err(NotaryToolError.GeneralError("Base URL was null"))
+      is Err -> Err(NotaryToolError.GeneralError(msg = "Base URL was null"))
     }
   }
 }
