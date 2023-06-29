@@ -4,10 +4,13 @@ import assertk.assertThat
 import assertk.assertions.endsWith
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
+import assertk.assertions.isNotNull
 import assertk.assertions.matches
 import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.http.response.SubmissionId
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
@@ -281,6 +284,73 @@ class NotaryToolClientTests {
 
     getPreviousSubmissionsResult.onFailure { error ->
       fail(AssertionError("Request failed with: $error"))
+    }
+  }
+
+  /**
+   * Tests getSubmissionStatus, using valid request to actual Apple Notary API
+   */
+  @Test
+  @Tag("Apple-Server")
+  @Tag("Private")
+  @DisplayName("getSubmissionStatus Valid submissionId Test to Apple Server")
+  fun getSubmissionStatusValidActual() {
+    val testValuesReader = TestValuesReader()
+    val keyId: String = testValuesReader.getKeyId()
+    val issuerId: String = testValuesReader.getIssueId()
+    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = keyId,
+      issuerId = issuerId,
+      privateKeyFile = privateKeyFile!!,
+    )
+
+    val submissionIdResult = SubmissionId.of("4685647e-0125-4343-a068-1c5786499827")
+    assertThat(submissionIdResult).isOk()
+    submissionIdResult.onSuccess { submissionId ->
+      val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
+      assertThat(getSubmissionStatusResult).isOk()
+      getSubmissionStatusResult.onSuccess { submissionStatusResponse ->
+        assertThat(submissionStatusResponse.submissionInfo.name).isEqualTo("PWMinder.zip")
+      }
+    }
+  }
+
+  /**
+   * Tests getSubmissionStatus, using invalid submissionId to actual Apple Notary API
+   * Expect that a [NotaryToolError.UserInputError.InvalidSubmissionIdError] will occur
+   */
+  @Test
+  @Tag("Apple-Server")
+  @Tag("Private")
+  @DisplayName("getSubmissionStatus Valid submissionId Test to Apple Server")
+  fun getSubmissionStatusInvalidActual() {
+    val testValuesReader = TestValuesReader()
+    val keyId: String = testValuesReader.getKeyId()
+    val issuerId: String = testValuesReader.getIssueId()
+    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = keyId,
+      issuerId = issuerId,
+      privateKeyFile = privateKeyFile!!,
+    )
+
+    val submissionIdResult = SubmissionId.of("4685647e-0125-4343-a068-1c5786499828")
+    assertThat(submissionIdResult).isOk()
+    submissionIdResult.onSuccess { submissionId ->
+      val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
+      assertThat(getSubmissionStatusResult).isErr()
+      getSubmissionStatusResult.onFailure { notaryToolError ->
+        assertThat(notaryToolError).isInstanceOf<NotaryToolError.UserInputError.InvalidSubmissionIdError>()
+        log.info() { notaryToolError }
+        assertThat(notaryToolError.msg).isEqualTo("There is no resource of type 'submissions' with id '4685647e-0125-4343-a068-1c5786499828'")
+      }
     }
   }
 }
