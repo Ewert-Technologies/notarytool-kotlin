@@ -47,11 +47,11 @@ class ErrorResponseJsonTests {
 
     errorResponseJsonResult.onSuccess { errorResponseJson ->
       assertThat(errorResponseJson.errors).hasSize(1)
-      assertThat(errorResponseJson.errors[0]).prop(Error::id).isEqualTo("228afb9e-58fa-4246-8fed-c0dec1f23595")
-      assertThat(errorResponseJson.errors[0]).prop(Error::status).isEqualTo("404")
-      assertThat(errorResponseJson.errors[0]).prop(Error::code).isEqualTo("NOT_FOUND")
-      assertThat(errorResponseJson.errors[0]).prop(Error::title).isEqualTo("The specified resource does not exist")
-      assertThat(errorResponseJson.errors[0]).prop(Error::detail)
+      assertThat(errorResponseJson.errors[0]).prop(ErrorJson::id).isEqualTo("228afb9e-58fa-4246-8fed-c0dec1f23595")
+      assertThat(errorResponseJson.errors[0]).prop(ErrorJson::status).isEqualTo("404")
+      assertThat(errorResponseJson.errors[0]).prop(ErrorJson::code).isEqualTo("NOT_FOUND")
+      assertThat(errorResponseJson.errors[0]).prop(ErrorJson::title).isEqualTo("The specified resource does not exist")
+      assertThat(errorResponseJson.errors[0]).prop(ErrorJson::detail)
         .isEqualTo("There is no resource of type 'submissions' with id '5685647e-0125-4343-a068-1c5786499827'")
     }
   }

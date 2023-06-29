@@ -16,11 +16,11 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
  *
  * Instance can be created by parsing json response
  *
- * @property errors A list of the [Error] responses.
+ * @property errors A list of the [ErrorJson] responses.
  * @author Victor Ewert
  */
 data class ErrorResponseJson(
-  val errors: List<Error>,
+  val errors: List<ErrorJson>,
 ) {
   companion object {
 
@@ -62,7 +62,7 @@ data class ErrorResponseJson(
  * @property title The error message title.
  * @author Victor Ewert
  */
-data class Error(
+data class ErrorJson(
   val code: String,
   val detail: String,
   val id: String,
