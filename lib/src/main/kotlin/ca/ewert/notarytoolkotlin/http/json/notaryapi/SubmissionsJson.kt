@@ -38,7 +38,7 @@ data class SubmissionResponseJson(
     fun create(jsonString: String?): Result<SubmissionResponseJson, NotaryToolError.JsonParseError> {
       return if (!jsonString.isNullOrEmpty()) {
         val jsonAdapter: JsonAdapter<SubmissionResponseJson> =
-          moshi.adapter(SubmissionResponseJson::class.java).failOnUnknown()
+          moshi.adapter(SubmissionResponseJson::class.java).failOnUnknown().lenient()
         try {
           val submissionResponseJson = jsonAdapter.fromJson(jsonString)
           if (submissionResponseJson != null) {
