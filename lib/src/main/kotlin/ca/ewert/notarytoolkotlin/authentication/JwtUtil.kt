@@ -58,7 +58,11 @@ enum class Scope(val scopeValue: String) {
 /**
  * Generates a Json Web Token [https://jwt.io/] suitable to add to the Header when sending a request
  * to Apple's Notary Web API. The token String is included in the request Header as:
- * `Authorization: Bearer <json web token>`
+ * `Authorization: Bearer <json web token>`,
+ * e.g. `Authorization: Bearer eyJhbGciOiAiRVMyNTYiLCJraWQiOiAiMlg5UjRIWEYzNCIsInR5cCI6ICJKV1QifQ.eyJpc3MiOiAiNTcyNDY1NDItOTZmZS0xYTYzLWUwNTMtMDgyNGQwMTEwNzJhIiwiaWF0IjogMTUyODQwNzYwMCwiZXhwIjogMTUyODQwODgwMCwiYXVkIjogImFwcHN0b3JlY29ubmVjdC12MSIsInNjb3BlIjogWyJHRVQgL3YxL2FwcHM/ZmlsdGVyW3BsYXRmb3JtXT1JT1MiXX0.5kFT-fy_5izumLsy0mmVxu8lZt7K4_NoChIZzhbnBtVfbs0eLWEvq4OL5EOin17v2FepyOe8Jw1jgXlgPhmvge`
+ *
+ * The Json Web Token String can be useful for testing the Notary API directly, using
+ * curl or an online web service tester.
  *
  * @return Either the Json Web Token String, or [JsonWebTokenError] containing an error message
  */
