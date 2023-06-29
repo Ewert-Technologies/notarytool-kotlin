@@ -13,6 +13,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 /** Logging Object */
@@ -34,6 +35,7 @@ class SubmissionListResponseJsonTests {
    * directly using adapter
    */
   @Test
+  @DisplayName("Direct create test")
   fun fromJsonTest1() {
     val jsonString = """
       {
@@ -90,6 +92,7 @@ class SubmissionListResponseJsonTests {
    * by using [SubmissionListResponseJson.create] method
    */
   @Test
+  @DisplayName("Basic Test")
   fun createTest1() {
     val jsonString = """
       {
@@ -148,6 +151,7 @@ class SubmissionListResponseJsonTests {
    * that is `null`. Asserts that an Error result is returned.
    */
   @Test
+  @DisplayName("null jsonString Test")
   fun createTest2() {
     val jsonString = null
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
@@ -161,6 +165,7 @@ class SubmissionListResponseJsonTests {
    * Asserts that an Error result is returned.
    */
   @Test
+  @DisplayName("Empty jsonString Test")
   fun createTest3() {
     val jsonString = ""
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
@@ -174,6 +179,7 @@ class SubmissionListResponseJsonTests {
    * but not the expected json. Asserts that an Error result is returned.
    */
   @Test
+  @DisplayName("Unexpected jsonString Test")
   fun createTest4() {
     val jsonString = """
       {
@@ -191,6 +197,7 @@ class SubmissionListResponseJsonTests {
    * Asserts that an Error result is returned.
    */
   @Test
+  @DisplayName("Invalid jsonString Test")
   fun createTest5() {
     val jsonString = "Not Authorized"
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
