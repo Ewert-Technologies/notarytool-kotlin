@@ -77,7 +77,7 @@ class ErrorResponseJsonTests {
    * Verifies that an Error is returned
    */
   @Test
-  @DisplayName("empty jsonString Test")
+  @DisplayName("Empty jsonString Test")
   fun createTest3() {
     val jsonString = ""
     val errorResponseJsonResult = ErrorResponseJson.create(jsonString)
@@ -94,7 +94,7 @@ class ErrorResponseJsonTests {
    * Verifies that an Error is returned
    */
   @Test
-  @DisplayName("unexpected jsonString Test")
+  @DisplayName("Unexpected jsonString Test")
   fun createTest4() {
     val jsonString = """
     {
