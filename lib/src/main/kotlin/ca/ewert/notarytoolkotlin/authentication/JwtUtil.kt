@@ -3,6 +3,7 @@ package ca.ewert.notarytoolkotlin.authentication
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.Err
@@ -88,10 +89,16 @@ fun generateJwt(
       Ok(renderedToken)
     } catch (illegalArgumentException: IllegalArgumentException) {
       log.warn("Error creating JWT", illegalArgumentException)
-      Err(TokenCreationError("Error creating JWT, provided algorithm is null"))
+
+      Err(TokenCreationError(ErrorStringsResource.getString("jwt.algorithm.null.error")))
     } catch (jwtCreationException: JWTCreationException) {
       log.warn("Error creating JWT", jwtCreationException)
-      Err(TokenCreationError("Error creating JWT: ${jwtCreationException.message}"))
+      Err(
+        TokenCreationError(
+          ErrorStringsResource
+            .getString("jwt.create.error").format(jwtCreationException.message)
+        )
+      )
     }
   }
 }
