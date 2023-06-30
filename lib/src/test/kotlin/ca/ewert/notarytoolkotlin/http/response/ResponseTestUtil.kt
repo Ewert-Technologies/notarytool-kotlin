@@ -51,3 +51,75 @@ fun createMockResponse401(): MockResponse {
     .addHeader("Connection", "close")
     .setBody(content)
 }
+
+/**
+ * Creates a [MockResponse] with a status of 401 with headers and body matching Apples response.
+ */
+fun createMockResponse403(): MockResponse {
+  val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+    .format(NotaryApiResponse.HTTP_DATE_TIME)
+  val content = """
+    Unauthenticated
+
+    Request ID: TYPN6E62TY76LDJXYZTMLQRK7I.0.0
+  """.trimIndent()
+  log.info { "Header Date String: $headerDateString" }
+  return MockResponse().setResponseCode(403)
+    .addHeader("Server", "daiquiri/3.0.0")
+    .addHeader("Content-Type", "text/plain")
+    .addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    .addHeader("Date", headerDateString)
+    .addHeader("Connection", "close")
+    .setBody(content)
+}
+
+/**
+ * Creates a [MockResponse] with a status of 404 with headers and body matching Apples response.
+ * Content-Type is set to `"application/octet-stream"`.
+ * Used when Notary API sends an error response as json
+ */
+fun createMockResponse404ErrorResponse(body: String): MockResponse {
+  val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+    .format(NotaryApiResponse.HTTP_DATE_TIME)
+  log.info { "Header Date String: $headerDateString" }
+  return MockResponse().setResponseCode(404)
+    .addHeader("Server", "daiquiri/3.0.0")
+    .addHeader("Content-Type", "application/octet-stream")
+    .addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    .addHeader("Date", headerDateString)
+    .addHeader("Connection", "close")
+    .setBody(body)
+}
+
+/**
+ * Creates a [MockResponse] with a status of 404 with headers and body matching Apples response.
+ * Content-Type is set to `"text/plain"`.
+ * Used when Server sends a general 404, with no content
+ */
+fun createMockResponse404General(): MockResponse {
+  val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+    .format(NotaryApiResponse.HTTP_DATE_TIME)
+  log.info { "Header Date String: $headerDateString" }
+  return MockResponse().setResponseCode(404)
+    .addHeader("Server", "daiquiri/3.0.0")
+    .addHeader("Content-Type", "text/plain")
+    .addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    .addHeader("Date", headerDateString)
+    .addHeader("Connection", "close")
+    .setBody("")
+}
+
+/**
+ * Creates a [MockResponse] with a status of 500 with headers and body matching Apples response.
+ */
+fun createMockResponse500(): MockResponse {
+  val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+    .format(NotaryApiResponse.HTTP_DATE_TIME)
+  log.info { "Header Date String: $headerDateString" }
+  return MockResponse().setResponseCode(500)
+    .addHeader("Server", "daiquiri/3.0.0")
+    .addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    .addHeader("Date", headerDateString)
+    .addHeader("Connection", "close")
+    .setBody("")
+}
