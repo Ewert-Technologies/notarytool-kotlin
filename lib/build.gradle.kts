@@ -31,12 +31,16 @@ plugins {
   id("org.jmailen.kotlinter")
 }
 
+//
 // Repositories for Library Dependencies
+//
 repositories {
   mavenCentral()
 }
 
+//
 // Library Dependencies
+//
 dependencies {
 
   val moshiVersion = "1.15.0"
@@ -65,7 +69,9 @@ dependencies {
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
 }
 
+//
 // Apply a specific Java toolchain to ease working on different environments.
+//
 java {
   toolchain {
     languageVersion.set(JavaLanguageVersion.of(11))
@@ -95,33 +101,69 @@ tasks.named<Test>("test") {
   useJUnitPlatform()
 }
 
+//
+// Configure ktlint
+//
 kotlinter {
   reporters = arrayOf("html", "json")
 }
 
-tasks.withType<DokkaTask>().configureEach {
+//
+// Configure Documentation
+//
+
+/**
+ * Generates Dokka Documentation in html format for all visibilities
+ */
+tasks.register<DokkaTask>("dokkaHtmlPrivate") {
+  group = "documentation"
+  description = "Generates Dokka Documentation in `html` format for all visibilities"
+
+  pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
+    footerMessage = "(c) 2023 Ewert Technologies"
+  }
+
   dokkaSourceSets {
     configureEach {
       documentedVisibilities.set(
         setOf(
           DokkaConfiguration.Visibility.PUBLIC,
-          DokkaConfiguration.Visibility.PROTECTED, DokkaConfiguration.Visibility.INTERNAL,
-          DokkaConfiguration.Visibility.PRIVATE
+          DokkaConfiguration.Visibility.PROTECTED,
+          DokkaConfiguration.Visibility.INTERNAL,
+          DokkaConfiguration.Visibility.PRIVATE,
         )
       )
-//      documentedVisibilities.set(setOf(DokkaConfiguration.Visibility.PUBLIC))
       jdkVersion.set(11)
     }
   }
 }
 
-tasks.dokkaHtml {
+/**
+ * Generates Dokka Documentation in html format for public items
+ */
+tasks.register<DokkaTask>("dokkaHtmlPublic") {
+  group = "documentation"
+  description = "Generates Dokka Documentation in 'html' format for public items"
+
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
     footerMessage = "(c) 2023 Ewert Technologies"
   }
 
+  dokkaSourceSets {
+    configureEach {
+      documentedVisibilities.set(
+        setOf(
+          DokkaConfiguration.Visibility.PUBLIC,
+        )
+      )
+      jdkVersion.set(11)
+    }
+  }
 }
 
+//
+// Other Tasks
+//
 
 /**
  * Displays general build info, such as versions, key directory locations, etc.
