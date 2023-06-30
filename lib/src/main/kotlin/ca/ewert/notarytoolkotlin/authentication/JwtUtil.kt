@@ -39,7 +39,7 @@ private const val SCOPE_CLAIM_NAME: String = "scope"
 /**
  * Enum of possible scope values
  */
-enum class Scope(val scopeValue: String) {
+internal enum class Scope(val scopeValue: String) {
 
   /**
    * Scope value of `GET /notary/v2/submissions`
