@@ -238,7 +238,6 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
     }
   }
 
-
   /**
    * Tests making a request to getSubmissionStatus, with a 401 - Unauthenticated response.
    */

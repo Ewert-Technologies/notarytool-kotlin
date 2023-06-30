@@ -17,7 +17,6 @@ object ErrorStringsResource {
   internal val resourceBundleName: String
     get() = resourceBundle.baseBundleName
 
-
   /**
    * Gets a string for the given key from this resource bundle. If the key cannot be found, it returns
    * a String of the format `""!-- $key --!""`

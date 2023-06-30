@@ -96,8 +96,8 @@ fun generateJwt(
       Err(
         TokenCreationError(
           ErrorStringsResource
-            .getString("jwt.create.error").format(jwtCreationException.message)
-        )
+            .getString("jwt.create.error").format(jwtCreationException.message),
+        ),
       )
     }
   }
