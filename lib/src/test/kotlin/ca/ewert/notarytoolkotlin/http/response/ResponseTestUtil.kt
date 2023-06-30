@@ -2,6 +2,7 @@ package ca.ewert.notarytoolkotlin.http.response
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.mockwebserver.MockResponse
+import okhttp3.mockwebserver.SocketPolicy
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -122,4 +123,21 @@ fun createMockResponse500(): MockResponse {
     .addHeader("Date", headerDateString)
     .addHeader("Connection", "close")
     .setBody("")
+}
+
+/**
+ * Creates a [MockResponse] with a connection issue, simulated using a [SocketPolicy]
+ */
+fun createMockResponseConnectionProblem(socketPolicy: SocketPolicy): MockResponse {
+  val headerDateString = ZonedDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+    .format(NotaryApiResponse.HTTP_DATE_TIME)
+  log.info { "Header Date String: $headerDateString" }
+  return MockResponse().setResponseCode(200)
+    .addHeader("Server", "daiquiri/3.0.0")
+    .addHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+    .addHeader("Date", headerDateString)
+    .addHeader("Content-Type", "text/plain")
+    .addHeader("Connection", "close")
+    .setBody("Some Text")
+    .setSocketPolicy(socketPolicy)
 }

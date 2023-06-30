@@ -161,6 +161,13 @@ sealed interface NotaryToolError {
   data class JsonParseError(override val msg: String, val jsonString: String?) : NotaryToolError
 
   /**
+   * An error caused when there is a connection issue.
+   *
+   * @property msg The connection error message
+   */
+  data class ConnectionError(override val msg: String) : NotaryToolError
+
+  /**
    * Any other error.
    *
    * @author Victor Ewert

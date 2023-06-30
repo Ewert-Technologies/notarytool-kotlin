@@ -16,10 +16,12 @@ import ca.ewert.notarytoolkotlin.http.response.createMockResponse403
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse404ErrorResponse
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse404General
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse500
+import ca.ewert.notarytoolkotlin.http.response.createMockResponseConnectionProblem
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
+import okhttp3.mockwebserver.SocketPolicy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -348,6 +350,86 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
 
           else -> log.warn {
             error.msg
+            fail(AssertionError("Incorrect Error: $error"))
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Tests making a request to getSubmissionStatus, simulating a connection issue
+   * using [SocketPolicy.NO_RESPONSE]
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("getSubmissionStatus No Response Test")
+  fun getSubmissionStatusNoResponse() {
+    mockWebServer.enqueue(createMockResponseConnectionProblem(SocketPolicy.NO_RESPONSE))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("5685647e-0125-4343-a068-1c5786499827")
+    assertThat(submissionIdResult).isOk()
+    submissionIdResult.onSuccess { submissionId ->
+      val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
+      assertThat(getSubmissionStatusResult).isErr()
+      getSubmissionStatusResult.onFailure { error ->
+        when (error) {
+          is NotaryToolError.ConnectionError -> {
+            log.info { error }
+          }
+
+          else -> {
+            log.warn { error.msg }
+            fail(AssertionError("Incorrect Error: $error"))
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Tests making a request to getSubmissionStatus, simulating a connection issue
+   * using [SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY]
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("getSubmissionStatus Disconnect During Response Test")
+  fun getSubmissionStatusDisconnect() {
+    mockWebServer.enqueue(createMockResponseConnectionProblem(SocketPolicy.DISCONNECT_DURING_RESPONSE_BODY))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("5685647e-0125-4343-a068-1c5786499827")
+    assertThat(submissionIdResult).isOk()
+    submissionIdResult.onSuccess { submissionId ->
+      val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
+      assertThat(getSubmissionStatusResult).isErr()
+      getSubmissionStatusResult.onFailure { error ->
+        when (error) {
+          is NotaryToolError.ConnectionError -> {
+            log.info { error }
+          }
+
+          else -> {
+            log.warn { error.msg }
             fail(AssertionError("Incorrect Error: $error"))
           }
         }

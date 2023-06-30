@@ -20,6 +20,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okio.IOException
 import java.nio.file.Path
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -136,88 +137,94 @@ class NotaryToolClient(
             .header(name = "Authorization", value = "Bearer ${jsonWebToken.signedToken}")
             .get()
             .build()
-          httpClient.newCall(request).execute().use { response: Response ->
-            log.info { "Response from ${response.request.url}: $response" }
-            val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
-            log.info { "Response body: ${responseMetaData.rawContents}" }
 
-            if (response.isSuccessful) {
-              SubmissionResponseJson.create(responseMetaData.rawContents)
-                .map { submissionResponseJson: SubmissionResponseJson ->
-                  SubmissionStatusResponse(responseMetaData = responseMetaData, jsonResponse = submissionResponseJson)
-                }
-            } else {
-              when (response.code) {
-                401, 403 -> {
-                  Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
-                }
+          try {
+            httpClient.newCall(request).execute().use { response: Response ->
+              log.info { "Response from ${response.request.url}: $response" }
+              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              log.info { "Response body: ${responseMetaData.rawContents}" }
 
-                404 -> {
-                  log.info { "Content-Type: ${responseMetaData.contentType}" }
-                  log.info { "Content-Length: ${responseMetaData.contentLength}" }
-                  if (isGeneral404(responseMetaData = responseMetaData)) {
-                    Err(
-                      NotaryToolError.HttpError.ClientError4xx(
-                        "Response was unsuccessful",
-                        httpStatusCode = response.code,
-                        httpStatusMsg = response.message,
-                        requestUrl = response.request.url.toString(),
-                        contentBody = responseMetaData.rawContents,
-                      ),
-                    )
-                  } else {
-                    // This is a Notary Error Response, likely incorrect submissionId
-                    return when (val errorResponseJsonResult = ErrorResponseJson.create(responseMetaData.rawContents)) {
-                      is Ok -> {
-                        // FIXME: Should maybe check that there is at least one error
-                        Err(NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail))
-                      }
+              if (response.isSuccessful) {
+                SubmissionResponseJson.create(responseMetaData.rawContents)
+                  .map { submissionResponseJson: SubmissionResponseJson ->
+                    SubmissionStatusResponse(responseMetaData = responseMetaData, jsonResponse = submissionResponseJson)
+                  }
+              } else {
+                when (response.code) {
+                  401, 403 -> {
+                    Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
+                  }
 
-                      is Err -> {
-                        log.warn { errorResponseJsonResult.error }
-                        errorResponseJsonResult
+                  404 -> {
+                    log.info { "Content-Type: ${responseMetaData.contentType}" }
+                    log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                    if (isGeneral404(responseMetaData = responseMetaData)) {
+                      Err(
+                        NotaryToolError.HttpError.ClientError4xx(
+                          "Response was unsuccessful",
+                          httpStatusCode = response.code,
+                          httpStatusMsg = response.message,
+                          requestUrl = response.request.url.toString(),
+                          contentBody = responseMetaData.rawContents,
+                        ),
+                      )
+                    } else {
+                      // This is a Notary Error Response, likely incorrect submissionId
+                      return when (val errorResponseJsonResult = ErrorResponseJson.create(responseMetaData.rawContents)) {
+                        is Ok -> {
+                          // FIXME: Should maybe check that there is at least one error
+                          Err(NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail))
+                        }
+
+                        is Err -> {
+                          log.warn { errorResponseJsonResult.error }
+                          errorResponseJsonResult
+                        }
                       }
                     }
                   }
-                }
 
-                in 400..499 -> {
-                  Err(
-                    NotaryToolError.HttpError.ClientError4xx(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
-                }
+                  in 400..499 -> {
+                    Err(
+                      NotaryToolError.HttpError.ClientError4xx(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
 
-                in 500..599 -> {
-                  Err(
-                    NotaryToolError.HttpError.ServerError5xx(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
-                }
+                  in 500..599 -> {
+                    Err(
+                      NotaryToolError.HttpError.ServerError5xx(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
 
-                else -> {
-                  Err(
-                    NotaryToolError.HttpError.OtherError(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
+                  else -> {
+                    Err(
+                      NotaryToolError.HttpError.OtherError(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
                 }
               }
             }
+          } catch (ioException: IOException) {
+            log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+            Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
           }
         } else {
           Err(NotaryToolError.GeneralError(msg = "Base URL Path was <null>"))
@@ -275,61 +282,66 @@ class NotaryToolClient(
             .get()
             .build()
 
-          httpClient.newCall(request = request).execute().use { response: Response ->
-            log.info { "Response from ${response.request.url}: $response" }
-            val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
-            log.info { "Response body: ${responseMetaData.rawContents}" }
-            if (response.isSuccessful) {
-              SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)
-                .map { submissionListResponseJson: SubmissionListResponseJson ->
-                  SubmissionListResponse(responseMetaData = responseMetaData, jsonResponse = submissionListResponseJson)
-                }
-            } else {
-              when (response.code) {
-                401, 403 -> {
-                  Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
-                }
-
-                in 400..499 -> {
-                  if (response.code == 404) {
-                    log.warn { "404 error when sending request to: $url" }
+          try {
+            httpClient.newCall(request = request).execute().use { response: Response ->
+              log.info { "Response from ${response.request.url}: $response" }
+              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              log.info { "Response body: ${responseMetaData.rawContents}" }
+              if (response.isSuccessful) {
+                SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)
+                  .map { submissionListResponseJson: SubmissionListResponseJson ->
+                    SubmissionListResponse(responseMetaData = responseMetaData, jsonResponse = submissionListResponseJson)
                   }
-                  Err(
-                    NotaryToolError.HttpError.ClientError4xx(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
-                }
+              } else {
+                when (response.code) {
+                  401, 403 -> {
+                    Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
+                  }
 
-                in 500..599 -> {
-                  Err(
-                    NotaryToolError.HttpError.ServerError5xx(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
-                }
+                  in 400..499 -> {
+                    if (response.code == 404) {
+                      log.warn { "404 error when sending request to: $url" }
+                    }
+                    Err(
+                      NotaryToolError.HttpError.ClientError4xx(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
 
-                else -> {
-                  Err(
-                    NotaryToolError.HttpError.OtherError(
-                      msg = "Response was unsuccessful.",
-                      httpStatusCode = responseMetaData.httpStatusCode,
-                      httpStatusMsg = responseMetaData.httpStatusMessage,
-                      requestUrl = url.toString(),
-                      contentBody = responseMetaData.rawContents,
-                    ),
-                  )
+                  in 500..599 -> {
+                    Err(
+                      NotaryToolError.HttpError.ServerError5xx(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
+
+                  else -> {
+                    Err(
+                      NotaryToolError.HttpError.OtherError(
+                        msg = "Response was unsuccessful.",
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
                 }
               }
             }
+          } catch (ioException: IOException) {
+            log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+            Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
           }
         } else {
           Err(NotaryToolError.GeneralError(msg = "URL Path was null"))
