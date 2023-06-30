@@ -43,4 +43,13 @@ data class SubmissionId internal constructor(val id: String) {
       }
     }
   }
+
+  /**
+   * Returns a String representation of the object.
+   *
+   * @return The submission id
+   */
+  override fun toString(): String {
+    return id
+  }
 }
