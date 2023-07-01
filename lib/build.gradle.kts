@@ -11,6 +11,7 @@ import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
+import java.nio.file.Paths
 
 buildscript {
   dependencies {
@@ -109,6 +110,11 @@ kotlinter {
 }
 
 //
+// Set Default Task
+//
+defaultTasks("release")
+
+//
 // Configure Documentation
 //
 
@@ -172,11 +178,40 @@ tasks.register("buildInfo") {
   group = "help"
   description = "Displays general build info, such as versions, etc."
 
+  logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Project: ${project.name} - ${project.description}")
   logger.quiet("Project version: ${project.version}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
-  logger.quiet("java.version: ${JavaVersion.current()}")
+  logger.quiet("build dir: ${project.buildDir}")
 }
 
+/**
+ * Creates a release by building and then copying the release artifacts
+ * to the rel directory. Release artifacts in include the jar,
+ * sources jar, and kdocs.
+ */
+tasks.register("release") {
+  group = project.name
+  description = "Creates a release"
+  dependsOn("buildInfo", "build", "kotlinSourcesJar", "dokkaHtmlPublic")
 
+  doLast {
+    val relDir = file(Paths.get("rel", "${project.version}"))
+    mkdir(relDir)
+
+    copy {
+      from(file(Paths.get(project.buildDir.absolutePath, "libs"))) {
+        include("*.jar")
+      }
+      into(relDir)
+    }
+
+    copy {
+      from(file(Paths.get(project.buildDir.absolutePath, "dokka", "htmlPublic")))
+      into(file(Paths.get(relDir.absolutePath, "docs")))
+    }
+
+    logger.quiet("Release artifacts copied to $relDir")
+  }
+}
