@@ -13,6 +13,7 @@ import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import java.nio.file.Paths
+import java.time.Instant
 
 buildscript {
   dependencies {
@@ -115,6 +116,16 @@ kotlinter {
 //
 defaultTasks("release")
 
+tasks.jar {
+  manifest {
+    attributes["Built-By"] = company
+    attributes["Version"] = version
+    attributes["Build-Timestamp"] = Instant.now().toString()
+    attributes["Created-By"] = "Gradle ${gradle.gradleVersion}"
+    attributes["Build-Toolchain"] = "Java 11 ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})"
+  }
+}
+
 //
 // Configure Documentation
 //
@@ -179,11 +190,12 @@ tasks.register("buildInfo") {
   group = "help"
   description = "Displays general build info, such as versions, etc."
 
-  logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Project: ${project.name} - ${project.description}")
   logger.quiet("Project version: ${project.version}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
+  logger.quiet("Gradle Version: ${gradle.gradleVersion}")
+  logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
   logger.quiet("build dir: ${project.buildDir}")
 }
 
