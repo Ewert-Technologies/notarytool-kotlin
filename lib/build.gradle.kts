@@ -7,6 +7,7 @@
  * This project uses @Incubating APIs which are subject to change.
  */
 
+import org.gradle.kotlin.dsl.support.zipTo
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
@@ -200,6 +201,7 @@ tasks.register("release") {
     val relDir = file(Paths.get("rel", "${project.version}"))
     mkdir(relDir)
 
+    // Copy jar files
     copy {
       from(file(Paths.get(project.buildDir.absolutePath, "libs"))) {
         include("*.jar")
@@ -207,10 +209,18 @@ tasks.register("release") {
       into(relDir)
     }
 
+    // Copy kdocs directory
+    val kDocsDir: File = file(Paths.get(relDir.absolutePath, "kdocs"))
     copy {
       from(file(Paths.get(project.buildDir.absolutePath, "dokka", "htmlPublic")))
-      into(file(Paths.get(relDir.absolutePath, "docs")))
+      into(kDocsDir)
     }
+
+    // Zip kdocs directory
+    zipTo(
+      zipFile = file(Paths.get(relDir.absolutePath, "kdocs.zip")),
+      baseDir = kDocsDir
+    )
 
     logger.quiet("Release artifacts copied to $relDir")
   }
