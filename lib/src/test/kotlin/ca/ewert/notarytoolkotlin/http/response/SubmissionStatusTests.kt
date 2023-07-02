@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import org.junit.jupiter.api.Test
 
 /**
- * Unit Tests for [SubmissionStatus]
+ * Unit Tests for the [SubmissionStatus] enum.
  *
  * Created: 2023-06-16
  * @author vewert
