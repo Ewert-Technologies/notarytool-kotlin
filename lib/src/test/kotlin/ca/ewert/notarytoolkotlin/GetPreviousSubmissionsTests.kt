@@ -36,7 +36,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
   @Test
   @Tag("MockServer")
   @DisplayName("getPreviousSubmissions - Success Test")
-  fun getPreviousSubmissionsTest1() {
+  fun getPreviousSubmissionsValid() {
     val responseBody: String = """
     {
       "data": [
@@ -153,7 +153,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
   @Test
   @Tag("MockServer")
   @DisplayName("getPreviousSubmissions - Invalid json")
-  fun getPreviousSubmissionsTest3() {
+  fun getPreviousSubmissionsInvalidJson() {
     val responseBody: String = """
     {
       "datas": [
@@ -227,7 +227,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
   @Test
   @Tag("MockServer")
   @DisplayName("getPreviousSubmissions - No data")
-  fun getPreviousSubmissionsTest4() {
+  fun getPreviousSubmissionsNoData() {
     val responseBody: String = """
     {
       "data": [
