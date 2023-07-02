@@ -35,7 +35,7 @@ class SubmissionListResponse internal constructor(
       val name = submissionsDataJson.attributes.name
 
       val statusText: String = submissionsDataJson.attributes.status
-      val status = SubmissionStatus.fromString(statusText)
+      val status = Status.fromString(statusText)
       val id = submissionsDataJson.id
 
       SubmissionInfo(createdDate, createdDateText, name, status, statusText, SubmissionId(id))

@@ -170,7 +170,7 @@ class SubmissionListResponseTests {
           assertThat(submissionListResponse.submissionInfoList).hasSize(3)
           assertThat(submissionListResponse.submissionInfoList[1].id).isEqualTo(SubmissionId("cf0c235a-dad2-4c24-96eb-c876d4cb3a2d"))
           assertThat(submissionListResponse.submissionInfoList[1].name).isEqualTo("OvernightTextEditor_11.6.7.zip")
-          assertThat(submissionListResponse.submissionInfoList[1].status).isEqualTo(SubmissionStatus.ACCEPTED)
+          assertThat(submissionListResponse.submissionInfoList[1].status).isEqualTo(Status.ACCEPTED)
         }
       } else {
         log.warn { "Request was not successful: $request" }

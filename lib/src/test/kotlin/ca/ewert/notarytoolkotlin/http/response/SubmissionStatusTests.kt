@@ -5,7 +5,7 @@ import assertk.assertions.isEqualTo
 import org.junit.jupiter.api.Test
 
 /**
- * Unit Tests for the [SubmissionStatus] enum.
+ * Unit Tests for the [Status] enum.
  *
  * Created: 2023-06-16
  * @author vewert
@@ -13,85 +13,85 @@ import org.junit.jupiter.api.Test
 class SubmissionStatusTests {
 
   /**
-   * Tests [SubmissionStatus.ACCEPTED]. Tests creating from lowercase, uppercase and invalid String
+   * Tests [Status.ACCEPTED]. Tests creating from lowercase, uppercase and invalid String
    */
   @Test
   fun createAcceptedTest() {
-    val submissionStatus1 = SubmissionStatus.fromString("Accepted")
-    assertThat(submissionStatus1).isEqualTo(SubmissionStatus.ACCEPTED)
-    assertThat(submissionStatus1.displayName).isEqualTo("Accepted")
-    assertThat(submissionStatus1.toString()).isEqualTo("Accepted")
+    val status1 = Status.fromString("Accepted")
+    assertThat(status1).isEqualTo(Status.ACCEPTED)
+    assertThat(status1.displayName).isEqualTo("Accepted")
+    assertThat(status1.toString()).isEqualTo("Accepted")
 
-    val submissionStatus2 = SubmissionStatus.fromString("AccepteD")
-    assertThat(submissionStatus2).isEqualTo(SubmissionStatus.ACCEPTED)
+    val status2 = Status.fromString("AccepteD")
+    assertThat(status2).isEqualTo(Status.ACCEPTED)
 
-    val submissionStatus3 = SubmissionStatus.fromString("acccepted")
-    assertThat(submissionStatus3).isEqualTo(SubmissionStatus.UNKNOWN)
-    assertThat(submissionStatus3.displayName).isEqualTo("Unknown")
-    assertThat(submissionStatus3.toString()).isEqualTo("Unknown")
+    val status3 = Status.fromString("acccepted")
+    assertThat(status3).isEqualTo(Status.UNKNOWN)
+    assertThat(status3.displayName).isEqualTo("Unknown")
+    assertThat(status3.toString()).isEqualTo("Unknown")
   }
 
   /**
-   * Tests [SubmissionStatus.IN_PROGRESS]. Tests creating from lowercase, uppercase and invalid String,
+   * Tests [Status.IN_PROGRESS]. Tests creating from lowercase, uppercase and invalid String,
    * also checks that "In-Progress" (case-insensitive) is allowed
    */
   @Test
   fun createInProgressTest() {
-    val submissionStatus1 = SubmissionStatus.fromString("In Progress")
-    assertThat(submissionStatus1).isEqualTo(SubmissionStatus.IN_PROGRESS)
-    assertThat(submissionStatus1.displayName).isEqualTo("In Progress")
-    assertThat(submissionStatus1.toString()).isEqualTo("In Progress")
+    val status1 = Status.fromString("In Progress")
+    assertThat(status1).isEqualTo(Status.IN_PROGRESS)
+    assertThat(status1.displayName).isEqualTo("In Progress")
+    assertThat(status1.toString()).isEqualTo("In Progress")
 
-    val submissionStatus2 = SubmissionStatus.fromString("in PROGRESS")
-    assertThat(submissionStatus2).isEqualTo(SubmissionStatus.IN_PROGRESS)
+    val status2 = Status.fromString("in PROGRESS")
+    assertThat(status2).isEqualTo(Status.IN_PROGRESS)
 
-    val submissionStatus3 = SubmissionStatus.fromString("In-Progress")
-    assertThat(submissionStatus3).isEqualTo(SubmissionStatus.IN_PROGRESS)
+    val status3 = Status.fromString("In-Progress")
+    assertThat(status3).isEqualTo(Status.IN_PROGRESS)
 
-    val submissionStatus4 = SubmissionStatus.fromString("IN-PROGRESS")
-    assertThat(submissionStatus4).isEqualTo(SubmissionStatus.IN_PROGRESS)
+    val status4 = Status.fromString("IN-PROGRESS")
+    assertThat(status4).isEqualTo(Status.IN_PROGRESS)
 
-    val submissionStatus5 = SubmissionStatus.fromString("in progesss")
-    assertThat(submissionStatus5).isEqualTo(SubmissionStatus.UNKNOWN)
-    assertThat(submissionStatus5.displayName).isEqualTo("Unknown")
-    assertThat(submissionStatus5.toString()).isEqualTo("Unknown")
+    val status5 = Status.fromString("in progesss")
+    assertThat(status5).isEqualTo(Status.UNKNOWN)
+    assertThat(status5.displayName).isEqualTo("Unknown")
+    assertThat(status5.toString()).isEqualTo("Unknown")
   }
 
   /**
-   * Tests [SubmissionStatus.INVALID]. Tests creating from lowercase, uppercase and invalid String
+   * Tests [Status.INVALID]. Tests creating from lowercase, uppercase and invalid String
    */
   @Test
   fun createInvalidTest() {
-    val submissionStatus1 = SubmissionStatus.fromString("Invalid")
-    assertThat(submissionStatus1).isEqualTo(SubmissionStatus.INVALID)
-    assertThat(submissionStatus1.displayName).isEqualTo("Invalid")
-    assertThat(submissionStatus1.toString()).isEqualTo("Invalid")
+    val status1 = Status.fromString("Invalid")
+    assertThat(status1).isEqualTo(Status.INVALID)
+    assertThat(status1.displayName).isEqualTo("Invalid")
+    assertThat(status1.toString()).isEqualTo("Invalid")
 
-    val submissionStatus2 = SubmissionStatus.fromString("INValid")
-    assertThat(submissionStatus2).isEqualTo(SubmissionStatus.INVALID)
+    val status2 = Status.fromString("INValid")
+    assertThat(status2).isEqualTo(Status.INVALID)
 
-    val submissionStatus3 = SubmissionStatus.fromString("Invalide")
-    assertThat(submissionStatus3).isEqualTo(SubmissionStatus.UNKNOWN)
-    assertThat(submissionStatus3.displayName).isEqualTo("Unknown")
-    assertThat(submissionStatus3.toString()).isEqualTo("Unknown")
+    val status3 = Status.fromString("Invalide")
+    assertThat(status3).isEqualTo(Status.UNKNOWN)
+    assertThat(status3.displayName).isEqualTo("Unknown")
+    assertThat(status3.toString()).isEqualTo("Unknown")
   }
 
   /**
-   * Tests [SubmissionStatus.REJECTED]. Tests creating from lowercase, uppercase and invalid String
+   * Tests [Status.REJECTED]. Tests creating from lowercase, uppercase and invalid String
    */
   @Test
   fun createRejectedTest() {
-    val submissionStatus1 = SubmissionStatus.fromString("Rejected")
-    assertThat(submissionStatus1).isEqualTo(SubmissionStatus.REJECTED)
-    assertThat(submissionStatus1.displayName).isEqualTo("Rejected")
-    assertThat(submissionStatus1.toString()).isEqualTo("Rejected")
+    val status1 = Status.fromString("Rejected")
+    assertThat(status1).isEqualTo(Status.REJECTED)
+    assertThat(status1.displayName).isEqualTo("Rejected")
+    assertThat(status1.toString()).isEqualTo("Rejected")
 
-    val submissionStatus2 = SubmissionStatus.fromString("REjected")
-    assertThat(submissionStatus2).isEqualTo(SubmissionStatus.REJECTED)
+    val status2 = Status.fromString("REjected")
+    assertThat(status2).isEqualTo(Status.REJECTED)
 
-    val submissionStatus3 = SubmissionStatus.fromString("Injected")
-    assertThat(submissionStatus3).isEqualTo(SubmissionStatus.UNKNOWN)
-    assertThat(submissionStatus3.displayName).isEqualTo("Unknown")
-    assertThat(submissionStatus3.toString()).isEqualTo("Unknown")
+    val status3 = Status.fromString("Injected")
+    assertThat(status3).isEqualTo(Status.UNKNOWN)
+    assertThat(status3.displayName).isEqualTo("Unknown")
+    assertThat(status3.toString()).isEqualTo("Unknown")
   }
 }

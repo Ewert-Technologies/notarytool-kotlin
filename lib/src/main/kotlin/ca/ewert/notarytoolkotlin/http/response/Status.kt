@@ -5,7 +5,7 @@ package ca.ewert.notarytoolkotlin.http.response
  *
  * @author vewert
  */
-enum class SubmissionStatus(val displayName: String) {
+enum class Status(val displayName: String) {
 
   /**
    * A Submission status of `Accepted`
@@ -46,7 +46,7 @@ enum class SubmissionStatus(val displayName: String) {
      *
      * @param stringValue The String value to convert
      */
-    fun fromString(stringValue: String): SubmissionStatus {
+    fun fromString(stringValue: String): Status {
       return when {
         stringValue.equals(ACCEPTED.displayName, true) -> ACCEPTED
         (stringValue.equals(IN_PROGRESS.displayName, true)) ||

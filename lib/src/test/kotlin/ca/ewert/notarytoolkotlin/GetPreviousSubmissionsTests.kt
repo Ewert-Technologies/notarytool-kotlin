@@ -7,7 +7,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.matches
 import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
-import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
+import ca.ewert.notarytoolkotlin.http.response.Status
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
 import com.github.michaelbull.result.onFailure
@@ -87,7 +87,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
     val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
     getPreviousSubmissionsResult.onSuccess { submissionListResponse ->
       assertThat(submissionListResponse.submissionInfoList).hasSize(3)
-      assertThat(submissionListResponse.submissionInfoList[2].status).isEqualTo(SubmissionStatus.INVALID)
+      assertThat(submissionListResponse.submissionInfoList[2].status).isEqualTo(Status.INVALID)
       val expectedCreatedDate: Instant =
         ZonedDateTime.of(2021, 4, 23, 17, 44, 54, 761000000, ZoneId.of("GMT")).toInstant()
       assertThat(submissionListResponse.submissionInfoList[1].createdDate ?: Instant.now())

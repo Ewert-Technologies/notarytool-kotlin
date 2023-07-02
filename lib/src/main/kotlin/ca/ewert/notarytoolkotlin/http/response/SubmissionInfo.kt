@@ -20,7 +20,7 @@ data class SubmissionInfo internal constructor(
   val createdDate: Instant?,
   val createdDateText: String,
   val name: String,
-  val status: SubmissionStatus,
+  val status: Status,
   val statusText: String,
   val id: SubmissionId,
 )

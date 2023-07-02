@@ -9,7 +9,7 @@ import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.http.response.SubmissionId
 import ca.ewert.notarytoolkotlin.http.response.SubmissionInfo
-import ca.ewert.notarytoolkotlin.http.response.SubmissionStatus
+import ca.ewert.notarytoolkotlin.http.response.Status
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse403
@@ -154,7 +154,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
         assertThat(submissionStatusResponse.submissionInfo).prop(SubmissionInfo::createdDate)
           .isEqualTo(expectedCreatedDate)
         assertThat(submissionStatusResponse.submissionInfo).prop(SubmissionInfo::status)
-          .isEqualTo(SubmissionStatus.ACCEPTED)
+          .isEqualTo(Status.ACCEPTED)
       }
     }
   }
