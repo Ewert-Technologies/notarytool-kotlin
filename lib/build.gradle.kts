@@ -29,6 +29,7 @@ plugins {
   java
   idea
   `java-library`
+  `maven-publish`
   id("org.jetbrains.kotlin.jvm") version "1.8.21"
   id("com.github.ben-manes.versions") version "0.47.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
@@ -209,11 +210,42 @@ tasks.register("buildInfo") {
 
   logger.quiet("Project: ${project.name} - ${project.description}")
   logger.quiet("Project version: ${project.version}")
+  logger.quiet("Group:  ${project.group}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
   logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
   logger.quiet("build dir: ${project.buildDir}")
+}
+
+//
+// Configure maven publishing
+//
+publishing {
+  publications {
+    create<MavenPublication>("maven") {
+      from(components["kotlin"])
+
+      pom {
+        name.set("Notarytool Kotlin Library")
+        description.set(project.description)
+        url.set("https://www.ewert-technologies.ca")
+        inceptionYear.set("2023")
+
+        organization {
+          name.set("Ewert Technologies")
+          url.set("https://www.ewert-technologies.ca")
+        }
+
+        developers {
+          developer {
+            name.set("Victor Ewert")
+            email.set("victor.ewert@ewert-technologies.ca")
+          }
+        }
+      }
+    }
+  }
 }
 
 /**
