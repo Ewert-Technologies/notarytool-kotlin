@@ -1,6 +1,7 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.MalformedSubmissionIdError
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
@@ -39,7 +40,12 @@ data class SubmissionId internal constructor(val id: String) {
       return if (submissionIdString.matches(VALIDATION_REGEX)) {
         Ok(SubmissionId(submissionIdString))
       } else {
-        Err(MalformedSubmissionIdError("String passed in is not valid", submissionIdString))
+        Err(
+          MalformedSubmissionIdError(
+            msg = ErrorStringsResource.getString("submission.id.invalid.string.error"),
+            invalidId = submissionIdString,
+          ),
+        )
       }
     }
   }

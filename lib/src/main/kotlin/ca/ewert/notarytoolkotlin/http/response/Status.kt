@@ -1,9 +1,10 @@
 package ca.ewert.notarytoolkotlin.http.response
 
 /**
- * Status of the Submission
+ * Various status states of a Submission
  *
- * @author vewert
+ * @property displayName The display name of the status
+ * @author Victor Ewert
  */
 enum class Status(val displayName: String) {
 
@@ -34,6 +35,11 @@ enum class Status(val displayName: String) {
   UNKNOWN("Unknown"),
   ;
 
+  /**
+   * Returns a String representation of the object.
+   *
+   * @return The display name.
+   */
   override fun toString(): String {
     return displayName
   }

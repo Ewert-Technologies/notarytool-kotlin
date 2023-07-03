@@ -10,6 +10,7 @@ import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionId
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatusResponse
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
@@ -78,9 +79,19 @@ class NotaryToolClient(
     private const val ENDPOINT_STRING = "submissions"
 
     /**
+     * Constant for the `User-Agent` header.
+     */
+    private const val USER_AGENT_HEADER = "User-Agent"
+
+    /**
      * Default value for the User-Agent, i.e. `notarytool-kotlin/0.1.0`
      */
     private const val USER_AGENT_VALUE = "notarytool-kotlin/0.1.0"
+
+    /**
+     * Constant for the `Authorization` header.
+     */
+    private const val AUTHORIZATION_HEADER = "Authorization"
   }
 
   /**
@@ -133,8 +144,8 @@ class NotaryToolClient(
           log.info { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url = url)
-            .header(name = "User-Agent", value = userAgent)
-            .header(name = "Authorization", value = "Bearer ${jsonWebToken.signedToken}")
+            .header(name = USER_AGENT_HEADER, value = userAgent)
+            .header(name = AUTHORIZATION_HEADER, value = "Bearer ${jsonWebToken.signedToken}")
             .get()
             .build()
 
@@ -152,7 +163,7 @@ class NotaryToolClient(
               } else {
                 when (response.code) {
                   401, 403 -> {
-                    Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
+                    Err(JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error")))
                   }
 
                   404 -> {
@@ -161,7 +172,7 @@ class NotaryToolClient(
                     if (isGeneral404(responseMetaData = responseMetaData)) {
                       Err(
                         NotaryToolError.HttpError.ClientError4xx(
-                          "Response was unsuccessful",
+                          msg = ErrorStringsResource.getString("http.400.error"),
                           httpStatusCode = response.code,
                           httpStatusMsg = response.message,
                           requestUrl = response.request.url.toString(),
@@ -170,7 +181,10 @@ class NotaryToolClient(
                       )
                     } else {
                       // This is a Notary Error Response, likely incorrect submissionId
-                      return when (val errorResponseJsonResult = ErrorResponseJson.create(responseMetaData.rawContents)) {
+                      return when (
+                        val errorResponseJsonResult =
+                          ErrorResponseJson.create(responseMetaData.rawContents)
+                      ) {
                         is Ok -> {
                           // FIXME: Should maybe check that there is at least one error
                           Err(NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail))
@@ -187,7 +201,7 @@ class NotaryToolClient(
                   in 400..499 -> {
                     Err(
                       NotaryToolError.HttpError.ClientError4xx(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.400.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -199,7 +213,7 @@ class NotaryToolClient(
                   in 500..599 -> {
                     Err(
                       NotaryToolError.HttpError.ServerError5xx(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.500.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -211,7 +225,7 @@ class NotaryToolClient(
                   else -> {
                     Err(
                       NotaryToolError.HttpError.OtherError(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.other.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -227,7 +241,7 @@ class NotaryToolClient(
             Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
           }
         } else {
-          Err(NotaryToolError.GeneralError(msg = "Base URL Path was <null>"))
+          Err(NotaryToolError.GeneralError(msg = ErrorStringsResource.getString("other.url.null.error")))
         }
       }
 
@@ -290,12 +304,15 @@ class NotaryToolClient(
               if (response.isSuccessful) {
                 SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)
                   .map { submissionListResponseJson: SubmissionListResponseJson ->
-                    SubmissionListResponse(responseMetaData = responseMetaData, jsonResponse = submissionListResponseJson)
+                    SubmissionListResponse(
+                      responseMetaData = responseMetaData,
+                      jsonResponse = submissionListResponseJson,
+                    )
                   }
               } else {
                 when (response.code) {
                   401, 403 -> {
-                    Err(JsonWebTokenError.AuthenticationError("Notary API Web Service could not authenticate the request."))
+                    Err(JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error")))
                   }
 
                   in 400..499 -> {
@@ -304,7 +321,7 @@ class NotaryToolClient(
                     }
                     Err(
                       NotaryToolError.HttpError.ClientError4xx(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.400.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -316,7 +333,7 @@ class NotaryToolClient(
                   in 500..599 -> {
                     Err(
                       NotaryToolError.HttpError.ServerError5xx(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.500.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -328,7 +345,7 @@ class NotaryToolClient(
                   else -> {
                     Err(
                       NotaryToolError.HttpError.OtherError(
-                        msg = "Response was unsuccessful.",
+                        msg = ErrorStringsResource.getString("http.other.error"),
                         httpStatusCode = responseMetaData.httpStatusCode,
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
@@ -344,7 +361,7 @@ class NotaryToolClient(
             Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
           }
         } else {
-          Err(NotaryToolError.GeneralError(msg = "URL Path was null"))
+          Err(NotaryToolError.GeneralError(msg = ErrorStringsResource.getString("other.url.null.error")))
         }
       }
 

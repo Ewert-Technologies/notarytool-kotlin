@@ -7,9 +7,9 @@ import assertk.assertions.isNotNull
 import assertk.assertions.prop
 import assertk.fail
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.http.response.Status
 import ca.ewert.notarytoolkotlin.http.response.SubmissionId
 import ca.ewert.notarytoolkotlin.http.response.SubmissionInfo
-import ca.ewert.notarytoolkotlin.http.response.Status
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse401
 import ca.ewert.notarytoolkotlin.http.response.createMockResponse403
