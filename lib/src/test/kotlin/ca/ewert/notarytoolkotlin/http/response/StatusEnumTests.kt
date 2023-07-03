@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
  * Created: 2023-06-16
  * @author vewert
  */
-class SubmissionStatusTests {
+class StatusEnumTests {
 
   /**
    * Tests [Status.ACCEPTED]. Tests creating from lowercase, uppercase and invalid String
