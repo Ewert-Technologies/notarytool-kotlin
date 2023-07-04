@@ -8,7 +8,6 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.matches
 import assertk.assertions.prop
 import assertk.fail
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.response.Status
 import ca.ewert.notarytoolkotlin.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.response.createMockResponse401

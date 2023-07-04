@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.NotaryToolError
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOk
 import com.github.michaelbull.result.onSuccess

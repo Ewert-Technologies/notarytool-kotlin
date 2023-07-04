@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin.response
 
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.MalformedSubmissionIdError
+import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.MalformedSubmissionIdError
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok

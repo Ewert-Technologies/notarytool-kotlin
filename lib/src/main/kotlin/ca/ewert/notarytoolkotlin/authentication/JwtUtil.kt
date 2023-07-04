@@ -1,8 +1,8 @@
 package ca.ewert.notarytoolkotlin.authentication
 
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
+import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError
+import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError
+import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException

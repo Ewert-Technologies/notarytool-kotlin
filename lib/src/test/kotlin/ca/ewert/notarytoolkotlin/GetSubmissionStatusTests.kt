@@ -6,7 +6,6 @@ import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.prop
 import assertk.fail
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.response.Status
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionInfo

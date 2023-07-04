@@ -6,7 +6,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
 import assertk.fail
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.NotaryToolError
 import ca.ewert.notarytoolkotlin.hasMessage
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd

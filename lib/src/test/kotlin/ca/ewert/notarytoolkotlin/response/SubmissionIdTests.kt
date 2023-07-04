@@ -3,7 +3,7 @@ package ca.ewert.notarytoolkotlin.response
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.prop
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.NotaryToolError
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd
 import org.junit.jupiter.api.DisplayName

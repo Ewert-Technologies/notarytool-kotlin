@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.errors
+package ca.ewert.notarytoolkotlin
 
 import java.security.interfaces.ECPrivateKey
 

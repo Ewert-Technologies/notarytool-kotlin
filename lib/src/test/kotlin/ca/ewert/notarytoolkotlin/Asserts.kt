@@ -5,7 +5,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.support.appendName
 import assertk.assertions.support.expected
 import assertk.assertions.support.show
-import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
