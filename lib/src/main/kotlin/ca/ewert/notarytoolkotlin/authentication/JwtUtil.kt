@@ -88,11 +88,11 @@ fun generateJwt(
         .sign(algorithm)
       Ok(renderedToken)
     } catch (illegalArgumentException: IllegalArgumentException) {
-      log.warn("Error creating JWT", illegalArgumentException)
+      log.warn(illegalArgumentException) { "Error creating JWT" }
 
       Err(TokenCreationError(ErrorStringsResource.getString("jwt.algorithm.null.error")))
     } catch (jwtCreationException: JWTCreationException) {
-      log.warn("Error creating JWT", jwtCreationException)
+      log.warn(jwtCreationException) { "Error creating JWT" }
       Err(
         TokenCreationError(
           ErrorStringsResource
