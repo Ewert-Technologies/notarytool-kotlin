@@ -24,7 +24,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
  * @property submissionResponseData `SubmissionResponse.Data` Data that describes the status of the submission request.
  * @property meta `SubmissionResponse.Meta` An empty object that you can ignore.
  */
-data class SubmissionResponseJson(
+data class SubmissionResponseJson internal constructor(
   @Json(name = "data") val submissionResponseData: SubmissionsDataJson,
   val meta: SubmissionsMetaJson,
 ) {
@@ -70,7 +70,7 @@ data class SubmissionResponseJson(
  * one of your team’s previous submissions.
  * @property meta `SubmissionListResponse.Meta` An empty object that you can ignore.
  */
-data class SubmissionListResponseJson(
+data class SubmissionListResponseJson internal constructor(
   @Json(name = "data") val submissionListResponseData: List<SubmissionsDataJson>,
   val meta: SubmissionsMetaJson,
 ) {
@@ -116,7 +116,7 @@ data class SubmissionListResponseJson(
  * @property id The unique identifier for this submission.
  * @property type The resource type.
  */
-data class SubmissionsDataJson(
+data class SubmissionsDataJson internal constructor(
   val attributes: SubmissionsAttributesJson,
   val id: String,
   val type: String,
@@ -134,7 +134,7 @@ data class SubmissionsDataJson(
  * @property status The status of the submission. The associated string contains one of the following:
  * `Accepted`, `In Progress`, `Invalid`, or `Rejected`.
  */
-data class SubmissionsAttributesJson(
+data class SubmissionsAttributesJson internal constructor(
   val createdDate: String,
   val name: String,
   val status: String,
