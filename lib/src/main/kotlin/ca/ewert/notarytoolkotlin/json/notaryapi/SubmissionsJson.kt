@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.json.notaryapi
+package ca.ewert.notarytoolkotlin.json.notaryapi
 
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import com.github.michaelbull.result.Err

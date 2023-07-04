@@ -1,7 +1,7 @@
 package ca.ewert.notarytoolkotlin.http.response
 
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.ErrorJson
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.ErrorResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
 
 /**
  * An Error response, returned from the Notary API

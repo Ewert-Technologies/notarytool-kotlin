@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin.http.response
 
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.Instant
 import java.time.format.DateTimeParseException
@@ -29,7 +29,7 @@ class SubmissionListResponse internal constructor(
       val createdDate = try {
         Instant.parse(submissionsDataJson.attributes.createdDate)
       } catch (dateTimeParseException: DateTimeParseException) {
-        log.warn("Error parsing 'createdDate' ($createdDateText) from Web API response, use ", dateTimeParseException)
+        log.warn(dateTimeParseException) { "Error parsing 'createdDate' ($createdDateText) from Web API response, use createdDateText instead" }
         null
       }
       val name = submissionsDataJson.attributes.name

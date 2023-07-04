@@ -4,9 +4,9 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.isCloseTo
 import ca.ewert.notarytoolkotlin.isOk
+import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
@@ -33,6 +33,7 @@ private val log = KotlinLogging.logger {}
  */
 class SubmissionResponseTests() {
   private var mockWebServer: MockWebServer
+
   init {
     mockWebServer = MockWebServer()
   }

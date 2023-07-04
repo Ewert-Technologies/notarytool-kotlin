@@ -205,8 +205,8 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
   }
 
   /**
-   * Tests getSubmissionStatus, using invalid submissionId
-   * Expect that a [NotaryToolError.UserInputError.InvalidSubmissionIdError] will occur
+   * Tests getSubmissionStatus, with an invalid url, giving a General 404 error.
+   * Expect that a [NotaryToolError.HttpError.ClientError4xx] will occur
    */
   @Test
   @Tag("MockServer")
@@ -230,7 +230,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
       val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
       assertThat(getSubmissionStatusResult).isErr()
       getSubmissionStatusResult.onFailure { notaryToolError ->
-        assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError>()
+        assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ClientError4xx>()
         log.info() { notaryToolError }
         val httpError: NotaryToolError.HttpError = notaryToolError as NotaryToolError.HttpError.ClientError4xx
         assertThat(httpError).prop(NotaryToolError.HttpError::httpStatusCode).isEqualTo(404)

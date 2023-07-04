@@ -3,14 +3,14 @@ package ca.ewert.notarytoolkotlin
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.JsonWebTokenError
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.ErrorResponseJson
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionListResponseJson
-import ca.ewert.notarytoolkotlin.http.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.http.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionId
 import ca.ewert.notarytoolkotlin.http.response.SubmissionListResponse
 import ca.ewert.notarytoolkotlin.http.response.SubmissionStatusResponse
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
+import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result

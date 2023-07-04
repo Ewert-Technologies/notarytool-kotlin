@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.json.jwt
+package ca.ewert.notarytoolkotlin.json.jwt
 
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

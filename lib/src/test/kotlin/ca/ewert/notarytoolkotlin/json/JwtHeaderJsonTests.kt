@@ -1,10 +1,10 @@
-package ca.ewert.notarytoolkotlin.http.json
+package ca.ewert.notarytoolkotlin.json
 
 import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
-import ca.ewert.notarytoolkotlin.http.json.jwt.JwtHeaderJson
+import ca.ewert.notarytoolkotlin.json.jwt.JwtHeaderJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
