@@ -49,12 +49,12 @@ data class SubmissionResponseJson(
             Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
           }
         } catch (jsonDataException: JsonDataException) {
-          val msg = ErrorStringsResource.getString("json.parse.error".format(jsonDataException.message))
+          val msg = ErrorStringsResource.getString("json.parse.error").format(jsonDataException.message)
           Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
         }
       } else {
         val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
-        Err(NotaryToolError.JsonParseError(msg = "msg", jsonString = jsonString))
+        Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
       }
     }
   }
@@ -100,7 +100,7 @@ data class SubmissionListResponseJson(
         }
       } else {
         val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
-        Err(NotaryToolError.JsonParseError(msg = "msg", jsonString = jsonString))
+        Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
       }
     }
   }
