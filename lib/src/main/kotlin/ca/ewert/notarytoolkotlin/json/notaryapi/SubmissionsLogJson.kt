@@ -12,8 +12,8 @@ import com.squareup.moshi.Json
  * @property meta `SubmissionLogURLResponse.Meta` An empty object that you can ignore.
  */
 data class SubmissionLogUrlResponseJson(
-  @Json(name = "data") val submissionLogResponseData: SubmissionsLogDataJson,
-  val meta: SubmissionsLogMetaJson,
+  @Json(name = "data") val submissionLogResponseData: SubmissionLogUrlResponseDataJson,
+  val meta: SubmissionLogUrlResponseMetaJson,
 )
 
 /**
@@ -26,8 +26,8 @@ data class SubmissionLogUrlResponseJson(
  * parameter to the Get Submission Log call that elicited this response
  * @property type The resource type.
  */
-data class SubmissionsLogDataJson(
-  val attributes: SubmissionsLogAttributesJson,
+data class SubmissionLogUrlResponseDataJson(
+  val attributes: SubmissionLogUrlResponseAttributesJson,
   val id: String,
   val type: String,
 )
@@ -41,7 +41,7 @@ data class SubmissionsLogDataJson(
  * only a few hours. If you need the log again later, ask for the URL again by making
  * another call to the Get Submission Log endpoint.
  */
-data class SubmissionsLogAttributesJson(
+data class SubmissionLogUrlResponseAttributesJson(
   val developerLogUrl: String,
 )
 
@@ -49,4 +49,4 @@ data class SubmissionsLogAttributesJson(
  * Corresponds to [`SubmissionLogURLResponse.Meta`](https://developer.apple.com/documentation/notaryapi/submissionlogurlresponse/meta),
  * from Apple's API. _An empty object. This object is reserved for future use._
  */
-class SubmissionsLogMetaJson
+class SubmissionLogUrlResponseMetaJson
