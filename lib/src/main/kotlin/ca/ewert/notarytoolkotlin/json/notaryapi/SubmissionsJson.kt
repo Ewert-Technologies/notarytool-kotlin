@@ -1,6 +1,7 @@
 package ca.ewert.notarytoolkotlin.json.notaryapi
 
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
@@ -44,13 +45,16 @@ data class SubmissionResponseJson(
           if (submissionResponseJson != null) {
             Ok(submissionResponseJson)
           } else {
-            Err(NotaryToolError.JsonParseError("Error creating Json Object.", jsonString))
+            val msg = ErrorStringsResource.getString("json.parse.other.error")
+            Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
           }
         } catch (jsonDataException: JsonDataException) {
-          Err(NotaryToolError.JsonParseError("Error parsing json: ${jsonDataException.message}.", jsonString))
+          val msg = ErrorStringsResource.getString("json.parse.error".format(jsonDataException.message))
+          Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
         }
       } else {
-        Err(NotaryToolError.JsonParseError("Json String is <null> or empty.", jsonString))
+        val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
+        Err(NotaryToolError.JsonParseError(msg = "msg", jsonString = jsonString))
       }
     }
   }
@@ -87,13 +91,16 @@ data class SubmissionListResponseJson(
           if (submissionListResponseJson != null) {
             Ok(submissionListResponseJson)
           } else {
-            Err(NotaryToolError.JsonParseError("Error creating Json Object.", jsonString))
+            val msg = ErrorStringsResource.getString("json.parse.other.error")
+            Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
           }
         } catch (jsonDataException: JsonDataException) {
-          Err(NotaryToolError.JsonParseError("Error parsing json: ${jsonDataException.message}.", jsonString))
+          val msg = ErrorStringsResource.getString("json.parse.error".format(jsonDataException.message))
+          Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
         }
       } else {
-        Err(NotaryToolError.JsonParseError("Json String is <null> or empty.", jsonString))
+        val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
+        Err(NotaryToolError.JsonParseError(msg = "msg", jsonString = jsonString))
       }
     }
   }
