@@ -31,7 +31,7 @@ private val log = KotlinLogging.logger {}
  * Unit Tests for [SubmissionStatusResponse]
  * @author vewert
  */
-class SubmissionResponseTests() {
+class SubmissionStatusResponseTests() {
   private var mockWebServer: MockWebServer
 
   init {
