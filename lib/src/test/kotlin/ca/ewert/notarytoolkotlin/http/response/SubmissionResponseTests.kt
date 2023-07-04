@@ -83,7 +83,7 @@ class SubmissionResponseTests() {
       .build()
 
     client.newCall(request).execute().use { response: Response ->
-      log.info("Returned Response: $response")
+      log.info { "Returned Response: $response" }
       assertThat(response.isSuccessful).isTrue()
       if (!response.isSuccessful) {
         log.warn { "Request was not successful: $request" }
@@ -124,7 +124,7 @@ class SubmissionResponseTests() {
     val client = OkHttpClient.Builder().build()
 
     client.newCall(request).execute().use { response: Response ->
-      log.info("Returned Response: $response")
+      log.info { "Returned Response: $response" }
       assertThat(response.isSuccessful).isTrue()
       if (response.isSuccessful) {
         val responseMetaData = NotaryApiResponse.ResponseMetaData(response)

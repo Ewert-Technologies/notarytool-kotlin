@@ -73,7 +73,7 @@ class SubmissionListResponseJsonTests {
     """.trimIndent()
 
     val submissionListResponseJson: SubmissionListResponseJson? = jsonAdapter.fromJson(jsonString)
-    log.info(submissionListResponseJson.toString())
+    log.info { submissionListResponseJson.toString() }
     assertThat(submissionListResponseJson).isNotNull()
 
     if (submissionListResponseJson != null) {
@@ -157,7 +157,7 @@ class SubmissionListResponseJsonTests {
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
 
     assertThat(submissionListResponseJsonResult).isErr()
-    log.info(submissionListResponseJsonResult.getError().toString())
+    log.info { submissionListResponseJsonResult.getError().toString() }
   }
 
   /**
@@ -171,7 +171,7 @@ class SubmissionListResponseJsonTests {
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
 
     assertThat(submissionListResponseJsonResult).isErr()
-    log.info(submissionListResponseJsonResult.getError().toString())
+    log.info { submissionListResponseJsonResult.getError().toString() }
   }
 
   /**
@@ -189,7 +189,7 @@ class SubmissionListResponseJsonTests {
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
 
     assertThat(submissionListResponseJsonResult).isErr()
-    log.info(submissionListResponseJsonResult.getError().toString())
+    log.info { submissionListResponseJsonResult.getError().toString() }
   }
 
   /**
@@ -203,6 +203,6 @@ class SubmissionListResponseJsonTests {
     val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonString)
 
     assertThat(submissionListResponseJsonResult).isErr()
-    log.info(submissionListResponseJsonResult.getError().toString())
+    log.info { submissionListResponseJsonResult.getError().toString() }
   }
 }

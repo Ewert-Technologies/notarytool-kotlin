@@ -128,7 +128,7 @@ class ErrorResponseJsonTests {
     val errorResponseJsonResult = ErrorResponseJson.create(jsonString)
     assertThat(errorResponseJsonResult).isErr()
     errorResponseJsonResult.onFailure { jsonParseError ->
-      log.info(errorResponseJsonResult.getError().toString())
+      log.info { errorResponseJsonResult.getError().toString() }
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::msg)
         .isEqualTo("Error parsing json: Expected BEGIN_OBJECT but was STRING at path \$.")
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::jsonString)
