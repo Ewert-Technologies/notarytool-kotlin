@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.response
+package ca.ewert.notarytoolkotlin.response
 
 import ca.ewert.notarytoolkotlin.errors.NotaryToolError.UserInputError.MalformedSubmissionIdError
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource

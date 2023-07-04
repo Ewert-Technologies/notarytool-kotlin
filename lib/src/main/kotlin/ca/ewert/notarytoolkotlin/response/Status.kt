@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.response
+package ca.ewert.notarytoolkotlin.response
 
 /**
  * Various status states of a Submission

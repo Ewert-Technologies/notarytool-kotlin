@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.response
+package ca.ewert.notarytoolkotlin.response
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo

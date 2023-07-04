@@ -95,7 +95,7 @@ data class SubmissionListResponseJson internal constructor(
             Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
           }
         } catch (jsonDataException: JsonDataException) {
-          val msg = ErrorStringsResource.getString("json.parse.error".format(jsonDataException.message))
+          val msg = ErrorStringsResource.getString("json.parse.error").format(jsonDataException.message)
           Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
         }
       } else {

@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.response
+package ca.ewert.notarytoolkotlin.response
 
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionLogUrlResponseJson
 import io.github.oshai.kotlinlogging.KotlinLogging

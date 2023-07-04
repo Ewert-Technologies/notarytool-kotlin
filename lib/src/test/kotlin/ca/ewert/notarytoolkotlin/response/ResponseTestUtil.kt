@@ -1,4 +1,4 @@
-package ca.ewert.notarytoolkotlin.http.response
+package ca.ewert.notarytoolkotlin.response
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.mockwebserver.MockResponse
