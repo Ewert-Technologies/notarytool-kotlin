@@ -8,9 +8,10 @@ import java.time.format.DateTimeParseException
 private val log = KotlinLogging.logger {}
 
 /**
- * Response from sending a request the `Get Submission Status` Endpoint.
+ * Response from sending a request the [`Get Submission Status`](https://developer.apple.com/documentation/notaryapi/get_submission_status)
+ * Endpoint.
  *
- * @author vewert
+ * @author Victor Ewert
  */
 class SubmissionStatusResponse internal constructor(
   responseMetaData: ResponseMetaData,
