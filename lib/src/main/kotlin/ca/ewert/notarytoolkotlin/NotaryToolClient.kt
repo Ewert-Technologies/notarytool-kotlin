@@ -5,10 +5,12 @@ import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionLogUrlResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.response.NotaryApiResponse
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionListResponse
+import ca.ewert.notarytoolkotlin.response.SubmissionLogUrlResponse
 import ca.ewert.notarytoolkotlin.response.SubmissionStatusResponse
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
@@ -76,6 +78,11 @@ class NotaryToolClient(
      * The name of the endpoint to send requests to
      */
     private const val ENDPOINT_STRING = "submissions"
+
+    /**
+     * The logs path component, used when making call to `getSubmissionLog`
+     */
+    private const val LOGS_PATH_SEGMENT = "logs"
 
     /**
      * Constant for the `User-Agent` header.
@@ -249,6 +256,143 @@ class NotaryToolClient(
   }
 
   /**
+   * Fetch details about a single completed notarization.
+   * Calls the [Get Submission Log](https://developer.apple.com/documentation/notaryapi/get_submission_log)
+   * Endpoint.
+   *
+   * Use this function to get a URL that you can download a log file from that enumerates any issues
+   * found by the notary service. The URL that you receive is temporary, so be sure to use it to immediately
+   * fetch the log. If you need the log again in the future, ask for the URL again.
+   *
+   * The log file that you download contains JSON-formatted data, and might include both errors and warnings.
+   * For information about how to deal with common notarization problems,
+   * see [Resolving common notarization issues.](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues)
+   *
+   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * to start a new submission.
+   */
+  fun getSubmissionLog(submissionId: SubmissionId): Result<SubmissionLogUrlResponse, NotaryToolError> {
+    return when (this.jsonWebTokenResult) {
+      is Ok -> {
+        val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
+        if (jsonWebToken.isExpired) {
+          jsonWebToken.updateWebToken()
+        }
+
+        if (baseUrl != null) {
+          val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING)
+            .addPathSegment(submissionId.id).addPathSegment(LOGS_PATH_SEGMENT).build()
+          log.info { "URL String: $url" }
+          val request: Request = Request.Builder()
+            .url(url = url)
+            .header(name = USER_AGENT_HEADER, value = userAgent)
+            .header(name = AUTHORIZATION_HEADER, value = "Bearer ${jsonWebToken.signedToken}")
+            .get()
+            .build()
+
+          try {
+            this.httpClient.newCall(request).execute().use { response: Response ->
+              log.info { "Response from ${response.request.url}: $response" }
+              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              log.info { "Response body: ${responseMetaData.rawContents}" }
+              if (response.isSuccessful) {
+                SubmissionLogUrlResponseJson.create(responseMetaData.rawContents)
+                  .map { submissionLogUrlResponseJson: SubmissionLogUrlResponseJson ->
+                    SubmissionLogUrlResponse(
+                      responseMetaData = responseMetaData,
+                      jsonResponse = submissionLogUrlResponseJson,
+                    )
+                  }
+              } else {
+                when (response.code) {
+                  401, 403 -> {
+                    Err(JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error")))
+                  }
+
+                  404 -> {
+                    log.info { "Content-Type: ${responseMetaData.contentType}" }
+                    log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                    if (isGeneral404(responseMetaData = responseMetaData)) {
+                      Err(
+                        NotaryToolError.HttpError.ClientError4xx(
+                          msg = ErrorStringsResource.getString("http.400.error"),
+                          httpStatusCode = response.code,
+                          httpStatusMsg = response.message,
+                          requestUrl = response.request.url.toString(),
+                          contentBody = responseMetaData.rawContents,
+                        ),
+                      )
+                    } else {
+                      // This is a Notary Error Response, likely incorrect submissionId
+                      return when (
+                        val errorResponseJsonResult =
+                          ErrorResponseJson.create(responseMetaData.rawContents)
+                      ) {
+                        is Ok -> {
+                          // FIXME: Should maybe check that there is at least one error
+                          Err(NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail))
+                        }
+
+                        is Err -> {
+                          log.warn { errorResponseJsonResult.error }
+                          errorResponseJsonResult
+                        }
+                      }
+                    }
+                  }
+
+                  in 400..499 -> {
+                    Err(
+                      NotaryToolError.HttpError.ClientError4xx(
+                        msg = ErrorStringsResource.getString("http.400.error"),
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
+
+                  in 500..599 -> {
+                    Err(
+                      NotaryToolError.HttpError.ServerError5xx(
+                        msg = ErrorStringsResource.getString("http.500.error"),
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
+
+                  else -> {
+                    Err(
+                      NotaryToolError.HttpError.OtherError(
+                        msg = ErrorStringsResource.getString("http.other.error"),
+                        httpStatusCode = responseMetaData.httpStatusCode,
+                        httpStatusMsg = responseMetaData.httpStatusMessage,
+                        requestUrl = url.toString(),
+                        contentBody = responseMetaData.rawContents,
+                      ),
+                    )
+                  }
+                }
+              }
+            }
+          } catch (ioException: IOException) {
+            log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+            Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
+          }
+        } else {
+          Err(NotaryToolError.GeneralError(msg = ErrorStringsResource.getString("other.url.null.error")))
+        }
+      }
+
+      is Err -> jsonWebTokenResult
+    }
+  }
+
+  /**
    * Determines whether the Response is a General 404, as opposed to a 404 caused by
    * using an incorrect submissionId. It checks if the content-type is `"text/plain"`,
    * or if the content-length is zero, and if so assumes it is a General 404,
@@ -279,7 +423,7 @@ class NotaryToolClient(
    * @return A [SubmissionListResponse] or a [NotaryToolError]
    */
   fun getPreviousSubmissions(): Result<SubmissionListResponse, NotaryToolError> {
-    return when (jsonWebTokenResult) {
+    return when (this.jsonWebTokenResult) {
       is Ok -> {
         val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {

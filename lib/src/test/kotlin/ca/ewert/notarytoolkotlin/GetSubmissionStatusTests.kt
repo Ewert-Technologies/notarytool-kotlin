@@ -169,7 +169,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
     val responseBody: String = """
     {
       "errors": [{
-        "id": "228afb9e-58fa-4246-8fed-c0dec1f23595",
+        "id": "5685647e-0125-4343-a068-1c5786499827",
         "status": "404",
         "code": "NOT_FOUND",
         "title": "The specified resource does not exist",
