@@ -29,7 +29,7 @@ class JwtGenerator {
    */
   @Test
   @Tag("Private")
-  @Tag("Apple-Server")
+  @Tag("AppleServer")
   fun generateJwt() {
     val testValuesReader = TestValuesReader()
     val keyId: String = testValuesReader.getKeyId()

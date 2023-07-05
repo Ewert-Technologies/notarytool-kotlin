@@ -38,7 +38,7 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
    * Tests getSubmissionLog, using valid request to actual Apple Notary API
    */
   @Test
-  @Tag("Apple-Server")
+  @Tag("AppleServer")
   @Tag("Private")
   @DisplayName("getSubmissionLog Valid submissionId Test to Apple Server")
   fun getSubmissionLogValidActual() {
@@ -75,7 +75,7 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
    * Expect that a [NotaryToolError.UserInputError.InvalidSubmissionIdError] will occur
    */
   @Test
-  @Tag("Apple-Server")
+  @Tag("AppleServer")
   @Tag("Private")
   @DisplayName("getSubmissionLog Valid submissionId Test to Apple Server")
   fun getSubmissionLogInvalidActual() {
