@@ -28,7 +28,7 @@ object ErrorStringsResource {
     return try {
       resourceBundle.getString(key)
     } catch (e: Exception) {
-      log.warn("Invalid key used: \"{}\", for resource: {}", key, resourceBundleName)
+      log.warn { "Invalid key used: \"$key\", for resource: $resourceBundleName" }
       "!-- $key --!"
     }
   }
