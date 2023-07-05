@@ -56,3 +56,6 @@ lib/src/test/resources/private
 
 # Other
 rel
+
+# macOS
+.DS_Store
