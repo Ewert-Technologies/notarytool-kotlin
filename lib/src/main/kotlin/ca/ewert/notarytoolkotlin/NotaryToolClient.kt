@@ -408,6 +408,74 @@ class NotaryToolClient(
   }
 
   /**
+   * Downloads the logs for a submission, using the developerLogUrl passed in. The developerLogUrl can
+   * be obtained by using [getSubmissionLog]. The Response body is returned 'as is' as a String, which may be
+   * empty.
+   *
+   * @param developerLogUrl URL that you use to download the logs for a submission
+   * @return The Submission Log, which is a JSON-encoded file that contains the log information.
+   */
+  internal fun downloadSubmissionLog(developerLogUrl: HttpUrl): Result<String, NotaryToolError> {
+    val request: Request = Request.Builder()
+      .url(developerLogUrl)
+      .header(name = USER_AGENT_HEADER, value = userAgent)
+      .get()
+      .build()
+
+    return try {
+      this.httpClient.newCall(request = request).execute().use { response: Response ->
+        log.info { "Response from ${response.request.url}: $response" }
+        log.info { "Response status code: ${response.code}" }
+        val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+        if (response.isSuccessful) {
+          Ok(responseMetaData.rawContents ?: "")
+        } else {
+          when (response.code) {
+            in 400..499 -> {
+              Err(
+                NotaryToolError.HttpError.ClientError4xx(
+                  msg = ErrorStringsResource.getString("http.400.error"),
+                  httpStatusCode = responseMetaData.httpStatusCode,
+                  httpStatusMsg = responseMetaData.httpStatusMessage,
+                  requestUrl = developerLogUrl.toString(),
+                  contentBody = responseMetaData.rawContents,
+                ),
+              )
+            }
+
+            in 500..599 -> {
+              Err(
+                NotaryToolError.HttpError.ServerError5xx(
+                  msg = ErrorStringsResource.getString("http.500.error"),
+                  httpStatusCode = responseMetaData.httpStatusCode,
+                  httpStatusMsg = responseMetaData.httpStatusMessage,
+                  requestUrl = developerLogUrl.toString(),
+                  contentBody = responseMetaData.rawContents,
+                ),
+              )
+            }
+
+            else -> {
+              Err(
+                NotaryToolError.HttpError.OtherError(
+                  msg = ErrorStringsResource.getString("http.other.error"),
+                  httpStatusCode = responseMetaData.httpStatusCode,
+                  httpStatusMsg = responseMetaData.httpStatusMessage,
+                  requestUrl = developerLogUrl.toString(),
+                  contentBody = responseMetaData.rawContents,
+                ),
+              )
+            }
+          }
+        }
+      }
+    } catch (ioException: IOException) {
+      log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+      Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
+    }
+  }
+
+  /**
    * Fetch a list of your team’s previous notarization submissions.
    * Calls the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions)
    * Endpoint.
@@ -434,8 +502,8 @@ class NotaryToolClient(
           log.info { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url = url)
-            .header(name = "User-Agent", value = userAgent)
-            .header(name = "Authorization", value = "Bearer ${jsonWebToken.signedToken}")
+            .header(name = USER_AGENT_HEADER, value = userAgent)
+            .header(name = AUTHORIZATION_HEADER, value = "Bearer ${jsonWebToken.signedToken}")
             .get()
             .build()
 
