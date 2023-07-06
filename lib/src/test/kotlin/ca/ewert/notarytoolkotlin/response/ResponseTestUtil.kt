@@ -153,7 +153,7 @@ fun createSubmissionLogResponse(): MockResponse {
   val body: String = """
   {
     "logFormatVersion": 1,
-    "jobId": "4685647e-0125-4343-a068-1c5786499827",
+    "jobId": "1234647e-0125-4343-a068-1c5786499827",
     "status": "Accepted",
     "statusSummary": "Ready for distribution",
     "statusCode": 0,

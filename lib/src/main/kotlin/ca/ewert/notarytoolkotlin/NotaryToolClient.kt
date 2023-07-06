@@ -15,9 +15,11 @@ import ca.ewert.notarytoolkotlin.response.SubmissionStatusResponse
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.andThen
 import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -65,7 +67,7 @@ class NotaryToolClient internal constructor(
   private val baseUrlString: String,
   private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
   private val userAgent: String = USER_AGENT_VALUE,
-  private val logUrlBaseString: String? = null,
+  private val submissionLogUrlString: String? = null,
 ) {
 
   /**
@@ -502,6 +504,25 @@ class NotaryToolClient internal constructor(
     } catch (ioException: IOException) {
       log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
       Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
+    }
+  }
+
+  /**
+   * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
+   * and uses the url to retrieve the submission log as a String.
+   */
+  fun retrieveSubmissionLog(submissionId: SubmissionId): Result<String, NotaryToolError> {
+    return this.getSubmissionLog(submissionId).andThen { submissionLogUrlResponse ->
+
+      // Uses test url String, if passed in, otherwise url from the submissionLog response
+      val urlString: String = this.submissionLogUrlString ?: submissionLogUrlResponse.developerLogUrlString
+      log.info { "Using URL: $urlString" }
+      try {
+        val responseUrl: HttpUrl = urlString.toHttpUrl()
+        this.downloadSubmissionLog(developerLogUrl = responseUrl)
+      } catch (illegalArgumentException: IllegalArgumentException) {
+        Err(NotaryToolError.GeneralError("Invalid submission log URL: ${illegalArgumentException.localizedMessage}"))
+      }
     }
   }
 

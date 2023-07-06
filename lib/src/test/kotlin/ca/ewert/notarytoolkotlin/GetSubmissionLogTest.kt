@@ -406,32 +406,87 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
   }
 
   /**
-   * Tests the downloadSubmissionLog function
+   * Tests retrieveSubmissionLog
    */
   @Test
-  @Tag("MockSever")
-  @DisplayName("Download Function Test")
-  fun downloadSubmissionLogFunctionTest() {
-    mockWebServer.enqueue(createSubmissionLogResponse())
+  @Tag("AppleServer")
+  @Tag("Private")
+  @DisplayName("Retrieve Submission Log Test Actual")
+  fun retrieveSubmissionLogActualTest() {
+    val testValuesReader = TestValuesReader()
+    val keyId: String = testValuesReader.getKeyId()
+    val issuerId: String = testValuesReader.getIssueId()
+    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = keyId,
+      issuerId = issuerId,
+      privateKeyFile = privateKeyFile!!,
+    )
+
+    val submissionLogResult =
+      notaryToolClient.retrieveSubmissionLog(SubmissionId(("b014d72f-17b6-45ac-abdf-8f39b9241c58")))
+    submissionLogResult.onSuccess { logString: String ->
+      log.info { "\n$logString" }
+      assertThat(logString).isNotEmpty()
+    }
+
+    submissionLogResult.onFailure { notaryToolError ->
+      fail(AssertionError("Notary Tool Error: $notaryToolError"))
+    }
+  }
+
+  /**
+   * Tests retrieveSubmissionLog
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Retrieve Submission Log Test")
+  fun retrieveSubmissionLogTest() {
 
     mockWebServer.start()
+
+    val baseUrl = mockWebServer.url("")
+
     val developerLogUrl: HttpUrl = mockWebServer.url(
-      "/prod/4685647e-0125-4343-a068-1c5786499827/developer_log.json?AWSAccessKeyId=VEIARQRX7CZSSQ7NXF3S&Signature=q28cXIrrf1%2B4VfAngZB6JRCYGHA%3D&x-amz-security-token=IQoJb7JpZ2luX2VjEL3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIQDFgFbNpWIEmgRJ%2BmEjLDx0ArsR2QKy4E5%2B3XhoTOwGPwIgLDNF5NlsOUbCkJ9ekW2UybnahrBbV4npIDayfSQsjngqkQMINhADGgwxMDQyNzAzMzc2MzciDD%2FeNZidfAXw1BB7hSruAnHu7E2iRW2tNAzMKNlAWvNUOUgowOni7ouvGYWI7EM6TlK8NOCX36TlfG8WsJu8i43bGrtkIT9ahF6q%2FqAeH6cGOFKQyWxqTL37vFs4cFreQ2tRbQHwhhuCLVRBkUkVOxpwaXXRo%2F557zAvH0dMFDYAJ3icsBFyBxTsLhc2CuStVkYszzToMBHTLo8lZZMd8nN0YeeKgEx6rDiZyIg7M31%2FS%2B1W%2B1NRmx%2F1OnnYgELEkLrk5PEojhXGChin%2BwRsUKPvRxl4JaEqJYYdJHoIWYyD%2Fgdno4W7K3qMm1FMXhxeQlYj87o%2FnTzfcyxM5GTgBxiH%2FDjeNJwEm6htBh7iG880nM8b7WuzloYrBRA%2BC3dOayg9Wt6wAvHh9Us%2FVBi%2By4isj95U4ALiBCybcbPqPU8TJGj8aEfUb9RwaeMQ3xYBsthKxKUxrP1Kx7rxNSGqIpRMgiJ4d3itEJA0mgdAIKzHtabMWxNKtT7SslqCLTDDpZelBjqdAZjp58V8I8KmuKm55s5OcOCQYE8DP3rR79fI3qqFVEp3WYGAxF%2F6V5%2Bi90BM1pJvyDcb4PlpsGtrL8Iiugvq2hphN0Wt%2FHUfCzA1ZPKnHdoqIviRcw1J8NmrJVLlKJuzRC9VDlB%2Fo6VQPgP5eW81fxzrapKNHlgtWv%2FXjPa2TcGp35AlQewGtzYoMk5kWAZ%2FKDuTh2DPZRtTftHnUuE%3D&Expires=1688597271",
+      "/prod/4685647e-0000-4343-a068-1c5786499827/developer_log.json?AWSAccessKeyId=VEIARQRX7CZSSQ7NXF3S&Signature=q28cXIrrf1%2B4VfAngZB6JRCYGHA%3D&x-amz-security-token=IQoJb7JpZ2luX2VjEL3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIQDFgFbNpWIEmgRJ%2BmEjLDx0ArsR2QKy4E5%2B3XhoTOwGPwIgLDNF5NlsOUbCkJ9ekW2UybnahrBbV4npIDayfSQsjngqkQMINhADGgwxMDQyNzAzMzc2MzciDD%2FeNZidfAXw1BB7hSruAnHu7E2iRW2tNAzMKNlAWvNUOUgowOni7ouvGYWI7EM6TlK8NOCX36TlfG8WsJu8i43bGrtkIT9ahF6q%2FqAeH6cGOFKQyWxqTL37vFs4cFreQ2tRbQHwhhuCLVRBkUkVOxpwaXXRo%2F557zAvH0dMFDYAJ3icsBFyBxTsLhc2CuStVkYszzToMBHTLo8lZZMd8nN0YeeKgEx6rDiZyIg7M31%2FS%2B1W%2B1NRmx%2F1OnnYgELEkLrk5PEojhXGChin%2BwRsUKPvRxl4JaEqJYYdJHoIWYyD%2Fgdno4W7K3qMm1FMXhxeQlYj87o%2FnTzfcyxM5GTgBxiH%2FDjeNJwEm6htBh7iG880nM8b7WuzloYrBRA%2BC3dOayg9Wt6wAvHh9Us%2FVBi%2By4isj95U4ALiBCybcbPqPU8TJGj8aEfUb9RwaeMQ3xYBsthKxKUxrP1Kx7rxNSGqIpRMgiJ4d3itEJA0mgdAIKzHtabMWxNKtT7SslqCLTDDpZelBjqdAZjp58V8I8KmuKm55s5OcOCQYE8DP3rR79fI3qqFVEp3WYGAxF%2F6V5%2Bi90BM1pJvyDcb4PlpsGtrL8Iiugvq2hphN0Wt%2FHUfCzA1ZPKnHdoqIviRcw1J8NmrJVLlKJuzRC9VDlB%2Fo6VQPgP5eW81fxzrapKNHlgtWv%2FXjPa2TcGp35AlQewGtzYoMk5kWAZ%2FKDuTh2DPZRtTftHnUuE%3D&Expires=1688597271",
     )
+
+    val responseBody: String = """
+    {
+      "data": {
+        "id": "b014d72f-17b6-45ac-abdf-8f39b9241c58",
+        "type": "submissionsLog",
+        "attributes": {
+          "developerLogUrl": "$developerLogUrl"
+        }
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBody))
+
+    mockWebServer.enqueue(createSubmissionLogResponse())
+
 
     val notaryToolClient = NotaryToolClient(
       privateKeyId = "A8B3X24VG1",
       issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
       privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
     )
 
-    val logResult = notaryToolClient.downloadSubmissionLog(developerLogUrl = developerLogUrl)
-    logResult.onSuccess { logString: String ->
+    val submissionLogResult =
+      notaryToolClient.retrieveSubmissionLog(SubmissionId(("b014d72f-17b6-45ac-abdf-8f39b9241c58")))
+    submissionLogResult.onSuccess { logString: String ->
       log.info { "\n$logString" }
       assertThat(logString).isNotEmpty()
     }
 
-    logResult.onFailure { notaryToolError ->
+    submissionLogResult.onFailure { notaryToolError ->
       fail(AssertionError("Notary Tool Error: $notaryToolError"))
     }
   }
