@@ -7,7 +7,7 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionLogUrlResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
-import ca.ewert.notarytoolkotlin.response.NotaryApiResponse
+import ca.ewert.notarytoolkotlin.response.ResponseMetaData
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionListResponse
 import ca.ewert.notarytoolkotlin.response.SubmissionLogUrlResponse
@@ -190,7 +190,7 @@ class NotaryToolClient internal constructor(
           try {
             httpClient.newCall(request).execute().use { response: Response ->
               log.info { "Response from ${response.request.url}: $response" }
-              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              val responseMetaData = ResponseMetaData(response = response)
               log.info { "Response body: ${responseMetaData.rawContents}" }
 
               if (response.isSuccessful) {
@@ -329,7 +329,7 @@ class NotaryToolClient internal constructor(
           try {
             this.httpClient.newCall(request).execute().use { response: Response ->
               log.info { "Response from ${response.request.url}: $response" }
-              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              val responseMetaData = ResponseMetaData(response = response)
               log.info { "Response body: ${responseMetaData.rawContents}" }
               if (response.isSuccessful) {
                 SubmissionLogUrlResponseJson.create(responseMetaData.rawContents)
@@ -438,7 +438,7 @@ class NotaryToolClient internal constructor(
    * or if the content-length is zero, and if so assumes it is a General 404,
    * since the other case would include a json body.
    */
-  private fun isGeneral404(responseMetaData: NotaryApiResponse.ResponseMetaData): Boolean {
+  private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
     val type: String? = responseMetaData.contentType?.type
     val subtype: String? = responseMetaData.contentType?.subtype
     val contentType = "$type/$subtype"
@@ -466,7 +466,7 @@ class NotaryToolClient internal constructor(
       this.httpClient.newCall(request = request).execute().use { response: Response ->
         log.info { "Response from ${response.request.url}: $response" }
         log.info { "Response status code: ${response.code}" }
-        val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+        val responseMetaData = ResponseMetaData(response = response)
         if (response.isSuccessful) {
           Ok(responseMetaData.rawContents ?: "")
         } else {
@@ -573,7 +573,7 @@ class NotaryToolClient internal constructor(
           try {
             httpClient.newCall(request = request).execute().use { response: Response ->
               log.info { "Response from ${response.request.url}: $response" }
-              val responseMetaData = NotaryApiResponse.ResponseMetaData(response = response)
+              val responseMetaData = ResponseMetaData(response = response)
               log.info { "Response body: ${responseMetaData.rawContents}" }
               if (response.isSuccessful) {
                 SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)

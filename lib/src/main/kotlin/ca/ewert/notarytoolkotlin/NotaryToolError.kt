@@ -1,6 +1,6 @@
 package ca.ewert.notarytoolkotlin
 
-import ca.ewert.notarytoolkotlin.response.NotaryApiResponse
+import ca.ewert.notarytoolkotlin.response.ResponseMetaData
 import java.security.interfaces.ECPrivateKey
 
 /**
@@ -107,7 +107,7 @@ sealed interface NotaryToolError {
     val httpStatusMsg: String
     val requestUrl: String
     val contentBody: String?
-    val responseMetaData: NotaryApiResponse.ResponseMetaData
+    val responseMetaData: ResponseMetaData
 
     /**
      * A Client Error response, in the range of 400 to 499. *"The request contains bad syntax
@@ -121,7 +121,7 @@ sealed interface NotaryToolError {
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
       override val contentBody: String?,
-      override val responseMetaData: NotaryApiResponse.ResponseMetaData,
+      override val responseMetaData: ResponseMetaData,
     ) : HttpError
 
     /**
@@ -136,7 +136,7 @@ sealed interface NotaryToolError {
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
       override val contentBody: String?,
-      override val responseMetaData: NotaryApiResponse.ResponseMetaData,
+      override val responseMetaData: ResponseMetaData,
     ) : HttpError
 
     /**
@@ -150,7 +150,7 @@ sealed interface NotaryToolError {
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
       override val contentBody: String?,
-      override val responseMetaData: NotaryApiResponse.ResponseMetaData,
+      override val responseMetaData: ResponseMetaData,
     ) : HttpError
   }
 
