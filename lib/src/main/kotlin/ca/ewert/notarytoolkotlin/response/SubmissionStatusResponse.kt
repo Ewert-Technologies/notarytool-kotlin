@@ -11,6 +11,8 @@ private val log = KotlinLogging.logger {}
  * Response from sending a request the [`Get Submission Status`](https://developer.apple.com/documentation/notaryapi/get_submission_status)
  * Endpoint.
  *
+ * @param responseMetaData Metadata received from the response.
+ * @param jsonResponse The response body json object.
  * @author Victor Ewert
  */
 class SubmissionStatusResponse internal constructor(

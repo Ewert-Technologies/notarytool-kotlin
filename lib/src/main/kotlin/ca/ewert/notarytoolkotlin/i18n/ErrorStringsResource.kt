@@ -11,10 +11,10 @@ private val log = KotlinLogging.logger {}
  *
  * @author Victor Ewert
  */
-object ErrorStringsResource {
+internal object ErrorStringsResource {
   private val resourceBundle: ResourceBundle = ResourceBundle.getBundle("strings/ErrorStrings")
 
-  internal val resourceBundleName: String
+  private val resourceBundleName: String
     get() = resourceBundle.baseBundleName
 
   /**
