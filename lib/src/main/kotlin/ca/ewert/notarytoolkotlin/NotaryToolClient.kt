@@ -215,6 +215,7 @@ class NotaryToolClient internal constructor(
                           httpStatusMsg = response.message,
                           requestUrl = response.request.url.toString(),
                           contentBody = responseMetaData.rawContents,
+                          responseMetaData = responseMetaData,
                         ),
                       )
                     } else {
@@ -244,6 +245,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -256,6 +258,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -268,6 +271,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -352,6 +356,7 @@ class NotaryToolClient internal constructor(
                           httpStatusMsg = response.message,
                           requestUrl = response.request.url.toString(),
                           contentBody = responseMetaData.rawContents,
+                          responseMetaData = responseMetaData,
                         ),
                       )
                     } else {
@@ -381,6 +386,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -393,6 +399,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -405,6 +412,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -471,6 +479,7 @@ class NotaryToolClient internal constructor(
                   httpStatusMsg = responseMetaData.httpStatusMessage,
                   requestUrl = developerLogUrl.toString(),
                   contentBody = responseMetaData.rawContents,
+                  responseMetaData = responseMetaData,
                 ),
               )
             }
@@ -483,6 +492,7 @@ class NotaryToolClient internal constructor(
                   httpStatusMsg = responseMetaData.httpStatusMessage,
                   requestUrl = developerLogUrl.toString(),
                   contentBody = responseMetaData.rawContents,
+                  responseMetaData = responseMetaData,
                 ),
               )
             }
@@ -495,6 +505,7 @@ class NotaryToolClient internal constructor(
                   httpStatusMsg = responseMetaData.httpStatusMessage,
                   requestUrl = developerLogUrl.toString(),
                   contentBody = responseMetaData.rawContents,
+                  responseMetaData = responseMetaData,
                 ),
               )
             }
@@ -589,6 +600,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -601,6 +613,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
@@ -613,6 +626,7 @@ class NotaryToolClient internal constructor(
                         httpStatusMsg = responseMetaData.httpStatusMessage,
                         requestUrl = url.toString(),
                         contentBody = responseMetaData.rawContents,
+                        responseMetaData = responseMetaData,
                       ),
                     )
                   }
