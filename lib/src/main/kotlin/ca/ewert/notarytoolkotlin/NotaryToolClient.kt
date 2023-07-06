@@ -50,24 +50,54 @@ private val log = KotlinLogging.logger {}
  * @param baseUrlString The base url of Apple's Notary Web API. The default value is:
  * `https://appstoreconnect.apple.com/notary/v2`. This should only be used for testing purposes.
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
- *  * `https://appstoreconnect.apple.com/notary/v2` This should only be used for testing purposes.
+ * `https://appstoreconnect.apple.com/notary/v2` This should only be used for testing purposes.
  * @param connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
  * @property connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
  * @param userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
  * @property userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
  * @author Victor Ewert
  */
-class NotaryToolClient(
+class NotaryToolClient internal constructor(
   private val privateKeyId: String,
   private val issuerId: String,
   private val privateKeyFile: Path,
   private val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
-  private val baseUrlString: String = BASE_URL_STRING,
+  private val baseUrlString: String,
   private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
   private val userAgent: String = USER_AGENT_VALUE,
+  private val logUrlBaseString: String? = null,
 ) {
 
-  companion object {
+  /**
+   * Public constructor.
+   *
+   * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API.
+   * @param privateKeyId The private key ID, provided by Apple.
+   * @param issuerId The issuer ID, provided by Apple.
+   * @param privateKeyFile The Private Key file `.p8` provided by Apple
+   * @param tokenLifetime Lifetime of the token used for Authentication. It should be less than 20 minutes,
+   * or request will be rejected by Apple. The default value is **15 minutes**
+   * @param connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
+   * @param userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
+   */
+  constructor(
+    privateKeyId: String,
+    issuerId: String,
+    privateKeyFile: Path,
+    tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
+    connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
+    userAgent: String = USER_AGENT_VALUE,
+  ) : this(
+    privateKeyId = privateKeyId,
+    issuerId = issuerId,
+    privateKeyFile = privateKeyFile,
+    tokenLifetime = tokenLifetime,
+    baseUrlString = BASE_URL_STRING,
+    connectTimeout = connectTimeout,
+    userAgent = userAgent,
+  )
+
+  internal companion object {
 
     /**
      * Constant for the base URL of Apple's notary web client
