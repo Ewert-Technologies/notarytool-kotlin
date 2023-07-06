@@ -439,12 +439,10 @@ class NotaryToolClient internal constructor(
    * since the other case would include a json body.
    */
   private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
-    val type: String? = responseMetaData.contentType?.type
-    val subtype: String? = responseMetaData.contentType?.subtype
-    val contentType = "$type/$subtype"
+    val contentType = responseMetaData.contentType
     log.info { "Found content type: $contentType" }
     val contentLength: Long = responseMetaData.contentLength ?: 0
-    return contentType.contains(other = "text/plain", ignoreCase = true) || contentLength == 0L
+    return contentType?.contains(other = "text/plain", ignoreCase = true) ?: false || contentLength == 0L
   }
 
   /**

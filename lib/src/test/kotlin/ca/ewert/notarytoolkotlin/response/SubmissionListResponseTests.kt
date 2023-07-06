@@ -159,7 +159,7 @@ class SubmissionListResponseTests {
       log.info { "Returned Response: $response" }
       assertThat(response.isSuccessful).isTrue()
       if (response.isSuccessful) {
-        val responseMetaData = NotaryApiResponse.ResponseMetaData(response)
+        val responseMetaData = ResponseMetaData(response)
         val jsonBody: String? = responseMetaData.rawContents
         assertThat(jsonBody).isNotNull()
         val submissionListResponseJsonResult = SubmissionListResponseJson.create(jsonBody)
