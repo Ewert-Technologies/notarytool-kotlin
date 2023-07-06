@@ -38,7 +38,8 @@ private val log = KotlinLogging.logger {}
  * - Check the status of a specific notarization submission: [getSubmissionStatus]
  * - View a history of submissions: [getPreviousSubmissions]
  *
- * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API.
+ * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API. Used for
+ * testing with MockWebServer
  * @param privateKeyId The private key ID, provided by Apple.
  * @property privateKeyId The private key ID, provided by Apple.
  * @param issuerId The issuer ID, provided by Apple.
@@ -67,7 +68,6 @@ class NotaryToolClient internal constructor(
   private val baseUrlString: String,
   private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
   private val userAgent: String = USER_AGENT_VALUE,
-  private val submissionLogUrlString: String? = null,
 ) {
 
   /**
@@ -447,7 +447,7 @@ class NotaryToolClient internal constructor(
    * @param developerLogUrl URL that you use to download the logs for a submission
    * @return The Submission Log, which is a JSON-encoded file that contains the log information.
    */
-  internal fun downloadSubmissionLog(developerLogUrl: HttpUrl): Result<String, NotaryToolError> {
+  private fun downloadSubmissionLog(developerLogUrl: HttpUrl): Result<String, NotaryToolError> {
     val request: Request = Request.Builder()
       .url(developerLogUrl)
       .header(name = USER_AGENT_HEADER, value = userAgent)
@@ -513,15 +513,16 @@ class NotaryToolClient internal constructor(
    */
   fun retrieveSubmissionLog(submissionId: SubmissionId): Result<String, NotaryToolError> {
     return this.getSubmissionLog(submissionId).andThen { submissionLogUrlResponse ->
-
-      // Uses test url String, if passed in, otherwise url from the submissionLog response
-      val urlString: String = this.submissionLogUrlString ?: submissionLogUrlResponse.developerLogUrlString
-      log.info { "Using URL: $urlString" }
+      val urlString: String = submissionLogUrlResponse.developerLogUrlString
+      log.info { "Using submissionLog URL: $urlString" }
       try {
         val responseUrl: HttpUrl = urlString.toHttpUrl()
         this.downloadSubmissionLog(developerLogUrl = responseUrl)
       } catch (illegalArgumentException: IllegalArgumentException) {
-        Err(NotaryToolError.GeneralError("Invalid submission log URL: ${illegalArgumentException.localizedMessage}"))
+        val msg: String = ErrorStringsResource.getString("other.invalid.submission.log.url.error")
+          .format(illegalArgumentException.localizedMessage)
+        log.warn(illegalArgumentException) { "Error parsing submission Log URL." }
+        Err(NotaryToolError.GeneralError(msg))
       }
     }
   }
