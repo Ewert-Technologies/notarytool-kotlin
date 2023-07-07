@@ -34,7 +34,7 @@ private val log = KotlinLogging.logger {}
  *
  * @author Victor Ewert
  */
-class GetSubmissionLogTest : NotaryToolClientTests() {
+class GetSubmissionLogTests : NotaryToolClientTests() {
 
   /**
    * Tests getSubmissionLog, using valid request to actual Apple Notary API
