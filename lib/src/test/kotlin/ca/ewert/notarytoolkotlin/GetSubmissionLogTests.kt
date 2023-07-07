@@ -1,7 +1,9 @@
 package ca.ewert.notarytoolkotlin
 
 import assertk.assertThat
+import assertk.assertions.exists
 import assertk.assertions.isEqualTo
+import assertk.assertions.isGreaterThan
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
@@ -25,7 +27,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.net.URL
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 private val log = KotlinLogging.logger {}
 
@@ -722,6 +726,59 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
         assertThat(notaryToolError.responseMetaData.httpStatusCode).isEqualTo(500)
         log.info { notaryToolError.responseMetaData.httpStatusMessage }
       }
+    }
+  }
+
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Download Submission Log Success - Test")
+  fun downloadSubmissionLogSuccessTest() {
+    val logFileLocation: Path = Paths.get("D:", "users", "vewert", "Downloads", "submissionLog.json")
+    log.info { "logFileLocation: $logFileLocation" }
+//    Files.deleteIfExists(logFileLocation)
+
+    mockWebServer.start()
+
+    val baseUrl = mockWebServer.url("")
+
+    val developerLogUrl: HttpUrl = mockWebServer.url(
+      "/prod/4685647e-0000-4343-a068-1c5786499827/developer_log.json?AWSAccessKeyId=VEIARQRX7CZSSQ7NXF3S&Signature=q28cXIrrf1%2B4VfAngZB6JRCYGHA%3D&x-amz-security-token=IQoJb7JpZ2luX2VjEL3%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEaCXVzLXdlc3QtMiJHMEUCIQDFgFbNpWIEmgRJ%2BmEjLDx0ArsR2QKy4E5%2B3XhoTOwGPwIgLDNF5NlsOUbCkJ9ekW2UybnahrBbV4npIDayfSQsjngqkQMINhADGgwxMDQyNzAzMzc2MzciDD%2FeNZidfAXw1BB7hSruAnHu7E2iRW2tNAzMKNlAWvNUOUgowOni7ouvGYWI7EM6TlK8NOCX36TlfG8WsJu8i43bGrtkIT9ahF6q%2FqAeH6cGOFKQyWxqTL37vFs4cFreQ2tRbQHwhhuCLVRBkUkVOxpwaXXRo%2F557zAvH0dMFDYAJ3icsBFyBxTsLhc2CuStVkYszzToMBHTLo8lZZMd8nN0YeeKgEx6rDiZyIg7M31%2FS%2B1W%2B1NRmx%2F1OnnYgELEkLrk5PEojhXGChin%2BwRsUKPvRxl4JaEqJYYdJHoIWYyD%2Fgdno4W7K3qMm1FMXhxeQlYj87o%2FnTzfcyxM5GTgBxiH%2FDjeNJwEm6htBh7iG880nM8b7WuzloYrBRA%2BC3dOayg9Wt6wAvHh9Us%2FVBi%2By4isj95U4ALiBCybcbPqPU8TJGj8aEfUb9RwaeMQ3xYBsthKxKUxrP1Kx7rxNSGqIpRMgiJ4d3itEJA0mgdAIKzHtabMWxNKtT7SslqCLTDDpZelBjqdAZjp58V8I8KmuKm55s5OcOCQYE8DP3rR79fI3qqFVEp3WYGAxF%2F6V5%2Bi90BM1pJvyDcb4PlpsGtrL8Iiugvq2hphN0Wt%2FHUfCzA1ZPKnHdoqIviRcw1J8NmrJVLlKJuzRC9VDlB%2Fo6VQPgP5eW81fxzrapKNHlgtWv%2FXjPa2TcGp35AlQewGtzYoMk5kWAZ%2FKDuTh2DPZRtTftHnUuE%3D&Expires=1688597271",
+    )
+
+    val responseBody: String = """
+    {
+      "data": {
+        "id": "b014d72f-17b6-45ac-abdf-8f39b9241c58",
+        "type": "submissionsLog",
+        "attributes": {
+          "developerLogUrl": "$developerLogUrl"
+        }
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBody))
+
+    mockWebServer.enqueue(createSubmissionLogResponse())
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val downloadSubmissionLogResult =
+      notaryToolClient.downloadSubmissionLog(SubmissionId("b014d72f-17b6-45ac-abdf-8f39b9241c58"), logFileLocation)
+
+    downloadSubmissionLogResult.onSuccess { downloadedPath ->
+      assertThat(downloadedPath).exists()
+      assertThat(Files.size(downloadedPath)).isGreaterThan(0)
+    }
+
+    downloadSubmissionLogResult.onFailure { notaryToolError ->
+      fail(AssertionError("Notary Tool Error: $notaryToolError"))
     }
   }
 }

@@ -24,10 +24,13 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import okio.FileSystem
 import okio.IOException
+import okio.Path.Companion.toPath
 import java.nio.file.Path
 import java.time.Duration
 import java.time.temporal.ChronoUnit
+import kotlin.io.path.absolutePathString
 
 /** Logger for [NotaryToolClient] class */
 private val log = KotlinLogging.logger {}
@@ -119,7 +122,7 @@ class NotaryToolClient internal constructor(
     /**
      * Constant for the `User-Agent` header.
      */
-    private const val USER_AGENT_HEADER = "User-Agent"
+    internal const val USER_AGENT_HEADER = "User-Agent"
 
     /**
      * Default value for the User-Agent, i.e. `notarytool-kotlin/0.1.0`
@@ -432,93 +435,13 @@ class NotaryToolClient internal constructor(
     }
   }
 
-  /**
-   * Determines whether the Response is a General 404, as opposed to a 404 caused by
-   * using an incorrect submissionId. It checks if the content-type is `"text/plain"`,
-   * or if the content-length is zero, and if so assumes it is a General 404,
-   * since the other case would include a json body.
-   */
-  private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
-    val contentType = responseMetaData.contentType
-    log.info { "Found content type: $contentType" }
-    val contentLength: Long = responseMetaData.contentLength ?: 0
-    return contentType?.contains(other = "text/plain", ignoreCase = true) ?: false || contentLength == 0L
-  }
-
-  /**
-   * Downloads the logs for a submission, using the developerLogUrl passed in. The developerLogUrl can
-   * be obtained by using [getSubmissionLog]. The Response body is returned 'as is' as a String, which may be
-   * empty.
-   *
-   * @param developerLogUrl URL that you use to download the logs for a submission
-   * @return The Submission Log, which is a JSON-encoded file that contains the log information.
-   */
-  private fun downloadSubmissionLog(developerLogUrl: HttpUrl): Result<String, NotaryToolError> {
-    val request: Request = Request.Builder()
-      .url(developerLogUrl)
-      .header(name = USER_AGENT_HEADER, value = userAgent)
-      .get()
-      .build()
-
-    return try {
-      this.httpClient.newCall(request = request).execute().use { response: Response ->
-        log.info { "Response from ${response.request.url}: $response" }
-        log.info { "Response status code: ${response.code}" }
-        val responseMetaData = ResponseMetaData(response = response)
-        if (response.isSuccessful) {
-          Ok(responseMetaData.rawContents ?: "")
-        } else {
-          when (response.code) {
-            in 400..499 -> {
-              Err(
-                NotaryToolError.HttpError.ClientError4xx(
-                  msg = ErrorStringsResource.getString("http.400.error"),
-                  httpStatusCode = responseMetaData.httpStatusCode,
-                  httpStatusMsg = responseMetaData.httpStatusMessage,
-                  requestUrl = developerLogUrl.toString(),
-                  contentBody = responseMetaData.rawContents,
-                  responseMetaData = responseMetaData,
-                ),
-              )
-            }
-
-            in 500..599 -> {
-              Err(
-                NotaryToolError.HttpError.ServerError5xx(
-                  msg = ErrorStringsResource.getString("http.500.error"),
-                  httpStatusCode = responseMetaData.httpStatusCode,
-                  httpStatusMsg = responseMetaData.httpStatusMessage,
-                  requestUrl = developerLogUrl.toString(),
-                  contentBody = responseMetaData.rawContents,
-                  responseMetaData = responseMetaData,
-                ),
-              )
-            }
-
-            else -> {
-              Err(
-                NotaryToolError.HttpError.OtherError(
-                  msg = ErrorStringsResource.getString("http.other.error"),
-                  httpStatusCode = responseMetaData.httpStatusCode,
-                  httpStatusMsg = responseMetaData.httpStatusMessage,
-                  requestUrl = developerLogUrl.toString(),
-                  contentBody = responseMetaData.rawContents,
-                  responseMetaData = responseMetaData,
-                ),
-              )
-            }
-          }
-        }
-      }
-    } catch (ioException: IOException) {
-      log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
-      Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
-    }
-  }
 
   /**
    * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
    * and uses the url to retrieve the submission log as a String.
+   *
+   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * to start a new submission.
    */
   fun retrieveSubmissionLog(submissionId: SubmissionId): Result<String, NotaryToolError> {
     return this.getSubmissionLog(submissionId).andThen { submissionLogUrlResponse ->
@@ -526,12 +449,39 @@ class NotaryToolClient internal constructor(
       log.info { "Using submissionLog URL: $urlString" }
       try {
         val responseUrl: HttpUrl = urlString.toHttpUrl()
-        this.downloadSubmissionLog(developerLogUrl = responseUrl)
+        downloadSubmissionLog(httpClient = this.httpClient, developerLogUrl = responseUrl, userAgent = this.userAgent)
       } catch (illegalArgumentException: IllegalArgumentException) {
         val msg: String = ErrorStringsResource.getString("other.invalid.submission.log.url.error")
           .format(illegalArgumentException.localizedMessage)
         log.warn(illegalArgumentException) { "Error parsing submission Log URL." }
         Err(NotaryToolError.GeneralError(msg))
+      }
+    }
+  }
+
+  /**
+   * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
+   * and uses the url to retrieve the submission log and saves it to the
+   * location indicated.
+   *
+   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * to start a new submission.
+   * @param location Location to download the submission log to.
+   * @return The [Path] the submissionLog was downloaded to, or a [NotaryToolError]
+   */
+  fun downloadSubmissionLog(submissionId: SubmissionId, location: Path): Result<Path, NotaryToolError> {
+    return this.retrieveSubmissionLog(submissionId).andThen { logString: String ->
+
+      try {
+        val file = location.absolutePathString().toPath()
+        FileSystem.SYSTEM.write(file = file) {
+          writeUtf8(logString)
+          Ok(file.toNioPath())
+        }
+      } catch (exception: Exception) {
+        log.warn(exception) { "Error downloading Submission Log" }
+        // TODO: use a better error
+        Err(NotaryToolError.GeneralError("Error downloading Submission Log: ${exception.localizedMessage}"))
       }
     }
   }
@@ -642,5 +592,95 @@ class NotaryToolClient internal constructor(
 
       is Err -> jsonWebTokenResult
     }
+  }
+}
+
+/**
+ * Determines whether the Response is a General 404, as opposed to a 404 caused by
+ * using an incorrect submissionId. It checks if the content-type is `"text/plain"`,
+ * or if the content-length is zero, and if so assumes it is a General 404,
+ * since the other case would include a json body.
+ */
+private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
+  val contentType = responseMetaData.contentType
+  log.info { "Found content type: $contentType" }
+  val contentLength: Long = responseMetaData.contentLength ?: 0
+  return contentType?.contains(other = "text/plain", ignoreCase = true) ?: false || contentLength == 0L
+}
+
+/**
+ * Downloads the logs for a submission, using the developerLogUrl passed in. The developerLogUrl can
+ * be obtained by using [NotaryToolClient.getSubmissionLog]. The Response body is returned 'as is' as a String, which may be
+ * empty.
+ *
+ * @param httpClient The [OkHttpClient] to use for making the download
+ * @param developerLogUrl URL that you use to download the logs for a submission
+ * @param userAgent The User Agent to use when making the download
+ * @return The Submission Log, which is a json String, that contains the log information, or a [NotaryToolError]
+ */
+private fun downloadSubmissionLog(
+  httpClient: OkHttpClient,
+  developerLogUrl: HttpUrl,
+  userAgent: String,
+): Result<String, NotaryToolError> {
+  val request: Request = Request.Builder()
+    .url(developerLogUrl)
+    .header(name = NotaryToolClient.USER_AGENT_HEADER, value = userAgent)
+    .get()
+    .build()
+
+  return try {
+    httpClient.newCall(request = request).execute().use { response: Response ->
+      log.info { "Response from ${response.request.url}: $response" }
+      log.info { "Response status code: ${response.code}" }
+      val responseMetaData = ResponseMetaData(response = response)
+      if (response.isSuccessful) {
+        Ok(responseMetaData.rawContents ?: "")
+      } else {
+        when (response.code) {
+          in 400..499 -> {
+            Err(
+              NotaryToolError.HttpError.ClientError4xx(
+                msg = ErrorStringsResource.getString("http.400.error"),
+                httpStatusCode = responseMetaData.httpStatusCode,
+                httpStatusMsg = responseMetaData.httpStatusMessage,
+                requestUrl = developerLogUrl.toString(),
+                contentBody = responseMetaData.rawContents,
+                responseMetaData = responseMetaData,
+              ),
+            )
+          }
+
+          in 500..599 -> {
+            Err(
+              NotaryToolError.HttpError.ServerError5xx(
+                msg = ErrorStringsResource.getString("http.500.error"),
+                httpStatusCode = responseMetaData.httpStatusCode,
+                httpStatusMsg = responseMetaData.httpStatusMessage,
+                requestUrl = developerLogUrl.toString(),
+                contentBody = responseMetaData.rawContents,
+                responseMetaData = responseMetaData,
+              ),
+            )
+          }
+
+          else -> {
+            Err(
+              NotaryToolError.HttpError.OtherError(
+                msg = ErrorStringsResource.getString("http.other.error"),
+                httpStatusCode = responseMetaData.httpStatusCode,
+                httpStatusMsg = responseMetaData.httpStatusMessage,
+                requestUrl = developerLogUrl.toString(),
+                contentBody = responseMetaData.rawContents,
+                responseMetaData = responseMetaData,
+              ),
+            )
+          }
+        }
+      }
+    }
+  } catch (ioException: IOException) {
+    log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+    Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
   }
 }
