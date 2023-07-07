@@ -119,7 +119,9 @@ fun isNonStable(version: String): Boolean {
 // Configure Testing
 //
 tasks.named<Test>("test") {
-  useJUnitPlatform()
+  useJUnitPlatform() {
+    excludeTags("Slow", "Private")
+  }
 }
 
 //
