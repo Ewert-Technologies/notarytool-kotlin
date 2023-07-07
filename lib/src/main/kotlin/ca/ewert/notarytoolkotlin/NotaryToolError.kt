@@ -103,9 +103,14 @@ sealed interface NotaryToolError {
    * @author Victor Ewert
    */
   sealed interface HttpError : NotaryToolError {
+    @Deprecated("Use responseMetaData instead")
     val httpStatusCode: Int
+
+    @Deprecated("Use responseMetaData instead")
     val httpStatusMsg: String
     val requestUrl: String
+
+    @Deprecated("Use responseMetaData instead")
     val contentBody: String?
     val responseMetaData: ResponseMetaData
 
@@ -117,9 +122,12 @@ sealed interface NotaryToolError {
      */
     data class ClientError4xx(
       override val msg: String,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusCode: Int,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
+      @Deprecated("Use responseMetaData instead")
       override val contentBody: String?,
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
@@ -132,9 +140,12 @@ sealed interface NotaryToolError {
      */
     data class ServerError5xx(
       override val msg: String,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusCode: Int,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
+      @Deprecated("Use responseMetaData instead")
       override val contentBody: String?,
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
@@ -146,9 +157,12 @@ sealed interface NotaryToolError {
      */
     data class OtherError(
       override val msg: String,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusCode: Int,
+      @Deprecated("Use responseMetaData instead")
       override val httpStatusMsg: String,
       override val requestUrl: String = "",
+      @Deprecated("Use responseMetaData instead")
       override val contentBody: String?,
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
