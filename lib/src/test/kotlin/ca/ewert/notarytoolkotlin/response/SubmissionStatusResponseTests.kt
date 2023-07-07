@@ -10,7 +10,6 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.Request
@@ -148,7 +147,7 @@ class SubmissionStatusResponseTests() {
           assertThat(submissionResponse.submissionInfo.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
           log.info { "header date: ${submissionResponse.responseMetaData.headerDate?.atZone(ZoneId.systemDefault())}" }
           log.info { "content-type: ${submissionResponse.responseMetaData.contentType}" }
-          assertThat(submissionResponse.responseMetaData.contentType).isEqualTo("application/octet-stream".toMediaTypeOrNull())
+          assertThat(submissionResponse.responseMetaData.contentType).isEqualTo("application/octet-stream")
           log.info { "content-length ${submissionResponse.responseMetaData.contentLength}" }
           assertThat(submissionResponse.responseMetaData.contentLength).isEqualTo(submissionResponse.responseMetaData.rawContents?.length?.toLong())
 
