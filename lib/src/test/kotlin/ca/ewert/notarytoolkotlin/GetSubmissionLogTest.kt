@@ -214,7 +214,7 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
       assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ClientError4xx>()
       log.info { notaryToolError }
       val httpError: NotaryToolError.HttpError = notaryToolError as NotaryToolError.HttpError.ClientError4xx
-      assertThat(httpError).prop(NotaryToolError.HttpError::httpStatusCode).isEqualTo(404)
+      assertThat(httpError.responseMetaData.httpStatusCode).isEqualTo(404)
     }
   }
 
@@ -318,7 +318,7 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
       when (notaryToolError) {
         is NotaryToolError.HttpError.ServerError5xx -> {
           log.info { "Authentication Error" }
-          assertThat(notaryToolError.httpStatusCode).isEqualTo(500)
+          assertThat(notaryToolError.responseMetaData.httpStatusCode).isEqualTo(500)
         }
 
         else -> log.warn {
@@ -668,8 +668,8 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
     submissionLogResult.onFailure { notaryToolError ->
       assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ClientError4xx>()
       if (notaryToolError is NotaryToolError.HttpError.ClientError4xx) {
-        assertThat(notaryToolError.httpStatusCode).isEqualTo(404)
-        log.info { notaryToolError.httpStatusMsg }
+        assertThat(notaryToolError.responseMetaData.httpStatusCode).isEqualTo(404)
+        log.info { notaryToolError.responseMetaData.httpStatusMessage }
       }
     }
   }
@@ -719,8 +719,8 @@ class GetSubmissionLogTest : NotaryToolClientTests() {
     submissionLogResult.onFailure { notaryToolError ->
       assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ServerError5xx>()
       if (notaryToolError is NotaryToolError.HttpError.ServerError5xx) {
-        assertThat(notaryToolError.httpStatusCode).isEqualTo(500)
-        log.info { notaryToolError.httpStatusMsg }
+        assertThat(notaryToolError.responseMetaData.httpStatusCode).isEqualTo(500)
+        log.info { notaryToolError.responseMetaData.httpStatusMessage }
       }
     }
   }

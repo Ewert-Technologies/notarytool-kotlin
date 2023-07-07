@@ -107,7 +107,9 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
     getPreviousSubmissionsResult.onFailure { error ->
       when (error) {
         is NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError -> log.warn { error.msg }
-        is NotaryToolError.HttpError -> log.warn { "An HTTP Error occurred. Code: ${error.httpStatusCode} - ${error.httpStatusMsg}, for request to: ${error.requestUrl}" }
+        is NotaryToolError.HttpError ->
+          log.warn { "An HTTP Error occurred. Code: ${error.responseMetaData.httpStatusCode} - ${error.responseMetaData.httpStatusMessage}, for request to: ${error.requestUrl}" }
+
         else -> log.warn { error.msg }
       }
       fail(AssertionError("Request failed with: $error"))
@@ -218,7 +220,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ClientError4xx>()
       log.info() { notaryToolError }
       val httpError: NotaryToolError.HttpError = notaryToolError as NotaryToolError.HttpError.ClientError4xx
-      assertThat(httpError).prop(NotaryToolError.HttpError::httpStatusCode).isEqualTo(404)
+      assertThat(httpError.responseMetaData.httpStatusCode).isEqualTo(404)
     }
   }
 
@@ -248,7 +250,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       assertThat(notaryToolError).isInstanceOf<NotaryToolError.HttpError.ServerError5xx>()
       log.info() { notaryToolError }
       val httpError: NotaryToolError.HttpError = notaryToolError as NotaryToolError.HttpError.ServerError5xx
-      assertThat(httpError).prop(NotaryToolError.HttpError::httpStatusCode).isEqualTo(500)
+      assertThat(httpError.responseMetaData.httpStatusCode).isEqualTo(500)
       assertThat(httpError).prop(NotaryToolError::msg)
         .isEqualTo("The request was unsuccessful, a Server error occurred.")
     }
