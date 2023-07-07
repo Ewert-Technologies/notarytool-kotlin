@@ -30,7 +30,7 @@ plugins {
   idea
   `java-library`
   `maven-publish`
-  id("org.jetbrains.kotlin.jvm") version "1.8.21"
+  id("org.jetbrains.kotlin.jvm") version "1.9.0"
   id("com.github.ben-manes.versions") version "0.47.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
   id("org.jmailen.kotlinter")
