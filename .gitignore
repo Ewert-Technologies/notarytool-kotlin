@@ -50,6 +50,7 @@ build
 
 # VSCode
 /.vscode
+lib/bin
 
 # Private files that shouldn't be checked in
 lib/src/test/resources/private
