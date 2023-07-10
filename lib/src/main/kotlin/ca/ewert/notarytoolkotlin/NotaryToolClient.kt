@@ -435,7 +435,6 @@ class NotaryToolClient internal constructor(
     }
   }
 
-
   /**
    * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
    * and uses the url to retrieve the submission log as a String.
@@ -451,10 +450,10 @@ class NotaryToolClient internal constructor(
         val responseUrl: HttpUrl = urlString.toHttpUrl()
         downloadSubmissionLog(httpClient = this.httpClient, developerLogUrl = responseUrl, userAgent = this.userAgent)
       } catch (illegalArgumentException: IllegalArgumentException) {
-        val msg: String = ErrorStringsResource.getString("other.invalid.submission.log.url.error")
+        val msg: String = ErrorStringsResource.getString("submission.log.invalid.url.error")
           .format(illegalArgumentException.localizedMessage)
         log.warn(illegalArgumentException) { "Error parsing submission Log URL." }
-        Err(NotaryToolError.GeneralError(msg))
+        Err(NotaryToolError.SubmissionLogError(msg = msg))
       }
     }
   }
@@ -480,8 +479,9 @@ class NotaryToolClient internal constructor(
         }
       } catch (exception: Exception) {
         log.warn(exception) { "Error downloading Submission Log" }
-        // TODO: use a better error
-        Err(NotaryToolError.GeneralError("Error downloading Submission Log: ${exception.localizedMessage}"))
+        val msg: String = ErrorStringsResource.getString("submission.log.download.error")
+          .format(exception.localizedMessage)
+        Err(NotaryToolError.SubmissionLogError(msg = msg))
       }
     }
   }
@@ -641,7 +641,7 @@ private fun downloadSubmissionLog(
           in 400..499 -> {
             Err(
               NotaryToolError.HttpError.ClientError4xx(
-                msg = ErrorStringsResource.getString("http.400.error"),
+                msg = ErrorStringsResource.getString("submission.log.http.400.error"),
                 httpStatusCode = responseMetaData.httpStatusCode,
                 httpStatusMsg = responseMetaData.httpStatusMessage,
                 requestUrl = developerLogUrl.toString(),
@@ -654,7 +654,7 @@ private fun downloadSubmissionLog(
           in 500..599 -> {
             Err(
               NotaryToolError.HttpError.ServerError5xx(
-                msg = ErrorStringsResource.getString("http.500.error"),
+                msg = ErrorStringsResource.getString("submission.log.http.500.error"),
                 httpStatusCode = responseMetaData.httpStatusCode,
                 httpStatusMsg = responseMetaData.httpStatusMessage,
                 requestUrl = developerLogUrl.toString(),

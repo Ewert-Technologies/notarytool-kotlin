@@ -532,7 +532,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
 
     assertThat(submissionLogResult).isErr()
     submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.GeneralError>()
+      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
       log.info { "$notaryToolError" }
       assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Expected URL scheme 'http' or 'https' but no scheme was found for bad/ur....")
     }
@@ -577,7 +577,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
 
     assertThat(submissionLogResult).isErr()
     submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.GeneralError>()
+      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
       log.info { "$notaryToolError" }
       assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Invalid URL host: \"\".")
     }
@@ -622,7 +622,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
 
     assertThat(submissionLogResult).isErr()
     submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.GeneralError>()
+      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
       log.info { "$notaryToolError" }
       assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Expected URL scheme 'http' or 'https' but no scheme was found for .")
     }

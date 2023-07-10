@@ -180,6 +180,16 @@ sealed interface NotaryToolError {
   data class JsonParseError(override val msg: String, val jsonString: String?) : NotaryToolError
 
   /**
+   * An error caused when there is a problem retrieving the submission log.
+   * This could be caused, for example, by an invalid `developerLogUrl` returned by the
+   * Notary API, or by an http error while attempting to download the log.
+   *
+   * @property msg The error message
+   * @author Victor Ewert
+   */
+  data class SubmissionLogError(override val msg: String) : NotaryToolError
+
+  /**
    * An error caused when there is a connection issue.
    *
    * @property msg The connection error message
