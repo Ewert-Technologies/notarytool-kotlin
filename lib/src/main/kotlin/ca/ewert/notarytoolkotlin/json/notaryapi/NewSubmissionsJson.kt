@@ -1,6 +1,17 @@
 package ca.ewert.notarytoolkotlin.json.notaryapi
 
+import ca.ewert.notarytoolkotlin.NotaryToolError
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
+import com.github.michaelbull.result.Err
+import com.github.michaelbull.result.Ok
+import com.github.michaelbull.result.Result
 import com.squareup.moshi.Json
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+
+private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 
 /**
  * Top level Request for making a **`Submit Software`** Request.
@@ -49,7 +60,38 @@ data class NewSubmissionRequestNotificationJson(
 data class NewSubmissionResponseJson(
   @Json(name = "data") val newSubmissionResponseData: NewSubmissionDataJson,
   val meta: NewSubmissionMetaJson,
-)
+) {
+  companion object {
+
+    /**
+     * Creates a [NewSubmissionResponseJson] from the json String.
+     *
+     * @return A [NewSubmissionResponseJson] or a [NotaryToolError.JsonParseError]
+     */
+    @JvmStatic
+    fun create(jsonString: String?): Result<NewSubmissionResponseJson, NotaryToolError.JsonParseError> {
+      return if (!jsonString.isNullOrEmpty()) {
+        val jsonAdapter: JsonAdapter<NewSubmissionResponseJson> =
+          moshi.adapter(NewSubmissionResponseJson::class.java).failOnUnknown().lenient()
+        try {
+          val newSubmissionResponseJson = jsonAdapter.fromJson(jsonString)
+          if (newSubmissionResponseJson != null) {
+            Ok(newSubmissionResponseJson)
+          } else {
+            val msg = ErrorStringsResource.getString("json.parse.other.error")
+            Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
+          }
+        } catch (jsonDataException: JsonDataException) {
+          val msg = ErrorStringsResource.getString("json.parse.error").format(jsonDataException.message)
+          Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
+        }
+      } else {
+        val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
+        Err(NotaryToolError.JsonParseError(msg = msg, jsonString = jsonString))
+      }
+    }
+  }
+}
 
 /**
  * Corresponds to [`NewSubmissionResponse.Data`](https://developer.apple.com/documentation/notaryapi/newsubmissionresponse/data),
