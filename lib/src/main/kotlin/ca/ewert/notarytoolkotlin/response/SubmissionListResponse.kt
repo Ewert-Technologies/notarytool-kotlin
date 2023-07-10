@@ -11,7 +11,7 @@ private val log = KotlinLogging.logger {}
  * Response from sending a request the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions)
  * Endpoint.
  *
- * @author vewert
+ * @author Victor Ewert
  */
 class SubmissionListResponse internal constructor(
   responseMetaData: ResponseMetaData,
