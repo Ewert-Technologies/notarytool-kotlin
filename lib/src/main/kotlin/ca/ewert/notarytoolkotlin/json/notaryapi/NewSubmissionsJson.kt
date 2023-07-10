@@ -47,8 +47,8 @@ data class NewSubmissionRequestNotificationJson(
  * @property meta `NewSubmissionResponse.Meta` An empty object that you can ignore.
  */
 data class NewSubmissionResponseJson(
-  @Json(name = "data") val newSubmissionResponseData: NewSubmissionsDataJson,
-  val meta: NewSubmissionsMetaJson,
+  @Json(name = "data") val newSubmissionResponseData: NewSubmissionDataJson,
+  val meta: NewSubmissionMetaJson,
 )
 
 /**
@@ -59,8 +59,8 @@ data class NewSubmissionResponseJson(
  * @property id A unique identifier for this submission. Use this value to track the status of your submission.
  * @property type The resource type.
  */
-data class NewSubmissionsDataJson(
-  val attributes: NewSubmissionsAttributesJson,
+data class NewSubmissionDataJson(
+  val attributes: NewSubmissionAttributesJson,
   val id: String,
   val type: String,
 )
@@ -75,7 +75,7 @@ data class NewSubmissionsDataJson(
  * @property bucket The Amazon S3 bucket that you upload your software into.
  * @property objectKey The object key that identifies your software upload within the bucket.
  */
-data class NewSubmissionsAttributesJson(
+data class NewSubmissionAttributesJson(
   val awsAccessKeyId: String,
   val awsSecretAccessKey: String,
   val awsSessionToken: String,
@@ -87,4 +87,4 @@ data class NewSubmissionsAttributesJson(
  * Corresponds to [`NewSubmissionResponse.Meta`](https://developer.apple.com/documentation/notaryapi/newsubmissionresponse/meta),
  * from Apples API. _An empty object. This object is reserved for future use._
  */
-class NewSubmissionsMetaJson
+class NewSubmissionMetaJson
