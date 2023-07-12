@@ -1,5 +1,11 @@
 package ca.ewert.notarytoolkotlin
 
+import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+import aws.sdk.kotlin.services.s3.model.PutObjectResponse
+import aws.smithy.kotlin.runtime.auth.awscredentials.Credentials
+import aws.smithy.kotlin.runtime.content.asByteStream
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
@@ -305,6 +311,29 @@ class NotaryToolClient internal constructor(
   }
 
   /**
+   * Convenience method that calls [submitSoftware] to retrieve the AWS required Credentials and then
+   * uses those credentials to upload the file to the AWS Servers. After uploading your software,
+   * you can use the returned submissionId to ask the notary service for the status of your
+   * submission using the [getSubmissionStatus] function.
+   *
+   * @param softwareFile Path to the software file being submitted.
+   * @return The submissionId, which can be used to check the status of the submission.
+   */
+  suspend fun submitAndUploadSoftware(softwareFile: Path): Result<SubmissionId, NotaryToolError> {
+    return this.submitSoftware(softwareFile).andThen { newSubmissionResponse ->
+      this.uploadSoftwareSubmission(
+        accessKeyId = newSubmissionResponse.awsAccessKeyId,
+        secretAccessKey = newSubmissionResponse.awsSecretAccessKey,
+        sessionToken = newSubmissionResponse.awsSessionToken,
+        bucketName = newSubmissionResponse.bucket,
+        objectKey = newSubmissionResponse.objectKey,
+        softwareFile = softwareFile,
+      )
+      Ok(newSubmissionResponse.id)
+    }
+  }
+
+  /**
    * Helper function that creates the Request to be sent to the Notary API.
    *
    * @param softwarePath Path to the software file being submitted.
@@ -348,6 +377,50 @@ class NotaryToolClient internal constructor(
 
     return NewSubmissionRequestJson.toJsonString(newSubmissionRequestJson).andThen { jsonString: String ->
       Ok(jsonString.toRequestBody(MEDIA_TYPE_JSON))
+    }
+  }
+
+  /**
+   * Uploads the software file to AWS S3 using the credential provided by the [NewSubmissionResponse]
+   *
+   * @param accessKeyId = AWS Access Key id.
+   * @param secretAccessKey = AWS Secret Access Key.
+   * @param sessionToken = AWS Session Token.
+   * @param bucketName = AWS S3 Bucket name to upload software file to.
+   * @param objectKey = The object key that identifies your software within the bucket
+   * @param softwareFile = The software file to upload
+   */
+  private suspend fun uploadSoftwareSubmission(
+    accessKeyId: String,
+    secretAccessKey: String,
+    sessionToken: String,
+    bucketName: String,
+    objectKey: String,
+    softwareFile: Path,
+  ): Result<String?, NotaryToolError.AwsUploadError> {
+    val credentials =
+      Credentials(accessKeyId = accessKeyId, secretAccessKey = secretAccessKey, sessionToken = sessionToken)
+
+    val s3Client = S3Client {
+      region = "us-west-2"
+      credentialsProvider = StaticCredentialsProvider(credentials)
+    }
+
+    val request = PutObjectRequest {
+      bucket = bucketName
+      key = objectKey
+      body = softwareFile.asByteStream()
+    }
+
+    s3Client.use { client: S3Client ->
+      try {
+        val response: PutObjectResponse = client.putObject(request)
+        log.info { "AWS S3 Response Tag information: ${response.eTag}" }
+        return Ok(response.eTag)
+      } catch (exception: Exception) {
+        log.warn(exception) { "Error uploading file to AWS S3 Bucket" }
+        return Err(NotaryToolError.AwsUploadError("", exception))
+      }
     }
   }
 

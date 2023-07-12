@@ -62,6 +62,8 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
+//  implementation(group = "software.amazon.awssdk", name = "s3", version = "2.20.102")
+  implementation(group = "aws.sdk.kotlin", name = "s3-jvm", version = "0.28.1-beta")
 
   // Logging
   implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "4.0.2")
@@ -72,6 +74,7 @@ dependencies {
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.3")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
+//  testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.2")
 }
 
 //
