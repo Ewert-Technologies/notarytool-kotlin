@@ -208,6 +208,15 @@ sealed interface NotaryToolError {
   data class ConnectionError(override val msg: String) : NotaryToolError
 
   /**
+   * An error that can occur when uploading the software submission to the
+   * AWS Servers.
+   *
+   * @property msg The error message
+   * @property exception The exception that occurred.
+   */
+  data class AwsUploadError(override val msg: String, val exception: Exception) : NotaryToolError
+
+  /**
    * Any other error.
    *
    * @author Victor Ewert
