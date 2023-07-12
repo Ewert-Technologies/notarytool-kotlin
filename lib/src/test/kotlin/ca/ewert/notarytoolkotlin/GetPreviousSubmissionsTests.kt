@@ -9,6 +9,7 @@ import assertk.assertions.matches
 import assertk.assertions.prop
 import assertk.fail
 import ca.ewert.notarytoolkotlin.response.Status
+import ca.ewert.notarytoolkotlin.response.SubmissionInfo
 import ca.ewert.notarytoolkotlin.response.createMockResponse200
 import ca.ewert.notarytoolkotlin.response.createMockResponse401
 import ca.ewert.notarytoolkotlin.response.createMockResponse403
@@ -72,6 +73,15 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
           },
           "id": "38ce81cc-0bf7-454b-91ef-3f7395bf297b",
           "type": "submissions"
+        },
+        {
+          "attributes": {
+            "createdDate": "2023-04-19T16:56:17.839Z",
+            "name": "OvernightTextEditor_11.6.8.zip",
+            "status": "In Progress"
+          },
+          "id": "38ce81cc-0bf7-454b-91ef-3f7395bf297b",
+          "type": "submissions"
         }
       ],
       "meta": {}
@@ -92,12 +102,16 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
 
     val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
     getPreviousSubmissionsResult.onSuccess { submissionListResponse ->
-      assertThat(submissionListResponse.submissionInfoList).hasSize(3)
+      assertThat(submissionListResponse.submissionInfoList).hasSize(4)
       assertThat(submissionListResponse.submissionInfoList[2].status).isEqualTo(Status.INVALID)
       val expectedCreatedDate: Instant =
         ZonedDateTime.of(2021, 4, 23, 17, 44, 54, 761000000, ZoneId.of("GMT")).toInstant()
       assertThat(submissionListResponse.submissionInfoList[1].createdDate ?: Instant.now())
         .isEqualTo(expectedCreatedDate)
+
+      val submissionInfo4 = submissionListResponse.submissionInfoList[3]
+      assertThat(submissionInfo4).prop(SubmissionInfo::status).isEqualTo(Status.IN_PROGRESS)
+      assertThat(submissionInfo4).prop(SubmissionInfo::name).isEqualTo("OvernightTextEditor_11.6.8.zip")
 
       val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
       assertThat(recordedRequest.getHeader("User-Agent") ?: "").matches(Regex("notarytool-kotlin/\\d+\\.\\d+\\.\\d+"))
