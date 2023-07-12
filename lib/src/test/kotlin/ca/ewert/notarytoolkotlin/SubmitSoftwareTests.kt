@@ -159,4 +159,36 @@ class SubmitSoftwareTests : NotaryToolClientTests() {
       assertThat(newSubmissionResponse.objectKey).isEqualTo("prod/AROARQRX7CZS3PRF6ZA5L:1238aa04-1593-4391-96c8-ca1920bc7c7f")
     }
   }
+
+//  /**
+//   * Tests submitting an uploading software for notarization.
+//   */
+//  @Test
+//  @Tag("AppleServer")
+//  @Tag("Private")
+//  @DisplayName("Submit and Upload Actual - Test")
+//  suspend fun submitAndUploadActual() {
+//    val testValuesReader = TestValuesReader()
+//    val keyId: String = testValuesReader.getKeyId()
+//    val issuerId: String = testValuesReader.getIssueId()
+//    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+//
+//    assertThat(privateKeyFile).isNotNull()
+//
+//    val notaryToolClient = NotaryToolClient(
+//      privateKeyId = keyId,
+//      issuerId = issuerId,
+//      privateKeyFile = privateKeyFile!!,
+//    )
+//    val softwareFile: Path? = resourceToPath("/pwm_3.3.3.0_aarch64.dmg")
+//    assertThat(softwareFile).isNotNull()
+//
+//    val submitResult = notaryToolClient.submitAndUploadSoftware(softwareFile!!)
+//    assertThat(submitResult).isOk()
+//
+//    submitResult.onSuccess { submissionId ->
+//      log.info { "Submitted new software. Submission Id: $submissionId" }
+//      assertThat(submissionId.id.length).isGreaterThan(0)
+//    }
+//  }
 }
