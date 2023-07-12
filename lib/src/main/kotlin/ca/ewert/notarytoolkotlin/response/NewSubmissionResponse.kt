@@ -39,4 +39,18 @@ class NewSubmissionResponse internal constructor(
     bucket = jsonResponse.newSubmissionResponseData.attributes.bucket
     objectKey = jsonResponse.newSubmissionResponseData.attributes.objectKey
   }
+
+  /**
+   * Returns a String representation of the object, suitable for debugging.
+   */
+  override fun toString(): String {
+    return "NewSubmissionResponse(" +
+      "id=$id, " +
+      "awsAccessKeyId='$awsAccessKeyId', " +
+      "awsSecretAccessKey='$awsSecretAccessKey', " +
+      "awsSessionToken='$awsSessionToken', " +
+      "bucket='$bucket', " +
+      "objectKey='$objectKey'" +
+      ")"
+  }
 }

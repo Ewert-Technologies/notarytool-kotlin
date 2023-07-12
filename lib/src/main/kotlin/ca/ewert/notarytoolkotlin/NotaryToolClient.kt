@@ -4,9 +4,12 @@ import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenErro
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.NewSubmissionRequestJson
+import ca.ewert.notarytoolkotlin.json.notaryapi.NewSubmissionResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionLogUrlResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
+import ca.ewert.notarytoolkotlin.response.NewSubmissionResponse
 import ca.ewert.notarytoolkotlin.response.ResponseMetaData
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionListResponse
@@ -16,17 +19,23 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.FileSystem
 import okio.IOException
 import okio.Path.Companion.toPath
+import okio.buffer
 import java.nio.file.Path
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -133,6 +142,11 @@ class NotaryToolClient internal constructor(
      * Constant for the `Authorization` header.
      */
     private const val AUTHORIZATION_HEADER = "Authorization"
+
+    /**
+     * Constant for media type of: `application/json`
+     */
+    private val MEDIA_TYPE_JSON: MediaType = "application/json".toMediaType()
   }
 
   /**
@@ -155,6 +169,187 @@ class NotaryToolClient internal constructor(
       privateKeyFile = privateKeyFile,
       tokenLifetime = tokenLifetime,
     )
+
+  /**
+   * Start the process of uploading a new version of your software to the notary service.
+   *
+   * Use this function to tell the notary service about a new software submission that you want to make.
+   * Do this when you want to notarize a new version of your software.
+   *
+   * The service responds with temporary security credentials that you use to submit the
+   * software to Amazon S3 and a submission identifier that you use to track the submission’s status.
+   *
+   * After uploading your software, you can use the identifier to ask the notary service for the
+   * status of your submission using the Get Submission Status endpoint. If you lose the identifier,
+   * you can get a list of your team’s 100 most recent submissions using the
+   * [getPreviousSubmissions] method. After notarization completes, use the
+   * [getSubmissionLog] to get details about the outcome of notarization. Do this even if notarization
+   * succeeds, because the log might contain warnings that you can fix before your next submission.
+   *
+   * @param softwarePath Path to the software file being submitted.
+   * @return The [NewSubmissionResponse] or a [NotaryToolError] if there is an error.
+   */
+  fun submitSoftware(softwarePath: Path): Result<NewSubmissionResponse, NotaryToolError> {
+    return when (this.jsonWebTokenResult) {
+      is Ok -> {
+        val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
+        if (jsonWebToken.isExpired) {
+          jsonWebToken.updateWebToken()
+        }
+        if (baseUrl != null) {
+          val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
+          log.info { "URL String: $url" }
+          try {
+            createSubmissionRequest(softwarePath, url, jsonWebToken).flatMap { request: Request ->
+              this.httpClient.newCall(request).execute().use { response: Response ->
+                log.info { "Response from ${response.request.url}: $response" }
+                val responseMetaData = ResponseMetaData(response = response)
+                log.info { "Response body: ${responseMetaData.rawContents}" }
+
+                if (response.isSuccessful) {
+                  NewSubmissionResponseJson.create(responseMetaData.rawContents).map { newSubmissionResponseJson ->
+                    NewSubmissionResponse(responseMetaData = responseMetaData, jsonResponse = newSubmissionResponseJson)
+                  }
+                } else {
+                  when (response.code) {
+                    401, 403 -> {
+                      Err(JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error")))
+                    }
+
+                    404 -> {
+                      log.info { "Content-Type: ${responseMetaData.contentType}" }
+                      log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                      if (isGeneral404(responseMetaData = responseMetaData)) {
+                        Err(
+                          NotaryToolError.HttpError.ClientError4xx(
+                            msg = ErrorStringsResource.getString("http.400.error"),
+                            httpStatusCode = response.code,
+                            httpStatusMsg = response.message,
+                            requestUrl = response.request.url.toString(),
+                            contentBody = responseMetaData.rawContents,
+                            responseMetaData = responseMetaData,
+                          ),
+                        )
+                      } else {
+                        // This is a Notary Error Response, likely incorrect submissionId
+                        return when (
+                          val errorResponseJsonResult =
+                            ErrorResponseJson.create(responseMetaData.rawContents)
+                        ) {
+                          is Ok -> {
+                            // FIXME: Should maybe check that there is at least one error
+                            Err(NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail))
+                          }
+
+                          is Err -> {
+                            log.warn { errorResponseJsonResult.error }
+                            errorResponseJsonResult
+                          }
+                        }
+                      }
+                    }
+
+                    in 400..499 -> {
+                      Err(
+                        NotaryToolError.HttpError.ClientError4xx(
+                          msg = ErrorStringsResource.getString("http.400.error"),
+                          httpStatusCode = responseMetaData.httpStatusCode,
+                          httpStatusMsg = responseMetaData.httpStatusMessage,
+                          requestUrl = url.toString(),
+                          contentBody = responseMetaData.rawContents,
+                          responseMetaData = responseMetaData,
+                        ),
+                      )
+                    }
+
+                    in 500..599 -> {
+                      Err(
+                        NotaryToolError.HttpError.ServerError5xx(
+                          msg = ErrorStringsResource.getString("http.500.error"),
+                          httpStatusCode = responseMetaData.httpStatusCode,
+                          httpStatusMsg = responseMetaData.httpStatusMessage,
+                          requestUrl = url.toString(),
+                          contentBody = responseMetaData.rawContents,
+                          responseMetaData = responseMetaData,
+                        ),
+                      )
+                    }
+
+                    else -> {
+                      Err(
+                        NotaryToolError.HttpError.OtherError(
+                          msg = ErrorStringsResource.getString("http.other.error"),
+                          httpStatusCode = responseMetaData.httpStatusCode,
+                          httpStatusMsg = responseMetaData.httpStatusMessage,
+                          requestUrl = url.toString(),
+                          contentBody = responseMetaData.rawContents,
+                          responseMetaData = responseMetaData,
+                        ),
+                      )
+                    }
+                  }
+                }
+              }
+            }
+          } catch (ioException: IOException) {
+            log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
+            Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
+          }
+        } else {
+          Err(NotaryToolError.GeneralError(msg = ErrorStringsResource.getString("other.url.null.error")))
+        }
+      }
+
+      is Err -> jsonWebTokenResult
+    }
+  }
+
+  /**
+   * Helper function that creates the Request to be sent to the Notary API.
+   *
+   * @param softwarePath Path to the software file being submitted.
+   * @param url Url to send the Request to
+   * @param jsonWebToken JSON Web Token, used for Authentication of the Request.
+   * @return The [Request] object or an [NotaryToolError.JsonCreateError]
+   */
+  private fun createSubmissionRequest(
+    softwarePath: Path,
+    url: HttpUrl,
+    jsonWebToken: JsonWebToken,
+  ): Result<Request, NotaryToolError.JsonCreateError> {
+    return this.createSubmissionRequestBody(softwarePath).andThen { requestBody ->
+      Ok(
+        Request.Builder()
+          .url(url = url)
+          .header(name = USER_AGENT_HEADER, value = userAgent)
+          .header(name = AUTHORIZATION_HEADER, value = "Bearer ${jsonWebToken.signedToken}")
+          .post(requestBody)
+          .build(),
+      )
+    }
+  }
+
+  /**
+   * Creates the body of the request by calculating the SHA-256 hash of the file, using the information
+   * to create a json object, then converting the json object to String and then using the String to create
+   * the request body.
+   *
+   * @param softwarePath Path to the software file being submitted.
+   * @return A [RequestBody] or an [NotaryToolError.JsonCreateError]
+   */
+  private fun createSubmissionRequestBody(softwarePath: Path): Result<RequestBody, NotaryToolError.JsonCreateError> {
+    val fileName: String = softwarePath.fileName.toString()
+    log.info { "fileName: $fileName" }
+    val sha256: String = calculateSha256(softwarePath)
+    log.info { "SHA-256 of file: $sha256" }
+
+    val newSubmissionRequestJson =
+      NewSubmissionRequestJson(notifications = emptyList(), sha256 = sha256, submissionName = fileName)
+
+    return NewSubmissionRequestJson.toJsonString(newSubmissionRequestJson).andThen { jsonString: String ->
+      Ok(jsonString.toRequestBody(MEDIA_TYPE_JSON))
+    }
+  }
 
   /**
    * Fetch the status of a software notarization submission.
@@ -683,4 +878,14 @@ private fun downloadSubmissionLog(
     log.warn(ioException) { "Connection Issue: ${ioException.localizedMessage}, ${ioException.cause?.localizedMessage}" }
     Err(NotaryToolError.ConnectionError(ioException.localizedMessage))
   }
+}
+
+/**
+ * Calculates the SHA-256 hash of the file.
+ *
+ * @param softwarePath Path to the software file being submitted.
+ * @return The SHA-256 hash of the file as a String
+ */
+internal fun calculateSha256(softwarePath: Path): String {
+  return FileSystem.SYSTEM.source(softwarePath.toString().toPath()).buffer().readByteString().sha256().hex()
 }

@@ -34,7 +34,27 @@ data class NewSubmissionRequestJson(
   val notifications: List<NewSubmissionRequestNotificationJson>,
   val sha256: String,
   val submissionName: String,
-)
+) {
+  companion object {
+
+    /**
+     * Takes a [NewSubmissionAttributesJson] object and attempts to convert it
+     * to a json String.
+     *
+     * @param newSubmissionRequestJson
+     */
+    @JvmStatic
+    internal fun toJsonString(newSubmissionRequestJson: NewSubmissionRequestJson): Result<String, NotaryToolError.JsonCreateError> {
+      val jsonAdapter: JsonAdapter<NewSubmissionRequestJson> =
+        moshi.adapter(NewSubmissionRequestJson::class.java).failOnUnknown().lenient()
+      return try {
+        Ok(jsonAdapter.toJson(newSubmissionRequestJson))
+      } catch (jsonDataException: JsonDataException) {
+        Err(NotaryToolError.JsonCreateError("error", newSubmissionRequestJson.toString()))
+      }
+    }
+  }
+}
 
 /**
  * Corresponds to [`NewSubmissionRequest.Notifications`](https://developer.apple.com/documentation/notaryapi/newsubmissionrequest/notifications),
