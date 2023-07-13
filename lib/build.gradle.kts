@@ -74,7 +74,6 @@ dependencies {
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.3")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
-//  testImplementation(group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.7.2")
 }
 
 //
