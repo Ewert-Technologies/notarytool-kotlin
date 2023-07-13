@@ -1,11 +1,5 @@
 package ca.ewert.notarytoolkotlin
 
-import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
-import aws.sdk.kotlin.services.s3.S3Client
-import aws.sdk.kotlin.services.s3.model.PutObjectRequest
-import aws.sdk.kotlin.services.s3.model.PutObjectResponse
-import aws.smithy.kotlin.runtime.auth.awscredentials.Credentials
-import aws.smithy.kotlin.runtime.content.asByteStream
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.authentication.JsonWebToken
 import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
@@ -15,6 +9,7 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.NewSubmissionResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionListResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionLogUrlResponseJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
+import ca.ewert.notarytoolkotlin.response.AwsUploadData
 import ca.ewert.notarytoolkotlin.response.NewSubmissionResponse
 import ca.ewert.notarytoolkotlin.response.ResponseMetaData
 import ca.ewert.notarytoolkotlin.response.SubmissionId
@@ -42,6 +37,12 @@ import okio.FileSystem
 import okio.IOException
 import okio.Path.Companion.toPath
 import okio.buffer
+import software.amazon.awssdk.auth.credentials.AwsSessionCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.nio.file.Path
 import java.time.Duration
 import java.time.temporal.ChronoUnit
@@ -153,6 +154,12 @@ class NotaryToolClient internal constructor(
      * Constant for media type of: `application/json`
      */
     private val MEDIA_TYPE_JSON: MediaType = "application/json".toMediaType()
+
+    /**
+     * AWS Region to use when uploading.
+     * Currently [Region.US_WEST_2]
+     */
+    private val AWS_REGION: Region = Region.US_WEST_2
   }
 
   /**
@@ -319,7 +326,7 @@ class NotaryToolClient internal constructor(
    * @param softwareFile Path to the software file being submitted.
    * @return The submissionId, which can be used to check the status of the submission.
    */
-  suspend fun submitAndUploadSoftware(softwareFile: Path): Result<SubmissionId, NotaryToolError> {
+  fun submitAndUploadSoftware(softwareFile: Path): Result<AwsUploadData, NotaryToolError> {
     return this.submitSoftware(softwareFile).andThen { newSubmissionResponse ->
       this.uploadSoftwareSubmission(
         accessKeyId = newSubmissionResponse.awsAccessKeyId,
@@ -328,8 +335,9 @@ class NotaryToolClient internal constructor(
         bucketName = newSubmissionResponse.bucket,
         objectKey = newSubmissionResponse.objectKey,
         softwareFile = softwareFile,
-      )
-      Ok(newSubmissionResponse.id)
+      ).andThen { eTag ->
+        Ok(AwsUploadData(eTag, newSubmissionResponse.id))
+      }
     }
   }
 
@@ -390,7 +398,7 @@ class NotaryToolClient internal constructor(
    * @param objectKey = The object key that identifies your software within the bucket
    * @param softwareFile = The software file to upload
    */
-  private suspend fun uploadSoftwareSubmission(
+  private fun uploadSoftwareSubmission(
     accessKeyId: String,
     secretAccessKey: String,
     sessionToken: String,
@@ -398,29 +406,37 @@ class NotaryToolClient internal constructor(
     objectKey: String,
     softwareFile: Path,
   ): Result<String?, NotaryToolError.AwsUploadError> {
-    val credentials =
-      Credentials(accessKeyId = accessKeyId, secretAccessKey = secretAccessKey, sessionToken = sessionToken)
+    val credentials = AwsSessionCredentials.Builder()
+      .accessKeyId(accessKeyId)
+      .secretAccessKey(secretAccessKey)
+      .sessionToken(sessionToken).build()
 
-    val s3Client = S3Client {
-      region = "us-west-2"
-      credentialsProvider = StaticCredentialsProvider(credentials)
-    }
+    val s3Client: S3Client = S3Client.builder()
+      .credentialsProvider(
+        StaticCredentialsProvider.create(credentials),
+      )
+      .region(AWS_REGION)
+      .build()
 
-    val request = PutObjectRequest {
-      bucket = bucketName
-      key = objectKey
-      body = softwareFile.asByteStream()
-    }
+    val request: PutObjectRequest = PutObjectRequest.builder()
+      .bucket(bucketName)
+      .key(objectKey)
+      .build()
 
-    s3Client.use { client: S3Client ->
-      try {
-        val response: PutObjectResponse = client.putObject(request)
-        log.info { "AWS S3 Response Tag information: ${response.eTag}" }
-        return Ok(response.eTag)
-      } catch (exception: Exception) {
-        log.warn(exception) { "Error uploading file to AWS S3 Bucket" }
-        return Err(NotaryToolError.AwsUploadError("", exception))
-      }
+    return try {
+      val response: PutObjectResponse = s3Client.putObject(request, softwareFile)
+      log.info { "AWS S3 Response Tag information: ${response.eTag()}" }
+      s3Client.close()
+      Ok(response.eTag())
+    } catch (exception: Exception) {
+      log.warn(exception) { "Error uploading file to AWS S3 Bucket" }
+      s3Client.close()
+      Err(
+        NotaryToolError.AwsUploadError(
+          "An error occurred while uploading file to AWS S3 Bucket: ${exception.localizedMessage}",
+          exception,
+        ),
+      )
     }
   }
 

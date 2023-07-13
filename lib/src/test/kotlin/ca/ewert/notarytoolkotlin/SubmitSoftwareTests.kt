@@ -8,7 +8,6 @@ import assertk.assertions.isNotZero
 import ca.ewert.notarytoolkotlin.response.createMockResponse200
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
@@ -169,7 +168,7 @@ class SubmitSoftwareTests : NotaryToolClientTests() {
   @Tag("AppleServer")
   @Tag("Private")
   @DisplayName("Submit and Upload Actual - Test")
-  fun submitAndUploadActual() = runTest {
+  fun submitAndUploadActual() {
     val testValuesReader = TestValuesReader()
     val keyId: String = testValuesReader.getKeyId()
     val issuerId: String = testValuesReader.getIssueId()
@@ -188,9 +187,9 @@ class SubmitSoftwareTests : NotaryToolClientTests() {
     val submitResult = notaryToolClient.submitAndUploadSoftware(softwareFile!!)
     assertThat(submitResult).isOk()
 
-    submitResult.onSuccess { submissionId ->
-      log.info { "Submitted new software. Submission Id: $submissionId" }
-      assertThat(submissionId.id.length).isGreaterThan(0)
+    submitResult.onSuccess { awsUploadData ->
+      log.info { "Submitted new software: $awsUploadData" }
+      assertThat(awsUploadData.submissionId.id.length).isGreaterThan(0)
     }
   }
 }
