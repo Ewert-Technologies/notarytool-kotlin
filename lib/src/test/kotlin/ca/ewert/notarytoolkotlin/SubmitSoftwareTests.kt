@@ -2,11 +2,13 @@ package ca.ewert.notarytoolkotlin
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isGreaterThan
 import assertk.assertions.isNotNull
 import assertk.assertions.isNotZero
 import ca.ewert.notarytoolkotlin.response.createMockResponse200
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
@@ -160,35 +162,35 @@ class SubmitSoftwareTests : NotaryToolClientTests() {
     }
   }
 
-//  /**
-//   * Tests submitting an uploading software for notarization.
-//   */
-//  @Test
-//  @Tag("AppleServer")
-//  @Tag("Private")
-//  @DisplayName("Submit and Upload Actual - Test")
-//  suspend fun submitAndUploadActual() {
-//    val testValuesReader = TestValuesReader()
-//    val keyId: String = testValuesReader.getKeyId()
-//    val issuerId: String = testValuesReader.getIssueId()
-//    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
-//
-//    assertThat(privateKeyFile).isNotNull()
-//
-//    val notaryToolClient = NotaryToolClient(
-//      privateKeyId = keyId,
-//      issuerId = issuerId,
-//      privateKeyFile = privateKeyFile!!,
-//    )
-//    val softwareFile: Path? = resourceToPath("/pwm_3.3.3.0_aarch64.dmg")
-//    assertThat(softwareFile).isNotNull()
-//
-//    val submitResult = notaryToolClient.submitAndUploadSoftware(softwareFile!!)
-//    assertThat(submitResult).isOk()
-//
-//    submitResult.onSuccess { submissionId ->
-//      log.info { "Submitted new software. Submission Id: $submissionId" }
-//      assertThat(submissionId.id.length).isGreaterThan(0)
-//    }
-//  }
+  /**
+   * Tests submitting an uploading software for notarization.
+   */
+  @Test
+  @Tag("AppleServer")
+  @Tag("Private")
+  @DisplayName("Submit and Upload Actual - Test")
+  fun submitAndUploadActual() = runTest {
+    val testValuesReader = TestValuesReader()
+    val keyId: String = testValuesReader.getKeyId()
+    val issuerId: String = testValuesReader.getIssueId()
+    val privateKeyFile: Path? = resourceToPath("/private/AuthKey_Test.p8")
+
+    assertThat(privateKeyFile).isNotNull()
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = keyId,
+      issuerId = issuerId,
+      privateKeyFile = privateKeyFile!!,
+    )
+    val softwareFile: Path? = resourceToPath("/pwm_3.3.3.0_aarch64.dmg")
+    assertThat(softwareFile).isNotNull()
+
+    val submitResult = notaryToolClient.submitAndUploadSoftware(softwareFile!!)
+    assertThat(submitResult).isOk()
+
+    submitResult.onSuccess { submissionId ->
+      log.info { "Submitted new software. Submission Id: $submissionId" }
+      assertThat(submissionId.id.length).isGreaterThan(0)
+    }
+  }
 }
