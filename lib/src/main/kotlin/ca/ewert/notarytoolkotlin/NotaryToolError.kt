@@ -212,7 +212,7 @@ sealed interface NotaryToolError {
    * AWS Servers.
    *
    * @property msg The error message
-   * @property exception The exception that occurred.
+   * @property exception The exception that occurred. Can be used to access the specific error message.
    */
   data class AwsUploadError(override val msg: String, val exception: Exception) : NotaryToolError
 
