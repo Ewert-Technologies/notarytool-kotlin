@@ -62,8 +62,7 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-//  implementation(group = "software.amazon.awssdk", name = "s3", version = "2.20.102")
-  implementation(group = "aws.sdk.kotlin", name = "s3-jvm", version = "0.28.1-beta")
+  implementation(group = "software.amazon.awssdk", name = "s3", version = "2.20.102")
 
   // Logging
   implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "4.0.2")
