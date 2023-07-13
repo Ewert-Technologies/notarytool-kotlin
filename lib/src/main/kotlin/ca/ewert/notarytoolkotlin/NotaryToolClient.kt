@@ -53,9 +53,21 @@ private val log = KotlinLogging.logger {}
 
 /**
  * Client used to make requests to Apple's Notary Web API. The client can be used to:
- * - Submit software to be notarized
+ * - Submit software to be notarized [submitSoftware]
+ * - Upload the software file to be notarized [submitAndUploadSoftware]
  * - Check the status of a specific notarization submission: [getSubmissionStatus]
- * - View a history of submissions: [getPreviousSubmissions]
+ * - Get the url of a submission log [getSubmissionLog]
+ * - View the submission log of a submission: [retrieveSubmissionLog]
+ * - View a history of the latest submissions: [getPreviousSubmissions]
+ *
+ * In order to use this client you will need an API Key from Apple, which provides
+ * the following pieces of information that are required to create the client:
+ * - Private Key ID
+ * - Private key, in the form of a `.p8` file
+ * - Issuer ID
+ *
+ * See [Create API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
+ * for more information.
  *
  * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API. Used for
  * testing with MockWebServer
@@ -190,14 +202,18 @@ class NotaryToolClient internal constructor(
    * Do this when you want to notarize a new version of your software.
    *
    * The service responds with temporary security credentials that you use to submit the
-   * software to Amazon S3 and a submission identifier that you use to track the submission’s status.
+   * software to Amazon S3 and a submission identifier that you use to track the submission's status.
    *
    * After uploading your software, you can use the identifier to ask the notary service for the
    * status of your submission using the Get Submission Status endpoint. If you lose the identifier,
-   * you can get a list of your team’s 100 most recent submissions using the
+   * you can get a list of your team's 100 most recent submissions using the
    * [getPreviousSubmissions] method. After notarization completes, use the
    * [getSubmissionLog] to get details about the outcome of notarization. Do this even if notarization
    * succeeds, because the log might contain warnings that you can fix before your next submission.
+   *
+   * This function only starts a submission, but doesn't upload the file to Amazon S3. Use this
+   * if you want to upload the file to Amazon S3 yourself. Use [submitAndUploadSoftware] to submit and
+   * upload at the same time.
    *
    * @param softwarePath Path to the software file being submitted.
    * @return The [NewSubmissionResponse] or a [NotaryToolError] if there is an error.
@@ -318,13 +334,14 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * Convenience method that calls [submitSoftware] to retrieve the AWS required Credentials and then
-   * uses those credentials to upload the file to the AWS Servers. After uploading your software,
-   * you can use the returned submissionId to ask the notary service for the status of your
-   * submission using the [getSubmissionStatus] function.
+   * A Convenience function that calls [submitSoftware] to retrieve the Amazon S3 security credentials
+   * and then uses those credentials to upload the file to the Amazon S3 Server. After uploading your software,
+   * you can use the returned [AwsUploadData] to get the [SubmissionId] and used that to query the notary service
+   * for the status of your submission using the [getSubmissionStatus] function.
    *
    * @param softwareFile Path to the software file being submitted.
-   * @return The submissionId, which can be used to check the status of the submission.
+   * @return [AwsUploadData] information about the upload including the submissionId,
+   * which can be used to check the status of the submission or a [NotaryToolError]
    */
   fun submitAndUploadSoftware(softwareFile: Path): Result<AwsUploadData, NotaryToolError> {
     return this.submitSoftware(softwareFile).andThen { newSubmissionResponse ->
@@ -455,6 +472,7 @@ class NotaryToolClient internal constructor(
    *
    * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
    * to start a new submission.
+   * @return The [SubmissionStatusResponse] or a [NotaryToolError]
    */
   fun getSubmissionStatus(submissionId: SubmissionId): Result<SubmissionStatusResponse, NotaryToolError> {
     return when (this.jsonWebTokenResult) {
@@ -591,8 +609,12 @@ class NotaryToolClient internal constructor(
    * For information about how to deal with common notarization problems,
    * see [Resolving common notarization issues.](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues)
    *
+   * This function only returns the url for the log file, to retrieve the contents of the file
+   * use [retrieveSubmissionLog], or to download the log to a file use [downloadSubmissionLog]
+   *
    * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
    * to start a new submission.
+   * @return A [SubmissionLogUrlResponse] containing the log url, or a [NotaryToolError]
    */
   fun getSubmissionLog(submissionId: SubmissionId): Result<SubmissionLogUrlResponse, NotaryToolError> {
     return when (this.jsonWebTokenResult) {
@@ -725,6 +747,7 @@ class NotaryToolClient internal constructor(
    *
    * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
    * to start a new submission.
+   * @return The submission log contents or a [NotaryToolError]
    */
   fun retrieveSubmissionLog(submissionId: SubmissionId): Result<String, NotaryToolError> {
     return this.getSubmissionLog(submissionId).andThen { submissionLogUrlResponse ->
@@ -732,7 +755,11 @@ class NotaryToolClient internal constructor(
       log.info { "Using submissionLog URL: $urlString" }
       try {
         val responseUrl: HttpUrl = urlString.toHttpUrl()
-        downloadSubmissionLog(httpClient = this.httpClient, developerLogUrl = responseUrl, userAgent = this.userAgent)
+        downloadSubmissionLogContents(
+          httpClient = this.httpClient,
+          developerLogUrl = responseUrl,
+          userAgent = this.userAgent
+        )
       } catch (illegalArgumentException: IllegalArgumentException) {
         val msg: String = ErrorStringsResource.getString("submission.log.invalid.url.error")
           .format(illegalArgumentException.localizedMessage)
@@ -902,7 +929,7 @@ private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
  * @param userAgent The User Agent to use when making the download
  * @return The Submission Log, which is a json String, that contains the log information, or a [NotaryToolError]
  */
-private fun downloadSubmissionLog(
+private fun downloadSubmissionLogContents(
   httpClient: OkHttpClient,
   developerLogUrl: HttpUrl,
   userAgent: String,

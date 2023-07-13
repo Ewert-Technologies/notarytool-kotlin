@@ -8,7 +8,7 @@ import java.util.*
 private val log = KotlinLogging.logger {}
 
 /**
- * Parent Class for all Notary Api Response Classes
+ * Parent Type for all Notary Api Response Types
  *
  * @property responseMetaData Meta information about the http response.
  * @author Victor Ewert

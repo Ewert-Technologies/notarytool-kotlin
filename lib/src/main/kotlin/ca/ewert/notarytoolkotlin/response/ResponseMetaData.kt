@@ -7,7 +7,7 @@ import java.time.Instant
 private val log = KotlinLogging.logger {}
 
 /**
- * Class for accessing Response Metadata.
+ * Encapsulates various metadata information of a Response.
  *
  * @author Victor Ewert
  */
@@ -19,7 +19,7 @@ class ResponseMetaData internal constructor(response: Response) {
   /** The HTTP Status Message, e.g. `OK`  */
   val httpStatusMessage: String
 
-  /** The Combined HTTP Status code and message, e.g. `200 - OK` */
+  /** The Combined HTTP Status code and message, e.g. `"200 - OK"` */
   val httpStatusString: String
 
   /** A map of all the Response Headers */
@@ -52,7 +52,8 @@ class ResponseMetaData internal constructor(response: Response) {
 
   /**
    * A String representation of the object.
-   * Displays as: `statusCode -  statusMessage; contentType`.
+   *
+   * Displays: `statusCode -  statusMessage; contentType`.
    *
    * Example: `"200 - OK; content-type: 'text/plain'"`
    */

@@ -4,7 +4,7 @@ import ca.ewert.notarytoolkotlin.NotaryToolClient
 
 /**
  * Information about a successful upload of the software file
- * to the AWS S3 Bucket.
+ * to Amazon S3.
  *
  * @property eTag The eTag received from AWS.
  * @property submissionId The submission id received from Apple Notarization API.
