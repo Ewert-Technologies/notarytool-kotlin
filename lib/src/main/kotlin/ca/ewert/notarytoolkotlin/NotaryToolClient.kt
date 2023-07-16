@@ -758,7 +758,7 @@ class NotaryToolClient internal constructor(
         downloadSubmissionLogContents(
           httpClient = this.httpClient,
           developerLogUrl = responseUrl,
-          userAgent = this.userAgent
+          userAgent = this.userAgent,
         )
       } catch (illegalArgumentException: IllegalArgumentException) {
         val msg: String = ErrorStringsResource.getString("submission.log.invalid.url.error")
