@@ -38,7 +38,7 @@ class ResponseMetaData internal constructor(response: Response) {
   val rawContents: String?
 
   init {
-    log.info { "Inside init" }
+    log.debug { "Inside init" }
     httpStatusCode = response.code
     httpStatusMessage = response.message
     httpStatusString = "$httpStatusCode - $httpStatusMessage"

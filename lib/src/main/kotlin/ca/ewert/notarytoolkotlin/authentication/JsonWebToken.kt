@@ -110,9 +110,9 @@ internal class JsonWebToken private constructor(
 
   init {
     this.issuedAtTime = _issuedAtTime
-    log.info { "Issued: ${this.issuedAtTime}" }
+    log.debug { "Issued: ${this.issuedAtTime}" }
     this.expirationTime = _expirationTime
-    log.info { "Expiry: ${this.expirationTime}" }
+    log.debug { "Expiry: ${this.expirationTime}" }
     this.signedToken = _signedToken
   }
 
@@ -121,8 +121,8 @@ internal class JsonWebToken private constructor(
    */
   internal val isExpired: Boolean
     get() {
-      log.info { "Now: ${ZonedDateTime.now()}" }
-      log.info { "Expiration Date: ${expirationTime.atZone(ZoneId.systemDefault())}" }
+      log.debug { "Now: ${ZonedDateTime.now()}" }
+      log.debug { "Expiration Date: ${expirationTime.atZone(ZoneId.systemDefault())}" }
       return Instant.now().isAfter(expirationTime)
     }
 

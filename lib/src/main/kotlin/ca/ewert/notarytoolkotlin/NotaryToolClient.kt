@@ -227,13 +227,13 @@ class NotaryToolClient internal constructor(
         }
         if (baseUrl != null) {
           val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
-          log.info { "URL String: $url" }
+          log.debug { "URL String: $url" }
           try {
             createSubmissionRequest(softwarePath, url, jsonWebToken).flatMap { request: Request ->
               this.httpClient.newCall(request).execute().use { response: Response ->
-                log.info { "Response from ${response.request.url}: $response" }
+                log.debug { "Response from ${response.request.url}: $response" }
                 val responseMetaData = ResponseMetaData(response = response)
-                log.info { "Response body: ${responseMetaData.rawContents}" }
+                log.debug { "Response body: ${responseMetaData.rawContents}" }
 
                 if (response.isSuccessful) {
                   NewSubmissionResponseJson.create(responseMetaData.rawContents).map { newSubmissionResponseJson ->
@@ -246,8 +246,8 @@ class NotaryToolClient internal constructor(
                     }
 
                     404 -> {
-                      log.info { "Content-Type: ${responseMetaData.contentType}" }
-                      log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                      log.debug { "Content-Type: ${responseMetaData.contentType}" }
+                      log.debug { "Content-Length: ${responseMetaData.contentLength}" }
                       if (isGeneral404(responseMetaData = responseMetaData)) {
                         Err(
                           NotaryToolError.HttpError.ClientError4xx(
@@ -393,9 +393,9 @@ class NotaryToolClient internal constructor(
    */
   private fun createSubmissionRequestBody(softwarePath: Path): Result<RequestBody, NotaryToolError.JsonCreateError> {
     val fileName: String = softwarePath.fileName.toString()
-    log.info { "fileName: $fileName" }
+    log.debug { "fileName: $fileName" }
     val sha256: String = calculateSha256(softwarePath)
-    log.info { "SHA-256 of file: $sha256" }
+    log.debug { "SHA-256 of file: $sha256" }
 
     val newSubmissionRequestJson =
       NewSubmissionRequestJson(notifications = emptyList(), sha256 = sha256, submissionName = fileName)
@@ -442,7 +442,7 @@ class NotaryToolClient internal constructor(
 
     return try {
       val response: PutObjectResponse = s3Client.putObject(request, softwareFile)
-      log.info { "AWS S3 Response Tag information: ${response.eTag()}" }
+      log.debug { "AWS S3 Response Tag information: ${response.eTag()}" }
       s3Client.close()
       Ok(response.eTag())
     } catch (exception: Exception) {
@@ -484,7 +484,7 @@ class NotaryToolClient internal constructor(
         if (baseUrl != null) {
           val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING)
             .addPathSegment(submissionId.id).build()
-          log.info { "URL String: $url" }
+          log.debug { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url = url)
             .header(name = USER_AGENT_HEADER, value = userAgent)
@@ -494,9 +494,9 @@ class NotaryToolClient internal constructor(
 
           try {
             httpClient.newCall(request).execute().use { response: Response ->
-              log.info { "Response from ${response.request.url}: $response" }
+              log.debug { "Response from ${response.request.url}: $response" }
               val responseMetaData = ResponseMetaData(response = response)
-              log.info { "Response body: ${responseMetaData.rawContents}" }
+              log.debug { "Response body: ${responseMetaData.rawContents}" }
 
               if (response.isSuccessful) {
                 SubmissionResponseJson.create(responseMetaData.rawContents)
@@ -510,8 +510,8 @@ class NotaryToolClient internal constructor(
                   }
 
                   404 -> {
-                    log.info { "Content-Type: ${responseMetaData.contentType}" }
-                    log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                    log.debug { "Content-Type: ${responseMetaData.contentType}" }
+                    log.debug { "Content-Length: ${responseMetaData.contentLength}" }
                     if (isGeneral404(responseMetaData = responseMetaData)) {
                       Err(
                         NotaryToolError.HttpError.ClientError4xx(
@@ -627,7 +627,7 @@ class NotaryToolClient internal constructor(
         if (baseUrl != null) {
           val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING)
             .addPathSegment(submissionId.id).addPathSegment(LOGS_PATH_SEGMENT).build()
-          log.info { "URL String: $url" }
+          log.debug { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url = url)
             .header(name = USER_AGENT_HEADER, value = userAgent)
@@ -637,9 +637,9 @@ class NotaryToolClient internal constructor(
 
           try {
             this.httpClient.newCall(request).execute().use { response: Response ->
-              log.info { "Response from ${response.request.url}: $response" }
+              log.debug { "Response from ${response.request.url}: $response" }
               val responseMetaData = ResponseMetaData(response = response)
-              log.info { "Response body: ${responseMetaData.rawContents}" }
+              log.debug { "Response body: ${responseMetaData.rawContents}" }
               if (response.isSuccessful) {
                 SubmissionLogUrlResponseJson.create(responseMetaData.rawContents)
                   .map { submissionLogUrlResponseJson: SubmissionLogUrlResponseJson ->
@@ -655,8 +655,8 @@ class NotaryToolClient internal constructor(
                   }
 
                   404 -> {
-                    log.info { "Content-Type: ${responseMetaData.contentType}" }
-                    log.info { "Content-Length: ${responseMetaData.contentLength}" }
+                    log.debug { "Content-Type: ${responseMetaData.contentType}" }
+                    log.debug { "Content-Length: ${responseMetaData.contentLength}" }
                     if (isGeneral404(responseMetaData = responseMetaData)) {
                       Err(
                         NotaryToolError.HttpError.ClientError4xx(
@@ -752,7 +752,7 @@ class NotaryToolClient internal constructor(
   fun retrieveSubmissionLog(submissionId: SubmissionId): Result<String, NotaryToolError> {
     return this.getSubmissionLog(submissionId).andThen { submissionLogUrlResponse ->
       val urlString: String = submissionLogUrlResponse.developerLogUrlString
-      log.info { "Using submissionLog URL: $urlString" }
+      log.debug { "Using submissionLog URL: $urlString" }
       try {
         val responseUrl: HttpUrl = urlString.toHttpUrl()
         downloadSubmissionLogContents(
@@ -821,7 +821,7 @@ class NotaryToolClient internal constructor(
         }
         if (baseUrl != null) {
           val url: HttpUrl = baseUrl.newBuilder().addPathSegment(ENDPOINT_STRING).build()
-          log.info { "URL String: $url" }
+          log.debug { "URL String: $url" }
           val request: Request = Request.Builder()
             .url(url = url)
             .header(name = USER_AGENT_HEADER, value = userAgent)
@@ -831,9 +831,9 @@ class NotaryToolClient internal constructor(
 
           try {
             httpClient.newCall(request = request).execute().use { response: Response ->
-              log.info { "Response from ${response.request.url}: $response" }
+              log.debug { "Response from ${response.request.url}: $response" }
               val responseMetaData = ResponseMetaData(response = response)
-              log.info { "Response body: ${responseMetaData.rawContents}" }
+              log.debug { "Response body: ${responseMetaData.rawContents}" }
               if (response.isSuccessful) {
                 SubmissionListResponseJson.create(jsonString = responseMetaData.rawContents)
                   .map { submissionListResponseJson: SubmissionListResponseJson ->
@@ -914,7 +914,7 @@ class NotaryToolClient internal constructor(
  */
 private fun isGeneral404(responseMetaData: ResponseMetaData): Boolean {
   val contentType = responseMetaData.contentType
-  log.info { "Found content type: $contentType" }
+  log.debug { "Found content type: $contentType" }
   val contentLength: Long = responseMetaData.contentLength ?: 0
   return contentType?.contains(other = "text/plain", ignoreCase = true) ?: false || contentLength == 0L
 }
@@ -942,8 +942,8 @@ private fun downloadSubmissionLogContents(
 
   return try {
     httpClient.newCall(request = request).execute().use { response: Response ->
-      log.info { "Response from ${response.request.url}: $response" }
-      log.info { "Response status code: ${response.code}" }
+      log.debug { "Response from ${response.request.url}: $response" }
+      log.debug { "Response status code: ${response.code}" }
       val responseMetaData = ResponseMetaData(response = response)
       if (response.isSuccessful) {
         Ok(responseMetaData.rawContents ?: "")
