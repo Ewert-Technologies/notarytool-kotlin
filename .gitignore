@@ -27,6 +27,7 @@ modules.xml
 ## Plugin-specific files:
 
 # IntelliJ
+lib/out
 /out/
 .idea/ant.xml
 .idea/kotlinc.xml
