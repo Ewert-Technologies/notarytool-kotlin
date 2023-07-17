@@ -147,6 +147,8 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
       val getSubmissionStatusResult = notaryToolClient.getSubmissionStatus(submissionId = submissionId)
       assertThat(getSubmissionStatusResult).isOk()
       getSubmissionStatusResult.onSuccess { submissionStatusResponse ->
+        assertThat(submissionStatusResponse.responseMetaData.httpStatusCode).isEqualTo(200)
+        assertThat(submissionStatusResponse.responseMetaData.requestUrlString).isEqualTo(baseUrl.toString() + "submissions/2efe2717-52ef-43a5-96dc-0797e4ca1041")
         assertThat(submissionStatusResponse.submissionInfo.name).isEqualTo("OvernightTextEditor_11.6.8.zip")
         assertThat(submissionStatusResponse.submissionInfo).prop(SubmissionInfo::id).prop(SubmissionId::id)
           .isEqualTo("2efe2717-52ef-43a5-96dc-0797e4ca1041")
