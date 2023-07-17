@@ -96,22 +96,10 @@ sealed interface NotaryToolError {
   /**
    * Top-level parent of HTTP Errors received from the App Store Connect API Web Service
    *
-   * @property httpStatusCode The HTTP status code.
-   * @property httpStatusMsg The HTTP status message.
-   * @property requestUrl The URL used in the request.
-   * @property contentBody The body of the request.
+   * @property responseMetaData The response metadata, may be useful in debugging the error.
    * @author Victor Ewert
    */
   sealed interface HttpError : NotaryToolError {
-    @Deprecated("Use responseMetaData instead")
-    val httpStatusCode: Int
-
-    @Deprecated("Use responseMetaData instead")
-    val httpStatusMsg: String
-    val requestUrl: String
-
-    @Deprecated("Use responseMetaData instead")
-    val contentBody: String?
     val responseMetaData: ResponseMetaData
 
     /**
@@ -122,13 +110,6 @@ sealed interface NotaryToolError {
      */
     data class ClientError4xx(
       override val msg: String,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusCode: Int = -1,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusMsg: String = "",
-      override val requestUrl: String = "",
-      @Deprecated("Use responseMetaData instead")
-      override val contentBody: String? = "",
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
 
@@ -140,13 +121,6 @@ sealed interface NotaryToolError {
      */
     data class ServerError5xx(
       override val msg: String,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusCode: Int = -1,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusMsg: String = "",
-      override val requestUrl: String = "",
-      @Deprecated("Use responseMetaData instead")
-      override val contentBody: String? = "",
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
 
@@ -157,13 +131,6 @@ sealed interface NotaryToolError {
      */
     data class OtherError(
       override val msg: String,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusCode: Int = -1,
-      @Deprecated("Use responseMetaData instead")
-      override val httpStatusMsg: String = "",
-      override val requestUrl: String = "",
-      @Deprecated("Use responseMetaData instead")
-      override val contentBody: String? = "",
       override val responseMetaData: ResponseMetaData,
     ) : HttpError
   }

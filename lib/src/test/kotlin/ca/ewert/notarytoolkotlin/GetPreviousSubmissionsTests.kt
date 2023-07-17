@@ -122,7 +122,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       when (error) {
         is NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError -> log.warn { error.msg }
         is NotaryToolError.HttpError ->
-          log.warn { "An HTTP Error occurred. Code: ${error.responseMetaData.httpStatusCode} - ${error.responseMetaData.httpStatusMessage}, for request to: ${error.requestUrl}" }
+          log.warn { "An HTTP Error occurred. Code: ${error.responseMetaData.httpStatusCode} - ${error.responseMetaData.httpStatusMessage}, for request to: ${error.responseMetaData.requestUrlString}" }
 
         else -> log.warn { error.msg }
       }

@@ -742,10 +742,6 @@ private fun downloadSubmissionLogContents(
             Err(
               NotaryToolError.HttpError.ClientError4xx(
                 msg = ErrorStringsResource.getString("submission.log.http.400.error"),
-                httpStatusCode = responseMetaData.httpStatusCode,
-                httpStatusMsg = responseMetaData.httpStatusMessage,
-                requestUrl = developerLogUrl.toString(),
-                contentBody = responseMetaData.rawContents,
                 responseMetaData = responseMetaData,
               ),
             )
@@ -755,10 +751,6 @@ private fun downloadSubmissionLogContents(
             Err(
               NotaryToolError.HttpError.ServerError5xx(
                 msg = ErrorStringsResource.getString("submission.log.http.500.error"),
-                httpStatusCode = responseMetaData.httpStatusCode,
-                httpStatusMsg = responseMetaData.httpStatusMessage,
-                requestUrl = developerLogUrl.toString(),
-                contentBody = responseMetaData.rawContents,
                 responseMetaData = responseMetaData,
               ),
             )
@@ -768,10 +760,6 @@ private fun downloadSubmissionLogContents(
             Err(
               NotaryToolError.HttpError.OtherError(
                 msg = ErrorStringsResource.getString("http.other.error"),
-                httpStatusCode = responseMetaData.httpStatusCode,
-                httpStatusMsg = responseMetaData.httpStatusMessage,
-                requestUrl = developerLogUrl.toString(),
-                contentBody = responseMetaData.rawContents,
                 responseMetaData = responseMetaData,
               ),
             )

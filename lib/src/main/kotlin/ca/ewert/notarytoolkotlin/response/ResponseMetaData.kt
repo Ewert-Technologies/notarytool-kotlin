@@ -37,6 +37,11 @@ class ResponseMetaData internal constructor(response: Response) {
   /** Response Content Body, if available */
   val rawContents: String?
 
+  /**
+   * The URL of the request that initiated this response
+   */
+  val requestUrlString: String
+
   init {
     log.debug { "Inside init" }
     httpStatusCode = response.code
@@ -47,6 +52,7 @@ class ResponseMetaData internal constructor(response: Response) {
     contentType = response.body?.contentType()?.toString()
     contentLength = response.body?.contentLength()
     rawContents = response.body?.string()
+    requestUrlString = response.request.url.toString()
     response.close()
   }
 
