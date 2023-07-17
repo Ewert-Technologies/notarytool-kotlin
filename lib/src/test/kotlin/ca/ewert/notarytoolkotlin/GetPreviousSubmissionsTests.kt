@@ -156,7 +156,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
     getPreviousSubmissionsResult.onFailure { error ->
       log.info { "onFailure(): $error" }
       when (error) {
-        is NotaryToolError.UserInputError.JsonWebTokenError.AuthenticationError -> {
+        is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
           assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
         }
@@ -195,7 +195,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
     getPreviousSubmissionsResult.onFailure { error ->
       log.info { "onFailure(): $error" }
       when (error) {
-        is NotaryToolError.UserInputError.JsonWebTokenError.AuthenticationError -> {
+        is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
           assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
         }

@@ -10,7 +10,7 @@ import java.security.interfaces.ECPrivateKey
  */
 sealed interface NotaryToolError {
 
-  /** Error Message */
+  /** The error Message */
   val msg: String
 
   /**
@@ -41,9 +41,18 @@ sealed interface NotaryToolError {
      * @property msg Error message details.
      * @author Victor Ewert
      */
-    data class InvalidSubmissionIdError(
-      override val msg: String,
-    ) : UserInputError
+    data class InvalidSubmissionIdError(override val msg: String) : UserInputError
+
+    /**
+     * An error caused when the request to the App Store Connect API Web Service fails the
+     * authentication check. This is typically caused by an invalid issuerId, private key id,
+     * private key file, or an expired web token.
+     *
+     * Internally this is trapped as an HTTP 401 error from the App Store Connect API Web Service.
+     *
+     * @author Victor Ewert
+     */
+    data class AuthenticationError(override val msg: String) : UserInputError
 
     /**
      * Top-level parent of all Errors related to creating or using the Json Web Token.
@@ -79,17 +88,6 @@ sealed interface NotaryToolError {
        * @author Victor Ewert
        */
       data class TokenCreationError(override val msg: String) : JsonWebTokenError
-
-      /**
-       * An error caused when the request to the App Store Connect API Web Service fails the
-       * authentication check. This is typically caused by an invalid issuerId, private key id,
-       * private key file, or an expired web token.
-       *
-       * Internally this is trapped as an HTTP 401 error from the App Store Connect API Web Service.
-       *
-       * @author Victor Ewert
-       */
-      data class AuthenticationError(override val msg: String) : UserInputError
     }
   }
 

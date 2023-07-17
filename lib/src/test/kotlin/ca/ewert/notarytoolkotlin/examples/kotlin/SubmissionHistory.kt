@@ -47,7 +47,7 @@ fun main(args: Array<String>) {
 
       is Err -> {
         when (val notaryToolError = result.error) {
-          is NotaryToolError.UserInputError.JsonWebTokenError.AuthenticationError ->
+          is NotaryToolError.UserInputError.AuthenticationError ->
             println("Authentication Error: '${notaryToolError.msg}' Please check your Apple API Key credentials")
 
           is NotaryToolError.HttpError ->

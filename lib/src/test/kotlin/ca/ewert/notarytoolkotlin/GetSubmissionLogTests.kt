@@ -246,7 +246,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     assertThat(getSubmissionLogResult).isErr()
     getSubmissionLogResult.onFailure { notaryToolError ->
       when (notaryToolError) {
-        is NotaryToolError.UserInputError.JsonWebTokenError.AuthenticationError -> {
+        is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
           assertThat(notaryToolError.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
         }
@@ -283,7 +283,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     assertThat(getSubmissionLogResult).isErr()
     getSubmissionLogResult.onFailure { notaryToolError ->
       when (notaryToolError) {
-        is NotaryToolError.UserInputError.JsonWebTokenError.AuthenticationError -> {
+        is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
           assertThat(notaryToolError.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
         }

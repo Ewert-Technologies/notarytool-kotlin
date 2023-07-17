@@ -642,7 +642,7 @@ class NotaryToolClient internal constructor(
 private fun handleUnsuccessfulResponse(responseMetaData: ResponseMetaData): NotaryToolError {
   return when (responseMetaData.httpStatusCode) {
     401, 403 -> {
-      JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error"))
+      NotaryToolError.UserInputError.AuthenticationError(ErrorStringsResource.getString("authentication.error"))
     }
 
     404 -> {
