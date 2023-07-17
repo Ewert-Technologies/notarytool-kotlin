@@ -843,53 +843,8 @@ class NotaryToolClient internal constructor(
                     )
                   }
               } else {
-                when (response.code) {
-                  401, 403 -> {
-                    Err(JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error")))
-                  }
-
-                  in 400..499 -> {
-                    if (response.code == 404) {
-                      log.warn { "404 error when sending request to: $url" }
-                    }
-                    Err(
-                      NotaryToolError.HttpError.ClientError4xx(
-                        msg = ErrorStringsResource.getString("http.400.error"),
-                        httpStatusCode = responseMetaData.httpStatusCode,
-                        httpStatusMsg = responseMetaData.httpStatusMessage,
-                        requestUrl = url.toString(),
-                        contentBody = responseMetaData.rawContents,
-                        responseMetaData = responseMetaData,
-                      ),
-                    )
-                  }
-
-                  in 500..599 -> {
-                    Err(
-                      NotaryToolError.HttpError.ServerError5xx(
-                        msg = ErrorStringsResource.getString("http.500.error"),
-                        httpStatusCode = responseMetaData.httpStatusCode,
-                        httpStatusMsg = responseMetaData.httpStatusMessage,
-                        requestUrl = url.toString(),
-                        contentBody = responseMetaData.rawContents,
-                        responseMetaData = responseMetaData,
-                      ),
-                    )
-                  }
-
-                  else -> {
-                    Err(
-                      NotaryToolError.HttpError.OtherError(
-                        msg = ErrorStringsResource.getString("http.other.error"),
-                        httpStatusCode = responseMetaData.httpStatusCode,
-                        httpStatusMsg = responseMetaData.httpStatusMessage,
-                        requestUrl = url.toString(),
-                        contentBody = responseMetaData.rawContents,
-                        responseMetaData = responseMetaData,
-                      ),
-                    )
-                  }
-                }
+                val notaryToolError: NotaryToolError = handleUnsuccessfulResponse(responseMetaData)
+                Err(notaryToolError)
               }
             }
           } catch (ioException: IOException) {
@@ -902,6 +857,69 @@ class NotaryToolClient internal constructor(
       }
 
       is Err -> jsonWebTokenResult
+    }
+  }
+}
+
+/**
+ * Handles cases where http response unsuccessful, i.e. not 2xx.
+ * It checks various error cases and returns the appropriate error.
+ *
+ * @param responseMetaData used for checking status codes displaying errors.
+ * @return The appropriate [NotaryToolError] subtype.
+ */
+private fun handleUnsuccessfulResponse(responseMetaData: ResponseMetaData): NotaryToolError {
+  return when (responseMetaData.httpStatusCode) {
+    401, 403 -> {
+      JsonWebTokenError.AuthenticationError(ErrorStringsResource.getString("authentication.error"))
+    }
+
+    404 -> {
+      log.debug { "Content-Type: ${responseMetaData.contentType}" }
+      log.debug { "Content-Length: ${responseMetaData.contentLength}" }
+      if (isGeneral404(responseMetaData = responseMetaData)) {
+        NotaryToolError.HttpError.ClientError4xx(
+          msg = ErrorStringsResource.getString("http.400.error"),
+          responseMetaData = responseMetaData,
+        )
+      } else {
+        // This is a Notary Error Response, likely incorrect submissionId
+        return when (
+          val errorResponseJsonResult =
+            ErrorResponseJson.create(responseMetaData.rawContents)
+        ) {
+          is Ok -> {
+            // FIXME: Should maybe check that there is at least one error
+            NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail)
+          }
+
+          is Err -> {
+            log.warn { errorResponseJsonResult.error }
+            errorResponseJsonResult.error
+          }
+        }
+      }
+    }
+
+    in 400..499 -> {
+      NotaryToolError.HttpError.ClientError4xx(
+        msg = ErrorStringsResource.getString("http.400.error"),
+        responseMetaData = responseMetaData,
+      )
+    }
+
+    in 500..599 -> {
+      NotaryToolError.HttpError.ServerError5xx(
+        msg = ErrorStringsResource.getString("http.500.error"),
+        responseMetaData = responseMetaData,
+      )
+    }
+
+    else -> {
+      NotaryToolError.HttpError.OtherError(
+        msg = ErrorStringsResource.getString("http.other.error"),
+        responseMetaData = responseMetaData,
+      )
     }
   }
 }
