@@ -1,7 +1,11 @@
 package ca.ewert.notarytoolkotlin
 
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import ca.ewert.notarytoolkotlin.response.ResponseMetaData
+import ca.ewert.notarytoolkotlin.response.SubmissionId
+import java.nio.file.Path
 import java.security.interfaces.ECPrivateKey
+import kotlin.io.path.absolutePathString
 
 /**
  * Top-level parent of all notarytool-kotlin errors
@@ -18,7 +22,7 @@ sealed interface NotaryToolError {
    * to notarize the software.
    *
    * These errors could be caused by errors creating the JsonWebToken (i.e. invalid or malformed issuer id,
-   * private key id, or private key) an authentication Issue (i.e incorrect issuer id, private key id, or private key),
+   * private key id, or private key) an authentication Issue (i.e. incorrect issuer id, private key id, or private key),
    * or by an invalid submission id.
    *
    * Errors of these types should be trapped and reported back to the end-user for corrective action.
@@ -28,14 +32,18 @@ sealed interface NotaryToolError {
   sealed interface UserInputError : NotaryToolError {
 
     /**
-     * An error caused by a submissionId that has an incorrect format. According to the Notary API,
-     * the submissionId must match: `"/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/"`
+     * An error caused by attempting to use submissionId that has an incorrect format.
+     * According to the Notary API, the submissionId must match:
+     * `"/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/"`
      *
-     * @property msg Error message details
-     * @property invalidId The invalid id that was used
+     * @property malformedId The String that was used when attempting to create the [SubmissionId].
      * @author Victor Ewert
      */
-    data class MalformedSubmissionIdError(override val msg: String, val invalidId: String) : UserInputError
+    data class MalformedSubmissionIdError internal constructor(val malformedId: String) : UserInputError {
+
+      /** Error message details */
+      override val msg: String = ErrorStringsResource.getString("submission.id.invalid.string.error")
+    }
 
     /**
      * An error caused when the submissionId used in a request is incorrect, and could not be found.
@@ -43,10 +51,10 @@ sealed interface NotaryToolError {
      * Internally this is trapped as an HTTP 404 error from the Notary API Web Service, but is reported here
      * as a [UserInputError], since the submission id passed in is incorrect.
      *
-     * @property msg Error message details.
+     * @property msg Error message details, as reported by the Notary API.
      * @author Victor Ewert
      */
-    data class InvalidSubmissionIdError(override val msg: String) : UserInputError
+    data class InvalidSubmissionIdError internal constructor(override val msg: String) : UserInputError
 
     /**
      * An error caused when the request to the Notary API Web Service fails the
@@ -58,7 +66,9 @@ sealed interface NotaryToolError {
      *
      * @author Victor Ewert
      */
-    data class AuthenticationError(override val msg: String) : UserInputError
+    data class AuthenticationError internal constructor(override val msg: String) : UserInputError {
+      constructor() : this(ErrorStringsResource.getString("authentication.error"))
+    }
 
     /**
      * Top-level parent of all errors related to creating or using the Json Web Token.
@@ -72,19 +82,28 @@ sealed interface NotaryToolError {
       /**
        * An error caused when the Private Key (`.p8`) file cannot be found
        *
-       * @property msg Error message details.
+       * @property privateKeyFilePath The Path of the file that couldn't be found.
        * @author Victor Ewert
        */
-      data class PrivateKeyNotFoundError(override val msg: String) : JsonWebTokenError
+      data class PrivateKeyNotFoundError internal constructor(val privateKeyFilePath: Path) : JsonWebTokenError {
+
+        /** Error message details. */
+        override val msg: String = ErrorStringsResource.getString("jwt.private.key.file.not.exist.error")
+          .format(privateKeyFilePath.absolutePathString())
+      }
 
       /**
        * An error caused when there is an Exception generating the [ECPrivateKey] (used to sign the Json Web Token)
        * from the private key file provided.
        *
-       * @property msg Error message including any Exception message.
+       * @property exceptionMsg More detailed message from the causing Exception.
        * @author Victor Ewert
        */
-      data class InvalidPrivateKeyError(override val msg: String) : JsonWebTokenError
+      data class InvalidPrivateKeyError internal constructor(val exceptionMsg: String) : JsonWebTokenError {
+
+        /** The error message. */
+        override val msg: String = ErrorStringsResource.getString("jwt.invalid.private.key.format.error")
+      }
 
       /**
        * An error for when there is a problem or Exception when generating or signing
@@ -93,7 +112,9 @@ sealed interface NotaryToolError {
        * @property msg Error message including any Exception message.
        * @author Victor Ewert
        */
-      data class TokenCreationError(override val msg: String) : JsonWebTokenError
+      data class TokenCreationError internal constructor(val exceptionMsg: String) : JsonWebTokenError {
+        override val msg: String = ErrorStringsResource.getString("json.parse.other.error")
+      }
     }
   }
 
@@ -191,7 +212,11 @@ sealed interface NotaryToolError {
    * Not an error, but an indication that polling has reached the maximum
    * number of attempts.
    */
-  data class PollingTimeout(override val msg: String) : NotaryToolError
+  data class PollingTimeout(val maxCount: Int) : NotaryToolError {
+
+    /** Polling count message */
+    override val msg: String = ErrorStringsResource.getString("polling.timeout.msg").format(maxCount)
+  }
 
   /**
    * Any other error.

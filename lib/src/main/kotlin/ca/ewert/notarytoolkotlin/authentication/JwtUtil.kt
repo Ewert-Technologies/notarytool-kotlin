@@ -3,7 +3,6 @@ package ca.ewert.notarytoolkotlin.authentication
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError
-import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTCreationException
 import com.github.michaelbull.result.Err
@@ -21,7 +20,6 @@ import java.security.spec.EncodedKeySpec
 import java.security.spec.PKCS8EncodedKeySpec
 import java.time.Instant
 import java.util.*
-import kotlin.io.path.absolutePathString
 import kotlin.io.path.exists
 import kotlin.io.path.useLines
 
@@ -89,16 +87,10 @@ fun generateJwt(
       Ok(renderedToken)
     } catch (illegalArgumentException: IllegalArgumentException) {
       log.warn(illegalArgumentException) { "Error creating JWT" }
-
-      Err(TokenCreationError(ErrorStringsResource.getString("jwt.algorithm.null.error")))
+      Err(TokenCreationError(illegalArgumentException.localizedMessage))
     } catch (jwtCreationException: JWTCreationException) {
       log.warn(jwtCreationException) { "Error creating JWT" }
-      Err(
-        TokenCreationError(
-          ErrorStringsResource
-            .getString("jwt.create.error").format(jwtCreationException.message),
-        ),
-      )
+      Err(TokenCreationError(jwtCreationException.localizedMessage))
     }
   }
 }
@@ -135,7 +127,7 @@ internal fun parsePrivateKeyString(privateKeyFile: Path): Result<String, JsonWeb
       },
     )
   } else {
-    Err(PrivateKeyNotFoundError("Private Key File: '${privateKeyFile.absolutePathString()}' does not exist"))
+    Err(PrivateKeyNotFoundError(privateKeyFile))
   }
 }
 
@@ -161,7 +153,7 @@ internal fun createPrivateKey(keyString: String): Result<ECPrivateKey, JsonWebTo
     log.warn(exception) { "Error creating ECPrivateKey" }
     Err(
       JsonWebTokenError
-        .InvalidPrivateKeyError(msg = "The private key format is invalid: '${exception.message ?: "N/A"}'"),
+        .InvalidPrivateKeyError(exceptionMsg = exception.message ?: "N/A"),
     )
   }
 }

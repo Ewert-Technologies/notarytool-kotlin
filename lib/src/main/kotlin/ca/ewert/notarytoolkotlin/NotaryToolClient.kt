@@ -480,11 +480,7 @@ class NotaryToolClient internal constructor(
       val delay: Duration = delayFunction(count)
       Thread.sleep(delay.toMillis())
     }
-    return Err(
-      NotaryToolError.PollingTimeout(
-        ErrorStringsResource.getString("polling.timeout.msg").format(maxPollCount)
-      )
-    )
+    return Err(NotaryToolError.PollingTimeout(maxPollCount))
   }
 
   /**
@@ -685,7 +681,7 @@ class NotaryToolClient internal constructor(
 private fun handleUnsuccessfulResponse(responseMetaData: ResponseMetaData): NotaryToolError {
   return when (responseMetaData.httpStatusCode) {
     401, 403 -> {
-      NotaryToolError.UserInputError.AuthenticationError(ErrorStringsResource.getString("authentication.error"))
+      NotaryToolError.UserInputError.AuthenticationError()
     }
 
     404 -> {

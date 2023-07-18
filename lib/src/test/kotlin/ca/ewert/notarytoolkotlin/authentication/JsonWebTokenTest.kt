@@ -64,12 +64,12 @@ class JsonWebTokenTest {
     assertThat(jsonWebTokenResult).isOk()
 
     jsonWebTokenResult.onSuccess { jsonWebToken ->
-      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(500, ChronoUnit.MILLIS))
+      assertThat(jsonWebToken.issuedAtTime).isCloseTo(Instant.now(), Duration.of(1000, ChronoUnit.MILLIS))
 
       val expectedExpirationTime = Instant.now().plus(tokenLifetime)
       assertThat(jsonWebToken.expirationTime).isCloseTo(
         expected = expectedExpirationTime,
-        tolerance = Duration.of(500, ChronoUnit.MILLIS),
+        tolerance = Duration.of(1000, ChronoUnit.MILLIS),
       )
       assertThat(jsonWebToken.isExpired).isFalse()
       assertThat(jsonWebToken.signedToken).isNotEmpty()

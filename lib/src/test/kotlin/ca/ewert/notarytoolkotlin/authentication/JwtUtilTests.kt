@@ -3,10 +3,13 @@ package ca.ewert.notarytoolkotlin.authentication
 import assertk.assertThat
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
+import assertk.assertions.prop
 import assertk.fail
 import ca.ewert.notarytoolkotlin.NotaryToolError
+import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError
 import ca.ewert.notarytoolkotlin.hasMessage
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd
@@ -183,13 +186,14 @@ class JwtUtilTests {
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
-    val expectedMsg =
-      "The private key format is invalid: 'Illegal base64 character 20'"
-    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
 
-    generateJwtResult.onFailure { jsonWebTokenError ->
-      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
-    }
+    val invalidPrivateKeyErrorAssert = assertThat(generateJwtResult).isErrAnd().isInstanceOf<InvalidPrivateKeyError>()
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::msg)
+      .isEqualTo("The private key format is invalid.")
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::exceptionMsg)
+      .isEqualTo("Illegal base64 character 20")
   }
 
   /**
@@ -211,12 +215,14 @@ class JwtUtilTests {
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
-    val expectedMsg =
-      "The private key format is invalid: 'java.security.InvalidKeyException: invalid key format'"
-    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
-    generateJwtResult.onFailure { jsonWebTokenError ->
-      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
-    }
+
+    val invalidPrivateKeyErrorAssert = assertThat(generateJwtResult).isErrAnd().isInstanceOf<InvalidPrivateKeyError>()
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::msg)
+      .isEqualTo("The private key format is invalid.")
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::exceptionMsg)
+      .isEqualTo("java.security.InvalidKeyException: invalid key format")
   }
 
   /**
@@ -238,12 +244,14 @@ class JwtUtilTests {
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
-    val expectedMsg =
-      "The private key format is invalid: 'java.security.InvalidKeyException: IOException : Short read of DER length'"
-    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
-    generateJwtResult.onFailure { jsonWebTokenError ->
-      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
-    }
+
+    val invalidPrivateKeyErrorAssert = assertThat(generateJwtResult).isErrAnd().isInstanceOf<InvalidPrivateKeyError>()
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::msg)
+      .isEqualTo("The private key format is invalid.")
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::exceptionMsg)
+      .isEqualTo("java.security.InvalidKeyException: IOException : Short read of DER length")
   }
 
   /**
@@ -265,12 +273,14 @@ class JwtUtilTests {
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
-    val expectedMsg =
-      "The private key format is invalid: 'java.security.InvalidKeyException: IOException : null'"
-    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
-    generateJwtResult.onFailure { jsonWebTokenError ->
-      assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError)
-    }
+
+    val invalidPrivateKeyErrorAssert = assertThat(generateJwtResult).isErrAnd().isInstanceOf<InvalidPrivateKeyError>()
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::msg)
+      .isEqualTo("The private key format is invalid.")
+
+    invalidPrivateKeyErrorAssert.prop(InvalidPrivateKeyError::exceptionMsg)
+      .isEqualTo("java.security.InvalidKeyException: IOException : null")
   }
 
   /**

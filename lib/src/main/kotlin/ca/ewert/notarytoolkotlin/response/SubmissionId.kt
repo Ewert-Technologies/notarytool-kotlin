@@ -1,7 +1,6 @@
 package ca.ewert.notarytoolkotlin.response
 
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.MalformedSubmissionIdError
-import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
@@ -33,7 +32,7 @@ data class SubmissionId internal constructor(val id: String) {
      * In general, it is better use the [SubmissionId] from a [SubmissionInfo] for subsequent uses.
      *
      * @param submissionIdString A valid submission id from a previous submission to the Notary API
-     * @return A [SubmissionId] or a [NotaryToolError.MalformedSubmissionIdError]
+     * @return A [SubmissionId] or a [MalformedSubmissionIdError]
      */
     @JvmStatic
     fun of(submissionIdString: String): Result<SubmissionId, MalformedSubmissionIdError> {
@@ -42,8 +41,7 @@ data class SubmissionId internal constructor(val id: String) {
       } else {
         Err(
           MalformedSubmissionIdError(
-            msg = ErrorStringsResource.getString("submission.id.invalid.string.error"),
-            invalidId = submissionIdString,
+            malformedId = submissionIdString,
           ),
         )
       }

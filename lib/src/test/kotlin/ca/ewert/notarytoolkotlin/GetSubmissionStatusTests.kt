@@ -502,9 +502,9 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
           println(
             "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
               submissionStatusResponse.receivedTimestamp.atZone(
-                ZoneId.systemDefault()
+                ZoneId.systemDefault(),
               )
-            }}"
+            }}",
           )
         },
       )
@@ -654,9 +654,9 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
           println(
             "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
               submissionStatusResponse.receivedTimestamp.atZone(
-                ZoneId.systemDefault()
+                ZoneId.systemDefault(),
               )
-            }}"
+            }}",
           )
         },
       )
@@ -719,9 +719,9 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
           println(
             "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
               submissionStatusResponse.receivedTimestamp.atZone(
-                ZoneId.systemDefault()
+                ZoneId.systemDefault(),
               )
-            }}"
+            }}",
           )
         },
       )
