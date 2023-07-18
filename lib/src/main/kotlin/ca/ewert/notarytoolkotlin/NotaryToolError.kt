@@ -188,6 +188,12 @@ sealed interface NotaryToolError {
   data class AwsUploadError(override val msg: String, val exception: Exception) : NotaryToolError
 
   /**
+   * Not an error, but an indication that polling has reached the maximum
+   * number of attempts.
+   */
+  data class PollingTimeout(override val msg: String) : NotaryToolError
+
+  /**
    * Any other error.
    *
    * @author Victor Ewert

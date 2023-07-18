@@ -12,6 +12,7 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.SubmissionResponseJson
 import ca.ewert.notarytoolkotlin.response.AwsUploadData
 import ca.ewert.notarytoolkotlin.response.NewSubmissionResponse
 import ca.ewert.notarytoolkotlin.response.ResponseMetaData
+import ca.ewert.notarytoolkotlin.response.Status
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionListResponse
 import ca.ewert.notarytoolkotlin.response.SubmissionLogUrlResponse
@@ -442,6 +443,48 @@ class NotaryToolClient internal constructor(
 
       is Err -> jsonWebTokenResult
     }
+  }
+
+  /**
+   * Polls the Notary API Web service, checking on the status of a submission.
+   * It calls [getSubmissionStatus] [maxPollCount] number of times, with a delay
+   * of [delayFunction] between each request. To allow 'backing off' the delay can be expressed
+   * as a function of the current count.
+   *
+   * @param submissionId The id of the submission
+   * @param maxPollCount The maximum number of times the status should be checked before 'timing out'.
+   * @param delayFunction A function used to calculate the delay, based on the current iteration count.
+   * @param progressCallback A callback function that will be called after each iteration when
+   * the [getSubmissionStatus] request is successful.
+   */
+  fun pollSubmissionStatus(
+    submissionId: SubmissionId,
+    maxPollCount: Int,
+    delayFunction: (currentPollCount: Int) -> Duration,
+    progressCallback: (currentPollCount: Int, submissionStatusResponse: SubmissionStatusResponse) -> Unit = { _, _ -> },
+  ): Result<SubmissionStatusResponse, NotaryToolError> {
+    for (count in 1..maxPollCount) {
+      when (val submissionStatusResult = getSubmissionStatus(submissionId)) {
+        is Ok -> {
+          val submissionStatusResponse = submissionStatusResult.value
+          progressCallback(count, submissionStatusResponse)
+          log.debug { "Current status: $submissionStatusResponse.submissionInfo.status" }
+          when (submissionStatusResponse.submissionInfo.status) {
+            Status.ACCEPTED, Status.REJECTED -> return submissionStatusResult
+            else -> {}
+          }
+        }
+
+        is Err -> return submissionStatusResult
+      }
+      val delay: Duration = delayFunction(count)
+      Thread.sleep(delay.toMillis())
+    }
+    return Err(
+      NotaryToolError.PollingTimeout(
+        ErrorStringsResource.getString("polling.timeout.msg").format(maxPollCount)
+      )
+    )
   }
 
   /**

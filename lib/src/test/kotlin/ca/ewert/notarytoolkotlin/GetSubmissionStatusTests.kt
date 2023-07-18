@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -433,6 +434,302 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
             fail(AssertionError("Incorrect Error: $error"))
           }
         }
+      }
+    }
+  }
+
+  /**
+   * Tests polling where the final status is accepted.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Polling Accepted Test")
+  fun pollStatusAccepted() {
+    val responseBodyInProgress: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "In Progress"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    val responseBodyAccepted: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Accepted"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyAccepted))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = this.privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+    submissionIdResult.onSuccess { submissionId ->
+      val result = notaryToolClient.pollSubmissionStatus(
+        submissionId = submissionId,
+        maxPollCount = 10,
+        delayFunction = { _: Int -> Duration.ofSeconds(10) },
+        progressCallback = { currentPollCount, submissionStatusResponse ->
+          println(
+            "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
+              submissionStatusResponse.receivedTimestamp.atZone(
+                ZoneId.systemDefault()
+              )
+            }}"
+          )
+        },
+      )
+      log.info { "Done" }
+      result.onSuccess { submissionStatusResponse ->
+        assertThat(submissionStatusResponse.submissionInfo.status).isEqualTo(Status.ACCEPTED)
+      }
+
+      result.onFailure { notaryToolError -> fail(AssertionError(notaryToolError.msg)) }
+    }
+  }
+
+  /**
+   * Tests polling where the final status is Rejected.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Polling Rejected Test")
+  fun pollStatusRejected() {
+    val responseBodyInProgress: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "In Progress"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    val responseBodyAccepted: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Rejected"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyAccepted))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = this.privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+    submissionIdResult.onSuccess { submissionId ->
+      val result = notaryToolClient.pollSubmissionStatus(
+        submissionId = submissionId,
+        maxPollCount = 10,
+        delayFunction = { _: Int -> Duration.ofSeconds(5) },
+        progressCallback = { currentPollCount, submissionStatusResponse ->
+          println("$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${ZonedDateTime.now()}")
+        },
+      )
+      log.info { "Done" }
+      result.onSuccess { submissionStatusResponse ->
+        assertThat(submissionStatusResponse.submissionInfo.status).isEqualTo(Status.REJECTED)
+      }
+      result.onFailure { notaryToolError -> fail(AssertionError(notaryToolError.msg)) }
+    }
+  }
+
+  /**
+   * Tests polling where an error occurs after several iterations.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Polling with Error Test")
+  fun pollStatusError() {
+    val responseBodyInProgress: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "In Progress"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    val responseBodyAccepted: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Accepted"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse500())
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyAccepted))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = this.privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+    submissionIdResult.onSuccess { submissionId ->
+      val result = notaryToolClient.pollSubmissionStatus(
+        submissionId = submissionId,
+        maxPollCount = 10,
+        delayFunction = { _: Int -> Duration.ofSeconds(10) },
+        progressCallback = { currentPollCount, submissionStatusResponse ->
+          println(
+            "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
+              submissionStatusResponse.receivedTimestamp.atZone(
+                ZoneId.systemDefault()
+              )
+            }}"
+          )
+        },
+      )
+      log.info { "Done" }
+
+      log.warn { result }
+
+      result.onFailure { notaryToolError ->
+        assertThat(notaryToolError is NotaryToolError.HttpError.ServerError5xx)
+      }
+    }
+  }
+
+  /**
+   * Tests polling where polling times out after reaching maximum count.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Polling with Max Count Test")
+  fun pollStatusMaxCountTest() {
+    val responseBodyInProgress: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "In Progress"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = this.privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+    submissionIdResult.onSuccess { submissionId ->
+      val result = notaryToolClient.pollSubmissionStatus(
+        submissionId = submissionId,
+        maxPollCount = 5,
+        delayFunction = { _: Int -> Duration.ofSeconds(7) },
+        progressCallback = { currentPollCount, submissionStatusResponse ->
+          println(
+            "$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${
+              submissionStatusResponse.receivedTimestamp.atZone(
+                ZoneId.systemDefault()
+              )
+            }}"
+          )
+        },
+      )
+      log.warn { result }
+
+      result.onFailure { notaryToolError ->
+        assertThat(notaryToolError is NotaryToolError.PollingTimeout)
+        assertThat(notaryToolError.msg).isEqualTo("Polling max count of 5, has been reached.")
       }
     }
   }
