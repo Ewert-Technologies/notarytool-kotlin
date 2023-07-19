@@ -68,7 +68,7 @@ class SubmissionLogUrlResponseJsonTest {
     val submissionLogUrlResponseJsonResult = SubmissionLogUrlResponseJson.create(jsonString)
 
     assertThat(submissionLogUrlResponseJsonResult).isErrAnd().prop(NotaryToolError.JsonParseError::msg)
-      .isEqualTo("Json String is <null> or empty.")
+      .isEqualTo("JSON String is <null> or empty.")
   }
 
   /**
@@ -82,7 +82,7 @@ class SubmissionLogUrlResponseJsonTest {
     val submissionLogUrlResponseJsonResult = SubmissionLogUrlResponseJson.create(jsonString)
 
     assertThat(submissionLogUrlResponseJsonResult).isErrAnd().prop(NotaryToolError.JsonParseError::msg)
-      .isEqualTo("Json String is <null> or empty.")
+      .isEqualTo("JSON String is <null> or empty.")
   }
 
   /**
@@ -109,7 +109,7 @@ class SubmissionLogUrlResponseJsonTest {
     val submissionLogUrlResponseJsonResult = SubmissionLogUrlResponseJson.create(jsonString)
 
     assertThat(submissionLogUrlResponseJsonResult).isErrAnd().prop(NotaryToolError.JsonParseError::msg)
-      .isEqualTo("Error parsing json: Cannot skip unexpected NAME at \$.data.attributes.createdDate.")
+      .isEqualTo("Error parsing JSON: Cannot skip unexpected NAME at \$.data.attributes.createdDate.")
   }
 
   /**
@@ -125,6 +125,6 @@ class SubmissionLogUrlResponseJsonTest {
     val submissionLogUrlResponseJsonResult = SubmissionLogUrlResponseJson.create(jsonString)
 
     assertThat(submissionLogUrlResponseJsonResult).isErrAnd().prop(NotaryToolError.JsonParseError::msg)
-      .isEqualTo("Error parsing json: Expected BEGIN_OBJECT but was STRING at path \$.")
+      .isEqualTo("Error parsing JSON: Expected BEGIN_OBJECT but was STRING at path \$.")
   }
 }

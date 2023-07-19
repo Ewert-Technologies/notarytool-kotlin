@@ -111,7 +111,7 @@ class SubmissionResponseJsonTests {
     submissionResponseJsonResult.onFailure { jsonParseError ->
       log.info { jsonParseError.toString() }
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::msg)
-        .isEqualTo("Json String is <null> or empty.")
+        .isEqualTo("JSON String is <null> or empty.")
     }
   }
 
@@ -128,7 +128,7 @@ class SubmissionResponseJsonTests {
     submissionResponseJsonResult.onFailure { jsonParseError ->
       log.info { jsonParseError.toString() }
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::msg)
-        .isEqualTo("Json String is <null> or empty.")
+        .isEqualTo("JSON String is <null> or empty.")
     }
   }
 
@@ -159,7 +159,7 @@ class SubmissionResponseJsonTests {
     errorResponseJsonResult.onFailure { jsonParseError ->
       log.info { jsonParseError.toString() }
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::msg)
-        .isEqualTo("Error parsing json: Cannot skip unexpected NAME at \$.data.attributes.status code.")
+        .isEqualTo("Error parsing JSON: Cannot skip unexpected NAME at \$.data.attributes.status code.")
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::jsonString)
         .isEqualTo(jsonString)
     }
@@ -181,7 +181,7 @@ class SubmissionResponseJsonTests {
     errorResponseJsonResult.onFailure { jsonParseError ->
       log.info { jsonParseError.toString() }
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::msg)
-        .isEqualTo("Error parsing json: Expected BEGIN_OBJECT but was STRING at path \$.")
+        .isEqualTo("Error parsing JSON: Expected BEGIN_OBJECT but was STRING at path \$.")
       assertThat(jsonParseError).prop(NotaryToolError.JsonParseError::jsonString)
         .isEqualTo(jsonString)
     }

@@ -530,12 +530,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     val submissionLogResult =
       notaryToolClient.retrieveSubmissionLog(SubmissionId(("b014d72f-17b6-45ac-abdf-8f39b9241c58")))
 
-    assertThat(submissionLogResult).isErr()
-    submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
-      log.info { "$notaryToolError" }
-      assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Expected URL scheme 'http' or 'https' but no scheme was found for bad/ur....")
-    }
+    val submissionLogErrorAssert =
+      assertThat(submissionLogResult).isErrAnd().isInstanceOf<NotaryToolError.SubmissionLogError>()
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::msg).isEqualTo("Invalid submission log URL.")
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+      .isEqualTo("Expected URL scheme 'http' or 'https' but no scheme was found for bad/ur...")
   }
 
   /**
@@ -575,12 +574,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     val submissionLogResult =
       notaryToolClient.retrieveSubmissionLog(SubmissionId(("b014d72f-17b6-45ac-abdf-8f39b9241c58")))
 
-    assertThat(submissionLogResult).isErr()
-    submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
-      log.info { "$notaryToolError" }
-      assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Invalid URL host: \"\".")
-    }
+    val submissionLogErrorAssert =
+      assertThat(submissionLogResult).isErrAnd().isInstanceOf<NotaryToolError.SubmissionLogError>()
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::msg).isEqualTo("Invalid submission log URL.")
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+      .isEqualTo("Invalid URL host: \"\"")
   }
 
   /**
@@ -620,12 +618,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     val submissionLogResult =
       notaryToolClient.retrieveSubmissionLog(SubmissionId(("b014d72f-17b6-45ac-abdf-8f39b9241c58")))
 
-    assertThat(submissionLogResult).isErr()
-    submissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
-      log.info { "$notaryToolError" }
-      assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: Expected URL scheme 'http' or 'https' but no scheme was found for .")
-    }
+    val submissionLogErrorAssert =
+      assertThat(submissionLogResult).isErrAnd().isInstanceOf<NotaryToolError.SubmissionLogError>()
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::msg).isEqualTo("Invalid submission log URL.")
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+      .isEqualTo("Expected URL scheme 'http' or 'https' but no scheme was found for ")
   }
 
   /**
@@ -831,10 +828,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     val downloadSubmissionLogResult =
       notaryToolClient.downloadSubmissionLog(SubmissionId("b014d72f-17b6-45ac-abdf-8f39b9241c58"), logFileLocation)
 
-    assertThat(downloadSubmissionLogResult).isErr()
-    downloadSubmissionLogResult.onFailure { notaryToolError ->
-      assertThat(notaryToolError).isInstanceOf<NotaryToolError.SubmissionLogError>()
-      assertThat(notaryToolError.msg).isEqualTo("Invalid submission log URL: C:\\Windows\\submissionLog.json (Access is denied).")
-    }
+    val submissionLogErrorAssert =
+      assertThat(downloadSubmissionLogResult).isErrAnd().isInstanceOf<NotaryToolError.SubmissionLogError>()
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::msg)
+      .isEqualTo("Error downloading submission log.")
+    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+      .isEqualTo("C:\\Windows\\submissionLog.json (Access is denied)")
   }
 }

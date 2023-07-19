@@ -1,6 +1,7 @@
 package ca.ewert.notarytoolkotlin.json.notaryapi
 
 import ca.ewert.notarytoolkotlin.NotaryToolError
+import ca.ewert.notarytoolkotlin.i18n.ErrorStringsResource
 import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
@@ -40,13 +41,16 @@ data class ErrorResponseJson(
           if (errorResponseJson != null) {
             Ok(errorResponseJson)
           } else {
-            Err(NotaryToolError.JsonParseError("Error creating Json Object.", jsonString))
+            val msg = ErrorStringsResource.getString("json.parse.other.error")
+            Err(NotaryToolError.JsonParseError(msg, jsonString))
           }
         } catch (jsonDataException: JsonDataException) {
-          Err(NotaryToolError.JsonParseError("Error parsing json: ${jsonDataException.message}.", jsonString))
+          val msg = ErrorStringsResource.getString("json.parse.error").format(jsonDataException.localizedMessage)
+          Err(NotaryToolError.JsonParseError(msg, jsonString))
         }
       } else {
-        Err(NotaryToolError.JsonParseError("Json String is <null> or empty.", jsonString = jsonString))
+        val msg = ErrorStringsResource.getString("json.parse.null.blank.error")
+        Err(NotaryToolError.JsonParseError(msg, jsonString = jsonString))
       }
     }
   }

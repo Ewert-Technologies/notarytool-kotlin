@@ -38,7 +38,7 @@ data class NewSubmissionRequestJson(
   companion object {
 
     /**
-     * Takes a [NewSubmissionAttributesJson] object and attempts to convert it
+     * Takes a [NewSubmissionAttributesJson] object and attempts to serialize it
      * to a json String.
      *
      * @param newSubmissionRequestJson
@@ -50,7 +50,8 @@ data class NewSubmissionRequestJson(
       return try {
         Ok(jsonAdapter.toJson(newSubmissionRequestJson))
       } catch (jsonDataException: JsonDataException) {
-        Err(NotaryToolError.JsonCreateError("error", newSubmissionRequestJson.toString()))
+        val msg = ErrorStringsResource.getString("json.create.error").format(jsonDataException.localizedMessage)
+        Err(NotaryToolError.JsonCreateError(msg, newSubmissionRequestJson.toString()))
       }
     }
   }

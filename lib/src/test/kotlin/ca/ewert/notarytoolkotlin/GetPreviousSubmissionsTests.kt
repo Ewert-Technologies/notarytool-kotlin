@@ -331,7 +331,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       when (error) {
         is NotaryToolError.JsonParseError -> {
           log.info { error }
-          assertThat(error.msg).isEqualTo("Error parsing json: Cannot skip unexpected NAME at \$.datas.")
+          assertThat(error.msg).isEqualTo("Error parsing JSON: Cannot skip unexpected NAME at \$.datas.")
           assertThat(error.jsonString).isEqualTo(responseBody)
         }
 

@@ -374,10 +374,7 @@ class NotaryToolClient internal constructor(
       log.warn(exception) { "Error uploading file to AWS S3 Bucket" }
       s3Client.close()
       Err(
-        NotaryToolError.AwsUploadError(
-          "An error occurred while uploading file to AWS S3 Bucket: ${exception.localizedMessage}",
-          exception,
-        ),
+        NotaryToolError.AwsUploadError(exceptionMsg = exception.localizedMessage),
       )
     }
   }
@@ -572,10 +569,9 @@ class NotaryToolClient internal constructor(
           userAgent = this.userAgent,
         )
       } catch (illegalArgumentException: IllegalArgumentException) {
-        val msg: String = ErrorStringsResource.getString("submission.log.invalid.url.error")
-          .format(illegalArgumentException.localizedMessage)
         log.warn(illegalArgumentException) { "Error parsing submission Log URL." }
-        Err(NotaryToolError.SubmissionLogError(msg = msg))
+        val msg: String = ErrorStringsResource.getString("submission.log.invalid.url.error")
+        Err(NotaryToolError.SubmissionLogError(msg = msg, exceptionMsg = illegalArgumentException.localizedMessage))
       }
     }
   }
@@ -602,8 +598,7 @@ class NotaryToolClient internal constructor(
       } catch (exception: Exception) {
         log.warn(exception) { "Error downloading Submission Log" }
         val msg: String = ErrorStringsResource.getString("submission.log.download.error")
-          .format(exception.localizedMessage)
-        Err(NotaryToolError.SubmissionLogError(msg = msg))
+        Err(NotaryToolError.SubmissionLogError(msg = msg, exceptionMsg = exception.localizedMessage))
       }
     }
   }
@@ -798,7 +793,7 @@ private fun downloadSubmissionLogContents(
           else -> {
             Err(
               NotaryToolError.HttpError.OtherError(
-                msg = ErrorStringsResource.getString("http.other.error"),
+                msg = ErrorStringsResource.getString("submission.log.http.other.error"),
                 responseMetaData = responseMetaData,
               ),
             )
