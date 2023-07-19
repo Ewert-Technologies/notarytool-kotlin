@@ -259,7 +259,7 @@ publishing {
 tasks.register("release") {
   group = project.name
   description = "Creates a release"
-  dependsOn("buildInfo", "build", "kotlinSourcesJar", "dokkaHtmlPublic")
+  dependsOn("buildInfo", "build", "kotlinSourcesJar", "dokkaHtmlPublic", "publishMavenPublicationToMavenLocal")
 
   doLast {
     val relDir = file(Paths.get("rel", "${project.version}"))
