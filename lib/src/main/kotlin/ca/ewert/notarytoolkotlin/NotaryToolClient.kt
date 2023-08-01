@@ -467,7 +467,7 @@ class NotaryToolClient internal constructor(
           progressCallback(count, submissionStatusResponse)
           log.debug { "Current status: $submissionStatusResponse.submissionInfo.status" }
           when (submissionStatusResponse.submissionInfo.status) {
-            Status.ACCEPTED, Status.REJECTED -> return submissionStatusResult
+            Status.ACCEPTED, Status.REJECTED, Status.INVALID -> return submissionStatusResult
             else -> {}
           }
         }

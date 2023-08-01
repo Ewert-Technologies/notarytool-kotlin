@@ -592,6 +592,80 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
   }
 
   /**
+   * Tests polling where the final status is Rejected.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("Polling Invalid Test")
+  fun pollStatusInvalid() {
+    val responseBodyInProgress: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "In Progress"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    val responseBodyInvalid: String = """
+    {
+      "data": {
+        "attributes": {
+          "createdDate": "2022-06-08T01:38:09.498Z",
+          "name": "OvernightTextEditor_11.6.8.zip",
+          "status": "Invalid"
+        },
+        "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+        "type": "submissions"
+      },
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInvalid))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyFile = this.privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val submissionIdResult = SubmissionId.of("2efe2717-52ef-43a5-96dc-0797e4ca1041")
+    submissionIdResult.onSuccess { submissionId ->
+      val result = notaryToolClient.pollSubmissionStatus(
+        submissionId = submissionId,
+        maxPollCount = 10,
+        delayFunction = { _: Int -> Duration.ofSeconds(5) },
+        progressCallback = { currentPollCount, submissionStatusResponse ->
+          println("$currentPollCount - Current Status: ${submissionStatusResponse.submissionInfo.status} at ${ZonedDateTime.now()}")
+        },
+      )
+      log.info { "Done" }
+      result.onSuccess { submissionStatusResponse ->
+        assertThat(submissionStatusResponse.submissionInfo.status).isEqualTo(Status.INVALID)
+      }
+      result.onFailure { notaryToolError -> fail(AssertionError(notaryToolError.msg)) }
+    }
+  }
+
+  /**
    * Tests polling where an error occurs after several iterations.
    */
   @Test
