@@ -539,7 +539,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
     }
     """.trimIndent()
 
-    val responseBodyAccepted: String = """
+    val responseBodyRejected: String = """
     {
       "data": {
         "attributes": {
@@ -560,7 +560,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
     mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
     mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
     mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
-    mockWebServer.enqueue(createMockResponse200(responseBodyAccepted))
+    mockWebServer.enqueue(createMockResponse200(responseBodyRejected))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("")
