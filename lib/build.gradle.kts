@@ -62,7 +62,7 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-  implementation(group = "software.amazon.awssdk", name = "s3", version = "2.20.105")
+  implementation(group = "software.amazon.awssdk", name = "s3", version = "2.20.117")
 
   // Logging
   implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "4.0.2")
@@ -70,7 +70,7 @@ dependencies {
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
 
   // Testing
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.9.3")
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.0")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
 }
