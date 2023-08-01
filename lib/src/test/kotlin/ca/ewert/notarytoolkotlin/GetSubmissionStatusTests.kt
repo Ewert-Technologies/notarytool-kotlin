@@ -561,6 +561,7 @@ class GetSubmissionStatusTests : NotaryToolClientTests() {
     mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
     mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
     mockWebServer.enqueue(createMockResponse200(responseBodyRejected))
+    mockWebServer.enqueue(createMockResponse200(responseBodyInProgress))
 
     mockWebServer.start()
     val baseUrl: HttpUrl = mockWebServer.url("")
