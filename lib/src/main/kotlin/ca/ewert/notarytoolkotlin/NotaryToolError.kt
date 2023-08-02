@@ -17,6 +17,9 @@ sealed interface NotaryToolError {
   /** The error message. */
   val msg: String
 
+  /** Longer message if available, otherwise the same as [msg] */
+  val longMsg: String
+
   /**
    * Top-level parent of all errors related to credentials received from the end-user, i.e. the user attempting
    * to notarize the software.
@@ -41,8 +44,11 @@ sealed interface NotaryToolError {
      */
     data class MalformedSubmissionIdError internal constructor(val malformedId: String) : UserInputError {
 
-      /** Error message details */
+      /** The error message. */
       override val msg: String = ErrorStringsResource.getString("submission.id.invalid.string.error")
+
+      /** Error message that includes the Invalid String. */
+      override val longMsg: String = "$msg Invalid String: $malformedId"
     }
 
     /**
@@ -54,7 +60,11 @@ sealed interface NotaryToolError {
      * @property msg Error message details, as reported by the Notary API.
      * @author Victor Ewert
      */
-    data class InvalidSubmissionIdError internal constructor(override val msg: String) : UserInputError
+    data class InvalidSubmissionIdError internal constructor(override val msg: String) : UserInputError {
+
+      /** Same as [msg]. */
+      override val longMsg: String = msg
+    }
 
     /**
      * An error caused when the request to the Notary API Web Service fails the
@@ -68,6 +78,9 @@ sealed interface NotaryToolError {
      */
     data class AuthenticationError internal constructor(override val msg: String) : UserInputError {
       constructor() : this(ErrorStringsResource.getString("authentication.error"))
+
+      /** Same as [msg]. */
+      override val longMsg: String = msg
     }
 
     /**
@@ -90,6 +103,9 @@ sealed interface NotaryToolError {
         /** Error message details. */
         override val msg: String = ErrorStringsResource.getString("jwt.private.key.file.not.exist.error")
           .format(privateKeyFilePath.absolutePathString())
+
+        /** Same as [msg] */
+        override val longMsg: String = msg
       }
 
       /**
@@ -103,17 +119,25 @@ sealed interface NotaryToolError {
 
         /** The error message. */
         override val msg: String = ErrorStringsResource.getString("jwt.invalid.private.key.format.error")
+
+        /** The error message, including the [exceptionMsg]. */
+        override val longMsg: String = "$msg $exceptionMsg"
       }
 
       /**
        * An error for when there is a problem or Exception when generating or signing
        * the Json Web Token.
        *
-       * @property msg Error message including any Exception message.
+       * @property exceptionMsg More detailed message from the causing Exception.
        * @author Victor Ewert
        */
       data class TokenCreationError internal constructor(val exceptionMsg: String) : JsonWebTokenError {
+
+        /** The error message. */
         override val msg: String = ErrorStringsResource.getString("jwt.create.error")
+
+        /** The error message, including the [exceptionMsg]. */
+        override val longMsg: String = "$msg $exceptionMsg"
       }
     }
   }
@@ -137,7 +161,11 @@ sealed interface NotaryToolError {
     data class ClientError4xx internal constructor(
       override val msg: String,
       override val responseMetaData: ResponseMetaData,
-    ) : HttpError
+    ) : HttpError {
+
+      /** Same as [msg]. */
+      override val longMsg: String = msg
+    }
 
     /**
      * A Server Error response, in the range of 500 to 599: *"The server failed to fulfil
@@ -148,7 +176,11 @@ sealed interface NotaryToolError {
     data class ServerError5xx internal constructor(
       override val msg: String,
       override val responseMetaData: ResponseMetaData,
-    ) : HttpError
+    ) : HttpError {
+
+      /** Same as [msg]. */
+      override val longMsg: String = msg
+    }
 
     /**
      * Any other HTTP Error.
@@ -158,7 +190,11 @@ sealed interface NotaryToolError {
     data class OtherError internal constructor(
       override val msg: String,
       override val responseMetaData: ResponseMetaData,
-    ) : HttpError
+    ) : HttpError {
+
+      /** Same as [msg]. */
+      override val longMsg: String = msg
+    }
   }
 
   /**
@@ -170,7 +206,11 @@ sealed interface NotaryToolError {
    * @property jsonString The json String that was used deserializing, if available.
    * @author Victor Ewert
    */
-  data class JsonParseError internal constructor(override val msg: String, val jsonString: String?) : NotaryToolError
+  data class JsonParseError internal constructor(override val msg: String, val jsonString: String?) : NotaryToolError {
+
+    /** Same as [msg]. */
+    override val longMsg: String = msg
+  }
 
   /**
    * An error caused when there is a problem serializing a data object into a json string.
@@ -180,7 +220,11 @@ sealed interface NotaryToolError {
    * when serializing into the json String.
    * @author Victor Ewert
    */
-  data class JsonCreateError internal constructor(override val msg: String, val dataObject: String) : NotaryToolError
+  data class JsonCreateError internal constructor(override val msg: String, val dataObject: String) : NotaryToolError {
+
+    /** Same as [msg]. */
+    override val longMsg: String = msg
+  }
 
   /**
    * An error caused when there is a problem retrieving the submission log for a specific software submission.
@@ -192,7 +236,11 @@ sealed interface NotaryToolError {
    * @author Victor Ewert
    */
   data class SubmissionLogError internal constructor(override val msg: String, val exceptionMsg: String) :
-    NotaryToolError
+    NotaryToolError {
+
+    /** The error message, including the [exceptionMsg]. */
+    override val longMsg: String = "$msg $exceptionMsg"
+  }
 
   /**
    * An error caused when there is a connection issue. Examples: no internet connection, the connection
@@ -200,7 +248,11 @@ sealed interface NotaryToolError {
    *
    * @property msg The connection error message.
    */
-  data class ConnectionError internal constructor(override val msg: String) : NotaryToolError
+  data class ConnectionError internal constructor(override val msg: String) : NotaryToolError {
+
+    /** Same as [msg]. */
+    override val longMsg: String = msg
+  }
 
   /**
    * An error that can occur when uploading the software submission to the
@@ -210,8 +262,11 @@ sealed interface NotaryToolError {
    */
   data class AwsUploadError internal constructor(val exceptionMsg: String) : NotaryToolError {
 
-    /** The error message */
+    /** The error message. */
     override val msg: String = ErrorStringsResource.getString("aws.upload.error")
+
+    /** The error message, including the [exceptionMsg]. */
+    override val longMsg: String = "$msg $exceptionMsg"
   }
 
   /**
@@ -220,8 +275,11 @@ sealed interface NotaryToolError {
    */
   data class PollingTimeout internal constructor(val maxCount: Int) : NotaryToolError {
 
-    /** Polling count message */
+    /** Polling count message. */
     override val msg: String = ErrorStringsResource.getString("polling.timeout.msg").format(maxCount)
+
+    /** Same as [msg]. */
+    override val longMsg: String = msg
   }
 
   /**
@@ -229,5 +287,9 @@ sealed interface NotaryToolError {
    *
    * @author Victor Ewert
    */
-  data class GeneralError internal constructor(override val msg: String) : NotaryToolError
+  data class GeneralError internal constructor(override val msg: String) : NotaryToolError {
+
+    /** Same as [msg]. */
+    override val longMsg: String = msg
+  }
 }
