@@ -91,12 +91,17 @@ kotlin {
 }
 
 //
-// Set up various Properties and Constants used by the build script
+// Set up various Properties and Constants used by the build scr
 //
 
 // Application Properties
+val longName: String by project
 val author: String by project
+val authorEmail: String by project
 val company: String by project
+val companyUrl: String by project
+val group: String by project
+val copyrightYear: String by project
 
 //
 // Configure dependencyUpdates
