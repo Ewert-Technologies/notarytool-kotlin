@@ -57,7 +57,6 @@ dependencies {
 
   // Other
   implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
-  implementation(group = "io.github.nefilim.kjwt", name = "kJWT", version = "0.1.6")
   implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
