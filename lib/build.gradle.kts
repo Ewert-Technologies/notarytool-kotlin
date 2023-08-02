@@ -147,7 +147,7 @@ tasks.jar {
     attributes["Version"] = version
     attributes["Build-Timestamp"] = Instant.now().toString()
     attributes["Created-By"] = "Gradle ${gradle.gradleVersion}"
-    attributes["Build-Toolchain"] = "Java 11 ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})"
+    attributes["Build-Toolchain"] = "Java ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})"
   }
 }
 
