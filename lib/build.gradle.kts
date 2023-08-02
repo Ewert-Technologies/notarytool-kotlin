@@ -97,6 +97,7 @@ kotlin {
 // Application Properties
 val longName: String by project
 val author: String by project
+val projectUrl: String by project
 val authorEmail: String by project
 val company: String by project
 val companyUrl: String by project
@@ -234,20 +235,27 @@ publishing {
       from(components["kotlin"])
 
       pom {
-        name.set("Notarytool Kotlin Library")
+        name.set(longName)
         description.set(project.description)
-        url.set("https://www.ewert-technologies.ca")
-        inceptionYear.set("2023")
+        url.set(projectUrl)
+        inceptionYear.set(copyrightYear)
+
+        properties.set(
+          mapOf(
+            "project.build.sourceEncoding" to "UTF-8",
+            "java.version" to "${java.toolchain.languageVersion.get()}"
+          )
+        )
 
         organization {
-          name.set("Ewert Technologies")
-          url.set("https://www.ewert-technologies.ca")
+          name.set(company)
+          url.set(companyUrl)
         }
 
         developers {
           developer {
-            name.set("Victor Ewert")
-            email.set("victor.ewert@ewert-technologies.ca")
+            name.set(author)
+            email.set(authorEmail)
           }
         }
       }
