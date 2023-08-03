@@ -84,13 +84,13 @@ private val log = KotlinLogging.logger {}
  * @author Victor Ewert
  */
 class NotaryToolClient internal constructor(
-  private val privateKeyId: String,
-  private val issuerId: String,
-  private val privateKeyFile: Path,
-  private val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
+  val privateKeyId: String,
+  val issuerId: String,
+  val privateKeyFile: Path,
+  val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
   private val baseUrlString: String,
-  private val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
-  private val userAgent: String = USER_AGENT_VALUE,
+  val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
+  val userAgent: String = USER_AGENT_VALUE,
 ) {
 
   /**
