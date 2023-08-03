@@ -72,23 +72,14 @@ private val log = KotlinLogging.logger {}
  *
  * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API. Used for
  * testing with MockWebServer
- * @param privateKeyId The private key ID, provided by Apple.
  * @property privateKeyId The private key ID, provided by Apple.
- * @param issuerId The issuer ID, provided by Apple.
  * @property issuerId The issuer ID, provided by Apple.
- * @param privateKeyFile The Private Key file `.p8` provided by Apple
  * @property privateKeyFile The Private Key file `.p8` provided by Apple
- * @param tokenLifetime Lifetime of the token used for Authentication. It should be less than 20 minutes,
- * or request will be rejected by Apple. The default value is **15 minutes**
  * @property tokenLifetime Lifetime of the token used for Authentication. It should be less than 20 minutes,
- *  * or request will be rejected by Apple. The default value is **15 minutes**
- * @param baseUrlString The base url of Apple's Notary Web API. The default value is:
- * `https://appstoreconnect.apple.com/notary/v2`. This should only be used for testing purposes.
+ * or request will be rejected by Apple. The default value is **15 minutes**
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
  * `https://appstoreconnect.apple.com/notary/v2` This should only be used for testing purposes.
- * @param connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
  * @property connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
- * @param userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
  * @property userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
  * @author Victor Ewert
  */
