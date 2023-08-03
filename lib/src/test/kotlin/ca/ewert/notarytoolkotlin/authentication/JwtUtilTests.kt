@@ -108,7 +108,7 @@ class JwtUtilTests {
     )
 
     val expectedMsg =
-      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist"
+      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist."
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
     generateJwtResult.onFailure { jsonWebTokenError ->
       assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError)
@@ -335,7 +335,7 @@ class JwtUtilTests {
   @Test
   fun parsePrivateKeyFromFileTest4() {
     val expectedMsg =
-      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist"
+      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist."
     val privateKeyFile = Paths.get("./noFile.file")
     assertThat(parsePrivateKeyString(privateKeyFile)).isErrAnd().hasMessage(expectedMsg)
   }
