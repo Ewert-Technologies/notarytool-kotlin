@@ -30,6 +30,10 @@ fun main(args: Array<String>) {
       privateKeyFile = privateKeyFile,
     )
 
+    println(notaryToolClient.tokenLifetime)
+    println(notaryToolClient.connectTimeout)
+    println(notaryToolClient.userAgent)
+
     when (val result = notaryToolClient.getPreviousSubmissions()) {
       is Ok -> {
         val submissionListResponse = result.value
