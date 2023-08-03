@@ -2,7 +2,7 @@
 
 ## Description
 
-A wrapper/library for notarizing applications
+A wrapper/library for notarizing applications for macOS,
 using [Apples Notary Web Service REST API](https://developer.apple.com/documentation/notaryapi). This library tries to
 following the Notary API, as closely as possible, mapping methods to the Endpoints calls. It also provides some
 convenience methods that groups several Endpoint calls together.
@@ -24,7 +24,6 @@ This library is available on Maven Central.
 ### Maven
 
 ```xml
-
 <dependency>
   <groupId>ca.ewert.notarytoolkotlin</groupId>
   <artifactId>notarytool-kotlin</artifactId>
@@ -42,7 +41,7 @@ implementation "ca.ewert.notarytoolkotlin:notarytool-kotlin:0.1.0"
 
 ### Pre-Requisites
 
-In order to notarize an application, you need to have an Apple Developer ID account with access to App Store Connect. In
+To be able to notarize an application on macOS, you need to have an Apple Developer ID account with access to App Store Connect. In
 order to make calls to the Notary API, you first need to create an API Key,
 see: [Creating API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
 for instructions. After creating an API key, you should have the following information:
@@ -53,9 +52,9 @@ for instructions. After creating an API key, you should have the following infor
 | Private Key ID | Your Private key ID from App Store Connect                     |
 | Private Key    | The `.p8` file downloaded when creating the API Key            |
 
-These items are used to generate a JSON Web Token (JWT), used as authentication when making calls to the Notary API see
-[Generating Tokens for API Requests](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests).
-Note: the JWT is created for you automatically by the library.
+These items are used to generate a JSON Web Token (JWT), used for authentication when making calls to the Notary API (see
+[Generating Tokens for API Requests](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests) for more information).
+Note: the JWT is created for you automatically by this library.
 
 ### NotaryToolClient
 
