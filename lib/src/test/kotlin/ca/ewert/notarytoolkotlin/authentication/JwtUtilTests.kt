@@ -17,6 +17,7 @@ import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.apache.commons.lang3.SystemUtils
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -107,8 +108,11 @@ class JwtUtilTests {
       expiryDate.toInstant(),
     )
 
-    val expectedMsg =
+    val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
       "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist."
+    } else {
+      "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/notExist.file' does not exist."
+    }
     assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
     generateJwtResult.onFailure { jsonWebTokenError ->
       assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError)
@@ -334,8 +338,12 @@ class JwtUtilTests {
    */
   @Test
   fun parsePrivateKeyFromFileTest4() {
-    val expectedMsg =
+    val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
       "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist."
+    } else {
+      "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/./noFile.file' does not exist."
+    }
+
     val privateKeyFile = Paths.get("./noFile.file")
     assertThat(parsePrivateKeyString(privateKeyFile)).isErrAnd().hasMessage(expectedMsg)
   }

@@ -23,13 +23,13 @@ import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
 import okhttp3.HttpUrl
 import okhttp3.mockwebserver.SocketPolicy
+import org.apache.commons.lang3.SystemUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import java.net.URL
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 private val log = KotlinLogging.logger {}
 
@@ -734,7 +734,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
   @Tag("Local")
   @DisplayName("Download Submission Log Success - Test")
   fun downloadSubmissionLogSuccessTest() {
-    val logFileLocation: Path = Paths.get("D:", "users", "vewert", "Downloads", "submissionLog.json")
+    val logFileLocation: Path = if (SystemUtils.IS_OS_WINDOWS) {
+      Path.of("D:", "users", "vewert", "Downloads", "submissionLog.json")
+    } else {
+      Path.of("/", "users", "vewert", "Downloads", "submissionLog.json")
+    }
     log.info { "logFileLocation: $logFileLocation" }
 
     mockWebServer.start()
@@ -790,7 +794,11 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
   @Tag("Local")
   @DisplayName("Download Submission Log Fail - Test")
   fun downloadSubmissionLogFailTest() {
-    val logFileLocation: Path = Paths.get("C:", "Windows", "submissionLog.json")
+    val logFileLocation = if (SystemUtils.IS_OS_WINDOWS) {
+      Path.of("C:", "Windows", "submissionLog.json")
+    } else {
+      Path.of("/", "System", "submissionLog.json")
+    }
     log.info { "logFileLocation: $logFileLocation" }
 
     mockWebServer.start()
@@ -832,7 +840,13 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
       assertThat(downloadSubmissionLogResult).isErrAnd().isInstanceOf<NotaryToolError.SubmissionLogError>()
     submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::msg)
       .isEqualTo("Error downloading submission log.")
-    submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
-      .isEqualTo("C:\\Windows\\submissionLog.json (Access is denied)")
+
+    if (SystemUtils.IS_OS_WINDOWS) {
+      submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+        .isEqualTo("C:\\Windows\\submissionLog.json (Access is denied)")
+    } else {
+      submissionLogErrorAssert.prop(NotaryToolError.SubmissionLogError::exceptionMsg)
+        .isEqualTo("/System/submissionLog.json (Operation not permitted)")
+    }
   }
 }
