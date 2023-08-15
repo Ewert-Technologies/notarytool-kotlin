@@ -53,24 +53,24 @@ import kotlin.io.path.absolutePathString
 private val log = KotlinLogging.logger {}
 
 /**
- * Client used to make requests to Apple's Notary Web API. The client can be used to:
+ * Client used to make requests to Apple's Notary API Web Service. The client can be used to:
  * - Submit software to be notarized [submitSoftware]
- * - Upload the software file to be notarized [submitAndUploadSoftware]
+ * - Submit and upload the software file to be notarized [submitAndUploadSoftware]
  * - Check the status of a specific notarization submission: [getSubmissionStatus]
- * - Get the url of a submission log [getSubmissionLog]
- * - View the submission log of a submission: [retrieveSubmissionLog]
+ * - Get the url of the submission log for a previous submission [getSubmissionLog]
+ * - View the submission log of a previous submission: [retrieveSubmissionLog]
  * - View a history of the latest submissions: [getPreviousSubmissions]
  *
  * In order to use this client you will need an API Key from Apple, which provides
- * the following pieces of information that are required to create the client:
+ * the following credentials, that are required to create the client:
+ * - Issuer ID
  * - Private Key ID
  * - Private key, in the form of a `.p8` file
- * - Issuer ID
  *
  * See [Create API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
  * for more information.
  *
- * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API. Used for
+ * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary API Web Service. Used for
  * testing with MockWebServer
  * @property privateKeyId The private key ID, provided by Apple.
  * @property issuerId The issuer ID, provided by Apple.
@@ -80,7 +80,7 @@ private val log = KotlinLogging.logger {}
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
  * `https://appstoreconnect.apple.com/notary/v2` This should only be used for testing purposes.
  * @property connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
- * @property userAgent Custom `"User-Agent"` to use when sending requests. The default is `notarytool-kotlin/x.y.z`
+ * @property userAgent Custom `"User-Agent"` to use when sending requests to the Web Service. The default is `notarytool-kotlin/x.y.z`
  * @author Victor Ewert
  */
 class NotaryToolClient internal constructor(
@@ -94,9 +94,8 @@ class NotaryToolClient internal constructor(
 ) {
 
   /**
-   * Public constructor.
+   * Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary API Web Service.
    *
-   * @constructor Creates a [NotaryToolClient] that can be used to make requests to Apple's Notary Web API.
    * @param privateKeyId The private key ID, provided by Apple.
    * @param issuerId The issuer ID, provided by Apple.
    * @param privateKeyFile The Private Key file `.p8` provided by Apple
@@ -188,22 +187,23 @@ class NotaryToolClient internal constructor(
     )
 
   /**
-   * Start the process of uploading a new version of your software to the notary service.
+   * Starts the process of uploading a new version of your software to the notary service.
+   * Calls the [Submit Software](https://developer.apple.com/documentation/notaryapi/submit_software) endpoint.
    *
-   * Use this function to tell the notary service about a new software submission that you want to make.
+   * Use this method to tell the notary service about a new software submission that you want to make.
    * Do this when you want to notarize a new version of your software.
    *
    * The service responds with temporary security credentials that you use to submit the
    * software to Amazon S3 and a submission identifier that you use to track the submission's status.
    *
    * After uploading your software, you can use the identifier to ask the notary service for the
-   * status of your submission using the Get Submission Status endpoint. If you lose the identifier,
+   * status of your submission using the [getSubmissionStatus] endpoint. If you lose the identifier,
    * you can get a list of your team's 100 most recent submissions using the
    * [getPreviousSubmissions] method. After notarization completes, use the
    * [getSubmissionLog] to get details about the outcome of notarization. Do this even if notarization
    * succeeds, because the log might contain warnings that you can fix before your next submission.
    *
-   * This function only starts a submission, but doesn't upload the file to Amazon S3. Use this
+   * This method only starts a submission, but doesn't upload the file to Amazon S3. Use this
    * if you want to upload the file to Amazon S3 yourself. Use [submitAndUploadSoftware] to submit and
    * upload at the same time.
    *
@@ -250,10 +250,10 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * A Convenience function that calls [submitSoftware] to retrieve the Amazon S3 security credentials
-   * and then uses those credentials to upload the file to the Amazon S3 Server. After uploading your software,
-   * you can use the returned [AwsUploadData] to get the [SubmissionId] and used that to query the notary service
-   * for the status of your submission using the [getSubmissionStatus] function.
+   * A convenience method that calls [submitSoftware] to retrieve the Amazon S3 security credentials,
+   * and then uses those credentials to upload the file to the Amazon S3 server. After uploading your software,
+   * you can use the returned [AwsUploadData] to get the [SubmissionId], and use that to query the notary service
+   * for the status of your submission using the [getSubmissionStatus] method.
    *
    * @param softwareFile Path to the software file being submitted.
    * @return [AwsUploadData] information about the upload including the submissionId,
@@ -275,7 +275,7 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * Helper function that creates the Request to be sent to the Notary API.
+   * Helper method that creates the Request to be sent to the Notary API.
    *
    * @param softwarePath Path to the software file being submitted.
    * @param url Url to send the Request to
@@ -375,15 +375,15 @@ class NotaryToolClient internal constructor(
    * Calls the [Get Submission Status](https://developer.apple.com/documentation/notaryapi/get_submission_status)
    * Endpoint.
    *
-   * Use this function to fetch the status of a submission request. Supply the identifier that was received in the id
-   * field of the response to the Submit Software function.
+   * Use this method to fetch the status of a submission request. Supply the identifier that was received in the id
+   * field of the response to the [submitSoftware] method.
    * If the identifier is no longer available, you can get a list of the most recent 100 submissions by
-   * calling the [getPreviousSubmissions] function.
+   * calling the [getPreviousSubmissions] method.
    *
    * Along with the status of the request, the response indicates the date that you initiated
    * the request and the software name that you provided at that time.
    *
-   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * @param submissionId The identifier that you receive from the notary service when you use [submitSoftware]
    * to start a new submission.
    * @return The [SubmissionStatusResponse] or a [NotaryToolError]
    */
@@ -435,11 +435,14 @@ class NotaryToolClient internal constructor(
 
   /**
    * Polls the Notary API Web service, checking on the status of a submission.
-   * It calls [getSubmissionStatus] [maxPollCount] number of times, with a delay
+   * It calls [getSubmissionStatus] `maxPollCount` number of times, with a delay
    * of [delayFunction] between each request. To allow 'backing off' the delay can be expressed
    * as a function of the current count.
+   * 
+   * The polling will end when the submission status is
+   * one of `Accepted`, `Invalid` or `Rejected`, or when the `maxPollCount` is reached
    *
-   * @param submissionId The id of the submission
+   * @param submissionId The id of the submission to check the results for.
    * @param maxPollCount The maximum number of times the status should be checked before 'timing out'.
    * @param delayFunction A function used to calculate the delay, based on the current iteration count.
    * @param progressCallback A callback function that will be called after each iteration when
@@ -472,11 +475,11 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * Fetch details about a single completed notarization.
+   * Fetches details about a single completed notarization.
    * Calls the [Get Submission Log](https://developer.apple.com/documentation/notaryapi/get_submission_log)
    * Endpoint.
    *
-   * Use this function to get a URL that you can download a log file from that enumerates any issues
+   * Use this method to get a URL that you can download a log file from that enumerates any issues
    * found by the notary service. The URL that you receive is temporary, so be sure to use it to immediately
    * fetch the log. If you need the log again in the future, ask for the URL again.
    *
@@ -484,12 +487,12 @@ class NotaryToolClient internal constructor(
    * For information about how to deal with common notarization problems,
    * see [Resolving common notarization issues.](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/resolving_common_notarization_issues)
    *
-   * This function only returns the url for the log file, to retrieve the contents of the file
+   * This method only returns the URL for the log file, to retrieve the contents of the file
    * use [retrieveSubmissionLog], or to download the log to a file use [downloadSubmissionLog]
    *
-   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * @param submissionId The identifier that you receive from the notary service when you use [submitSoftware]
    * to start a new submission.
-   * @return A [SubmissionLogUrlResponse] containing the log url, or a [NotaryToolError]
+   * @return A [SubmissionLogUrlResponse] containing the log URL, or a [NotaryToolError]
    */
   fun getSubmissionLog(submissionId: SubmissionId): Result<SubmissionLogUrlResponse, NotaryToolError> {
     return when (this.jsonWebTokenResult) {
@@ -544,7 +547,7 @@ class NotaryToolClient internal constructor(
    * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
    * and uses the url to retrieve the submission log as a String.
    *
-   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * @param submissionId The identifier that you receive from the notary service when you use [submitSoftware]
    * to start a new submission.
    * @return The submission log contents or a [NotaryToolError]
    */
@@ -568,11 +571,11 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * Requests the submission log url from the Notary API Web Service using [getSubmissionLog],
-   * and uses the url to retrieve the submission log and saves it to the
-   * location indicated.
+   * Requests the submission log url from the Notary API Web Service, using [getSubmissionLog],
+   * and uses the url to retrieve the submission log and save it to the
+   * location specified.
    *
-   * @param submissionId The identifier that you receive from the notary service when you post to `Submit Software`
+   * @param submissionId The identifier that you received from the Notary API when you use [submitSoftware]
    * to start a new submission.
    * @param location Location to download the submission log to.
    * @return The [Path] the submissionLog was downloaded to, or a [NotaryToolError]
@@ -595,11 +598,11 @@ class NotaryToolClient internal constructor(
   }
 
   /**
-   * Fetch a list of your team’s previous notarization submissions.
+   * Fetches a list of your team’s previous notarization submissions.
    * Calls the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions)
    * Endpoint.
    *
-   * Use this function to get the list of submissions associated with your team. The response contains a List of values
+   * Use this method to get the list of submissions associated with your team. The response contains a List of values
    * that include the unique identifier for the submission, the date the submission was initiated,
    * the name of the associated file that was uploaded, and the status of the submission.
    * The response returns information about only the 100 most recent submissions.
