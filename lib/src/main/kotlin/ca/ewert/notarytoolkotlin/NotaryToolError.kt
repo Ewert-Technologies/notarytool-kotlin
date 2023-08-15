@@ -8,7 +8,7 @@ import java.security.interfaces.ECPrivateKey
 import kotlin.io.path.absolutePathString
 
 /**
- * Top-level parent of all notarytool-kotlin errors
+ * Top-level parent of all notarytool-kotlin error types.
  *
  * @author Victor Ewert
  */
@@ -17,18 +17,18 @@ sealed interface NotaryToolError {
   /** The error message. */
   val msg: String
 
-  /** Longer message if available, otherwise the same as [msg] */
+  /** Longer message, if available, otherwise the same as [msg]. */
   val longMsg: String
 
   /**
-   * Top-level parent of all errors related to credentials received from the end-user, i.e. the user attempting
+   * Top-level parent of all errors related to input from the end-user or client, i.e. the user/client attempting
    * to notarize the software.
    *
    * These errors could be caused by errors creating the JsonWebToken (i.e. invalid or malformed issuer id,
-   * private key id, or private key) an authentication Issue (i.e. incorrect issuer id, private key id, or private key),
+   * private key id, or private key) an authentication issue (i.e. incorrect issuer id, private key id, or private key),
    * or by an invalid submission id.
    *
-   * Errors of these types should be trapped and reported back to the end-user for corrective action.
+   * Errors of these types should be trapped and reported back to the end-user for corrective actions.
    *
    * @author Victor Ewert
    */
@@ -47,15 +47,15 @@ sealed interface NotaryToolError {
       /** The error message. */
       override val msg: String = ErrorStringsResource.getString("submission.id.invalid.string.error")
 
-      /** Error message that includes the Invalid String. */
+      /** Error message that includes the invalid String. */
       override val longMsg: String = "$msg Invalid String: $malformedId"
     }
 
     /**
      * An error caused when the submissionId used in a request is incorrect, and could not be found.
      *
-     * Internally this is trapped as an HTTP 404 error from the Notary API Web Service, but is reported here
-     * as a [UserInputError], since the submission id passed in is incorrect.
+     * Internally this is detected as an `HTTP 404` error from the Notary API Web Service, but is reported here
+     * as a [UserInputError], since it is caused when the submission id passed in is incorrect.
      *
      * @property msg Error message details, as reported by the Notary API.
      * @author Victor Ewert
@@ -71,8 +71,8 @@ sealed interface NotaryToolError {
      * authentication check. This is typically caused by an incorrect issuer id, private key id,
      * private key file, or an expired web token.
      *
-     * Internally this is trapped as an HTTP 401 error from the Notary API Web Service, but is reported here
-     * as a [UserInputError], since it is like caused by invalid user credentials.
+     * Internally this is detected as an `HTTP 401` error from the Notary API Web Service, but is reported here
+     * as a [UserInputError], since it is like caused by incorrect user credentials.
      *
      * @author Victor Ewert
      */
@@ -95,7 +95,7 @@ sealed interface NotaryToolError {
       /**
        * An error caused when the Private Key (`.p8`) file cannot be found
        *
-       * @property privateKeyFilePath The Path of the file that couldn't be found.
+       * @property privateKeyFilePath The [Path] of the file that couldn't be found.
        * @author Victor Ewert
        */
       data class PrivateKeyNotFoundError internal constructor(val privateKeyFilePath: Path) : JsonWebTokenError {
@@ -109,10 +109,10 @@ sealed interface NotaryToolError {
       }
 
       /**
-       * An error caused when there is an Exception generating the [ECPrivateKey] (used to sign the Json Web Token)
+       * An error caused when there is an [Exception] generating the [ECPrivateKey] (used to sign the Json Web Token)
        * from the private key file provided.
        *
-       * @property exceptionMsg More detailed message from the causing Exception.
+       * @property exceptionMsg A more detailed message from the causing [Exception].
        * @author Victor Ewert
        */
       data class InvalidPrivateKeyError internal constructor(val exceptionMsg: String) : JsonWebTokenError {
@@ -125,10 +125,10 @@ sealed interface NotaryToolError {
       }
 
       /**
-       * An error for when there is a problem or Exception when generating or signing
+       * An error caused when there is a problem or [Exception] when generating or signing
        * the Json Web Token.
        *
-       * @property exceptionMsg More detailed message from the causing Exception.
+       * @property exceptionMsg More detailed message from the causing [Exception].
        * @author Victor Ewert
        */
       data class TokenCreationError internal constructor(val exceptionMsg: String) : JsonWebTokenError {
@@ -153,7 +153,7 @@ sealed interface NotaryToolError {
     val responseMetaData: ResponseMetaData
 
     /**
-     * A Client Error response, in the range of 400 to 499: *"The request contains bad syntax
+     * A Client Error response, in the range of `400` to `499`: *"The request contains bad syntax
      * or cannot be fulfilled."*
      *
      * @author Victor Ewert
@@ -168,7 +168,7 @@ sealed interface NotaryToolError {
     }
 
     /**
-     * A Server Error response, in the range of 500 to 599: *"The server failed to fulfil
+     * A Server Error response, in the range of `500` to `599`: *"The server failed to fulfil
      * an apparently valid request."*
      *
      * @author Victor Ewert
@@ -203,7 +203,7 @@ sealed interface NotaryToolError {
    * changes.
    *
    * @property msg The error message.
-   * @property jsonString The json String that was used deserializing, if available.
+   * @property jsonString The json String that was used when deserializing, if available.
    * @author Victor Ewert
    */
   data class JsonParseError internal constructor(override val msg: String, val jsonString: String?) : NotaryToolError {
@@ -232,7 +232,7 @@ sealed interface NotaryToolError {
    * Notary API, or by an HTTP error while attempting to download the log.
    *
    * @property msg The error message.
-   * @property msg A more detailed message from the causing Exception.
+   * @property msg A more detailed message from the causing [Exception].
    * @author Victor Ewert
    */
   data class SubmissionLogError internal constructor(override val msg: String, val exceptionMsg: String) :
@@ -247,6 +247,7 @@ sealed interface NotaryToolError {
    * timed out, the connection dropped, etc.
    *
    * @property msg The connection error message.
+   * @author Victor Ewert
    */
   data class ConnectionError internal constructor(override val msg: String) : NotaryToolError {
 
@@ -258,7 +259,8 @@ sealed interface NotaryToolError {
    * An error that can occur when uploading the software submission to the
    * Amazon S3 Server.
    *
-   * @property exceptionMsg A more detailed message from the causing Exception.
+   * @property exceptionMsg A more detailed message from the causing [Exception].
+   * @author Victor Ewert
    */
   data class AwsUploadError internal constructor(val exceptionMsg: String) : NotaryToolError {
 
@@ -272,6 +274,8 @@ sealed interface NotaryToolError {
   /**
    * Not an error, but an indication that polling has reached the maximum
    * number of attempts.
+   * 
+   * @author Victor Ewert
    */
   data class PollingTimeout internal constructor(val maxCount: Int) : NotaryToolError {
 
