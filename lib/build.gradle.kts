@@ -253,6 +253,13 @@ publishing {
           url.set(companyUrl)
         }
 
+        licenses {
+          license {
+            name.set("The MIT License")
+            url.set("https://mit-license.org/")
+          }
+        }
+
         developers {
           developer {
             name.set(author)
