@@ -438,7 +438,7 @@ class NotaryToolClient internal constructor(
    * It calls [getSubmissionStatus] `maxPollCount` number of times, with a delay
    * of [delayFunction] between each request. To allow 'backing off' the delay can be expressed
    * as a function of the current count.
-   * 
+   *
    * The polling will end when the submission status is
    * one of `Accepted`, `Invalid` or `Rejected`, or when the `maxPollCount` is reached
    *

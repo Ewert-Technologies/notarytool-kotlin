@@ -274,7 +274,7 @@ sealed interface NotaryToolError {
   /**
    * Not an error, but an indication that polling has reached the maximum
    * number of attempts.
-   * 
+   *
    * @author Victor Ewert
    */
   data class PollingTimeout internal constructor(val maxCount: Int) : NotaryToolError {
