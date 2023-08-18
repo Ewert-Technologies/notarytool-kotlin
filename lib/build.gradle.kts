@@ -71,7 +71,7 @@ dependencies {
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.8")
 
   // Testing
-  testImplementation(group = "org.apache.commons", name = "commons-lang3", version =  "3.13.0")
+  testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.13.0")
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.0")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
