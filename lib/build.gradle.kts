@@ -225,7 +225,7 @@ tasks.register("buildInfo") {
   logger.quiet("Company: $company")
   logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
-  logger.quiet("build dir: ${project.layout.buildDirectory}")
+  logger.quiet("build dir: ${project.layout.buildDirectory.asFile.get()}")
 }
 
 //
