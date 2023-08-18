@@ -226,7 +226,7 @@ tasks.register("buildInfo") {
   logger.quiet("Company: $company")
   logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
-  logger.quiet("build dir: ${project.buildDir}")
+  logger.quiet("build dir: ${project.layout.buildDirectory}")
 }
 
 //
@@ -289,7 +289,7 @@ tasks.register("release") {
 
     // Copy jar files
     copy {
-      from(file(Paths.get(project.buildDir.absolutePath, "libs"))) {
+      from(file(Paths.get(project.layout.buildDirectory.asFile.get().absolutePath, "libs"))) {
         include("*.jar")
       }
       into(relDir)
@@ -298,7 +298,7 @@ tasks.register("release") {
     // Copy kdocs directory
     val kDocsDir: File = file(Paths.get(relDir.absolutePath, "kdocs"))
     copy {
-      from(file(Paths.get(project.buildDir.absolutePath, "dokka", "htmlPublic")))
+      from(file(Paths.get(project.layout.buildDirectory.asFile.get().absolutePath, "dokka", "htmlPublic")))
       into(kDocsDir)
     }
 
