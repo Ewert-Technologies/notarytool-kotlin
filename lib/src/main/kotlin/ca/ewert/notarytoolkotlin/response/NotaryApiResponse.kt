@@ -8,14 +8,14 @@ import java.util.*
 private val log = KotlinLogging.logger {}
 
 /**
- * Parent Type for all Notary Api Response Types
+ * Parent Type for allNotary Api Response Types.
  *
- * @property responseMetaData Meta information about the http response.
+ * @property responseMetaData Meta information about the HTTP response.
  * @author Victor Ewert
  */
 open class NotaryApiResponse internal constructor(val responseMetaData: ResponseMetaData) {
 
-  /** The timestamp of when the client received the Response */
+  /** The timestamp of when the client received the Response. */
   val receivedTimestamp: Instant = Instant.now()
 
   companion object {

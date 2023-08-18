@@ -4,7 +4,7 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorJson
 import ca.ewert.notarytoolkotlin.json.notaryapi.ErrorResponseJson
 
 /**
- * An Error response, returned from the Notary API
+ * An Error response, returned from the Notary API.
  *
  * @author Victor Ewert
  */
@@ -14,7 +14,7 @@ class ErrorResponse internal constructor(
 ) : NotaryApiResponse(responseMetaData = responseMetaData) {
 
   /**
-   * List of individual Errors
+   * List of individual Errors.
    */
   val errorList: List<ErrorInfo>
 
@@ -28,22 +28,22 @@ class ErrorResponse internal constructor(
  */
 data class ErrorInfo internal constructor(val errorJson: ErrorJson) {
 
-  /** The submssionId used in the request */
+  /** The submssionId used in the request. */
   val id: String
 
-  /** The status for the error */
+  /** The status for the error. */
   val status: Int?
 
-  /** The status for the error as a String, e.g. `"404"` */
+  /** The status for the error as a String, e.g. `"404"`. */
   val statusString: String
 
-  /** The Error code, e.g. `NOT_FOUND`  */
+  /** The Error code, e.g. `"NOT_FOUND"`.  */
   val code: String
 
-  /** The error title */
+  /** The error title. */
   val title: String
 
-  /** Detailed message for the error */
+  /** Detailed message for the error. */
   val detail: String
 
   init {

@@ -9,7 +9,7 @@ import com.github.michaelbull.result.Result
  * Wrapper around the `submissionId`, used by Apple's Notary API:
  * The identifier that you receive from the notary service when you post to
  * Submit Software to start a new submission. Value must match the pattern:
- * `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`
+ * `"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"`.
  *
  * @property id A unique identifier for a submission. Used to track the status of a submission.
  * @author Victor Ewert

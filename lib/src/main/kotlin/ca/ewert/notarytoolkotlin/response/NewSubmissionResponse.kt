@@ -6,6 +6,8 @@ import ca.ewert.notarytoolkotlin.json.notaryapi.NewSubmissionResponseJson
  * Response from sending a request the [Submit Software](https://developer.apple.com/documentation/notaryapi/submit_software)
  * Endpoint.
  *
+ * Contains credentials, and other information, required to upload your software to the Amazon S3 Server.
+ *
  * @author Victor Ewert
  */
 class NewSubmissionResponse internal constructor(
@@ -16,13 +18,13 @@ class NewSubmissionResponse internal constructor(
   /** The unique identifier for this submission. */
   val id: SubmissionId
 
-  /** An access key that you use in a call to Amazon S3. */
+  /** An access key that you use in a call to Amazon S3, to upload the software. */
   val awsAccessKeyId: String
 
-  /** A secret key that you use in a call to Amazon S3. */
+  /** A secret key that you use in a call to Amazon S3, to upload the software. */
   val awsSecretAccessKey: String
 
-  /** A session token that you use in a call to Amazon S3. */
+  /** A session token that you use in a call to Amazon S3, to upload the software. */
   val awsSessionToken: String
 
   /** The Amazon S3 bucket that you upload your software into. */

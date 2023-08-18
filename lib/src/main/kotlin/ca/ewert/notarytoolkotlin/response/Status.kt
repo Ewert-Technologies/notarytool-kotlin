@@ -1,36 +1,36 @@
 package ca.ewert.notarytoolkotlin.response
 
 /**
- * Various status states of a Submission
+ * The various status states of a Submission.
  *
- * @property displayName The display name of the status
+ * @property displayName The display name of the status.
  * @author Victor Ewert
  */
 enum class Status(val displayName: String) {
 
   /**
-   * A Submission status of `Accepted`
+   * A Submission status of `Accepted`.
    */
   ACCEPTED("Accepted"),
 
   /**
-   * A Submission status of `In Progress`
+   * A Submission status of `In Progress`.
    */
   IN_PROGRESS("In Progress"),
 
   /**
-   * A Submission status of `Invalid`
+   * A Submission status of `Invalid`.
    */
   INVALID("Invalid"),
 
   /**
-   * A Submission status of `Rejected`
+   * A Submission status of `Rejected`.
    */
   REJECTED("Rejected"),
 
   /**
    * When the submission status returned from the API doesn't match
-   * a known status
+   * a known status.
    */
   UNKNOWN("Unknown"),
   ;
@@ -50,7 +50,7 @@ enum class Status(val displayName: String) {
      * Return the enum value corresponding to the String passed in. If the String
      * doesn't match then [UNKNOWN] is returned.
      *
-     * @param stringValue The String value to convert
+     * @param stringValue The String value to convert.
      */
     fun fromString(stringValue: String): Status {
       return when {

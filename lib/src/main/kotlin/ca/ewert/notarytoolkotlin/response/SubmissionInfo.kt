@@ -3,12 +3,12 @@ package ca.ewert.notarytoolkotlin.response
 import java.time.Instant
 
 /**
- * Information about the status of a submission
+ * Information about the status of a submission.
  *
- * @property createdDate The date that submission process was started. May be `null`
- * if the `createdDate` value returned by Apple's Web API can't be parsed.
+ * @property createdDate The date that the submission process was started. May be `null`
+ * if the `createdDate` value returned by the Notary API can't be parsed.
  * In this case, use [createdDateText] and attempt to parse it manually.
- * @property createdDateText The date that the submission process was started, as a Text String
+ * @property createdDateText The date that the submission process was started, as a Text String, as returned by the Notary API.
  * @property name The name that was specified in the submissionName field of the
  * Submit Software call when the submission was started, i.e. the name of the software file
  * that was submitted.
