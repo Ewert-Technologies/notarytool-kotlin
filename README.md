@@ -21,7 +21,7 @@ This library is available on Maven Central.
 
 <dependency>
     <groupId>
-        ca.ewert.notarytoolkotlin
+        ca.ewert-technologies.notarytoolkotlin
     </groupId>
     <artifactId>
         notarytool-kotlin
@@ -54,10 +54,9 @@ for instructions. After creating an API key, you should have the following infor
 | Private Key    | The `.p8` file downloaded when creating the API Key            |
 
 These items are used to generate a JSON Web Token (JWT), used for authentication when making calls to the Notary API
-(
-see [Generating Tokens for API Requests](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
-for more information).
-Note: the JWT is generated for you automatically by this library.
+(see
+[Generating Tokens for API Requests](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
+for more information). Note: the JWT is generated for you automatically by this library.
 
 ### NotaryToolClient
 
