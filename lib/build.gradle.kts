@@ -232,10 +232,23 @@ tasks.register("buildInfo") {
 //
 // Configure maven publishing
 //
+
+tasks.register<Jar>("sourceJar") {
+  from(sourceSets.main.get().allSource)
+  archiveClassifier.set("sources")
+}
+
+tasks.register<Jar>("javadocJar") {
+  from(tasks.getByName("dokkaHtmlPublic"))
+  archiveClassifier.set("javadoc")
+}
+
 publishing {
   publications {
     create<MavenPublication>("maven") {
       from(components["kotlin"])
+      artifact(tasks.getByName("sourceJar"))
+      artifact(tasks.getByName("javadocJar"))
 
       pom {
         name.set(longName)
