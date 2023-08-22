@@ -15,9 +15,9 @@ import java.time.format.FormatStyle
 private val log = KotlinLogging.logger {}
 
 /**
- * Lists the submission history
+ * Example of getting the Submission History
  */
-fun main(args: Array<String>) {
+fun main() {
   val testValuesReader = TestValuesReader()
   val keyId: String = testValuesReader.getKeyId()
   val issuerId: String = testValuesReader.getIssueId()
@@ -30,8 +30,8 @@ fun main(args: Array<String>) {
       privateKeyFile = privateKeyFile,
     )
 
-    println(notaryToolClient.tokenLifetime)
-    println(notaryToolClient.connectTimeout)
+    println("Token Lifetime: ${notaryToolClient.tokenLifetime}")
+    println("Connect Timeout: ${notaryToolClient.connectTimeout}")
     println(notaryToolClient.userAgent)
 
     when (val result = notaryToolClient.getPreviousSubmissions()) {
@@ -39,13 +39,13 @@ fun main(args: Array<String>) {
         val submissionListResponse = result.value
         println(
           "Response Received on: ${
-            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.FULL)
+            DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.LONG)
               .format(submissionListResponse.receivedTimestamp.atZone(ZoneId.systemDefault()))
           }",
         )
         println("Response Status: ${submissionListResponse.responseMetaData.httpStatusString}")
         submissionListResponse.submissionInfoList.forEach { submissionInfo ->
-          println("${submissionInfo.createdDate}\t${submissionInfo.name}\t${submissionInfo.id}\t${submissionInfo.status}")
+          println("${submissionInfo.createdDate}\t${submissionInfo.id}\t${submissionInfo.status}\t${submissionInfo.name}")
         }
       }
 
