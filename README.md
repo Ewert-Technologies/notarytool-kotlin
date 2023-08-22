@@ -69,16 +69,15 @@ This example shows creating a `NotaryToolClient` using the Authentication inform
 default configuration.
 
 ```kotlin
-val notaryToolClient =
-    NotaryToolClient(
-        privateKeyId = "<Private Key ID>",
-        issuerId = "<Issuer ID here>",
-        privateKeyFile = Path.of(
-            "path",
-            "to",
-            "privateKeyFile.p8"
-        ),
-    )
+val notaryToolClient = NotaryToolClient(
+    privateKeyId = "<Private Key ID>",
+    issuerId = "<Issuer ID here>",
+    privateKeyFile = Path.of(
+        "path",
+        "to",
+        "privateKeyFile.p8"
+    ),
+)
 ```
 
 #### Custom Parameters
@@ -87,25 +86,24 @@ This example shows creating a `NotaryToolClient` using the Authentication inform
 custom parameters.
 
 ```kotlin
-val notaryToolClient =
-    NotaryToolClient(
-        privateKeyId = "<Private Key ID>",
-        issuerId = "<Issuer ID here>",
-        privateKeyFile = Path.of(
-            "path",
-            "to",
-            "privateKeyFile.p8"
-        ),
-        tokenLifetime = Duration.of(
-            10,
-            ChronoUnit.MINUTES
-        ),
-        connectTimeout = Duration.of(
-            15,
-            ChronoUnit.SECONDS
-        ),
-        userAgent = "MyTool/1.0.0"
-    )
+val notaryToolClient = NotaryToolClient(
+    privateKeyId = "<Private Key ID>",
+    issuerId = "<Issuer ID here>",
+    privateKeyFile = Path.of(
+        "path",
+        "to",
+        "privateKeyFile.p8"
+    ),
+    tokenLifetime = Duration.of(
+        10,
+        ChronoUnit.MINUTES
+    ),
+    connectTimeout = Duration.of(
+        15,
+        ChronoUnit.SECONDS
+    ),
+    userAgent = "MyTool/1.0.0"
+)
 ```
 
 - `tokenLifetime` sets how long the JWT is valid for. Apple requires this to be less than 20 minutes. The default is 15
@@ -138,7 +136,82 @@ Result will either contain the success value, or it will contain an error type. 
 
 ### Examples
 
-#### Submit example with minimal Error handling
+#### Submit and Upload example with minimal Error handling
+
+This example uses `submitAndUploadSoftware()` to initiate a submission request, and then upload the software, so it
+can be notarized. The returned Result contains the submission id, which can later be used to check the notarization
+status.
+
+```kotlin
+val notaryToolClient = NotaryToolClient(
+    privateKeyId = "<Private Key ID>",
+    issuerId = "<Issuer ID here>",
+    privateKeyFile = Path.of(
+        "path",
+        "to",
+        "privateKeyFile.p8"
+    ),
+)
+
+val softwareFile: Path = Path.of("softwareApp.dmg")
+
+val result: Result<AwsUploadData, NotaryToolError> = notaryToolClient.submitAndUploadSoftware(softwareFile)
+
+result.onSuccess { awsUploadData ->
+    println("Uploaded file: ${softwareFile.fileName}, and received submissionId: ${awsUploadData.submissionId}")
+}
+
+result.onFailure { notaryToolError ->
+    println(notaryToolError.longMsg)
+}
+
+```
+
+This would return output similar to:
+
+```text
+Uploaded file: softwareApp.dmg, and received submissionId: 6253220d-ee59-4682-8d23-9a4fe87eaagg
+```
+
+#### Check submission Status
+
+This example uses `getSubmissionStatus()`, to check the status of a previous submission.
+
+```kotlin
+val submissionIdResult: Result<SubmissionId, NotaryToolError.UserInputError.MalformedSubmissionIdError> =
+    SubmissionId.of("6253220d-ee59-4682-8d23-9a4fe87eaagg")
+
+submissionIdResult.onSuccess { submissionId ->
+    val notaryToolClient = NotaryToolClient(
+        privateKeyId = "<Private Key ID>",
+        issuerId = "<Issuer ID here>",
+        privateKeyFile = Path.of(
+            "path",
+            "to",
+            "privateKeyFile.p8"
+        ),
+    )
+    val result: Result<SubmissionStatusResponse, NotaryToolError> = notaryToolClient.getSubmissionStatus(submissionId)
+    result.onSuccess { submissionStatusResponse ->
+        val statusInfo = submissionStatusResponse.submissionInfo
+        println("Status for submission $submissionId (${statusInfo.name}): ${statusInfo.status}")
+    }
+
+    result.onFailure { notaryToolError ->
+        println(notaryToolError.longMsg)
+    }
+}
+
+submissionIdResult.onFailure { malformedSubmissionIdError ->
+    println(malformedSubmissionIdError)
+}
+```
+
+This would return output similar to:
+
+```text
+Status for submission 6253220d-ee59-4682-8d23-9a4fe87eaagg (softwareApp.dmg): Accepted
+```
 
 ## Support
 
