@@ -35,7 +35,7 @@ This library is available on Maven Central.
 ### Gradle
 
 ```kotlin
-implementation "ca.ewert.notarytoolkotlin:notarytool-kotlin:0.1.0"
+implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.1.0"
 ```
 
 ## Usage
@@ -217,18 +217,6 @@ Status for submission 6253220d-ee59-4682-8d23-9a4fe87eaagg (softwareApp.dmg): Ac
 
 For any issues or suggestions please use github issues.
 
-## Contributing
-
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started.
-Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps
-explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce
-the likelihood that the changes inadvertently break something. Having instructions for running tests is especially
-helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
 ## Third-Party Dependencies
 
 This project uses the following runtime and test dependencies.
@@ -247,8 +235,6 @@ This project uses the following runtime and test dependencies.
 - [mockwebserver](https://github.com/square/okhttp/tree/master/mockwebserver)
 
 See also Licenses file.
-
-Show your appreciation to those who have contributed to the project.
 
 ## License
 
