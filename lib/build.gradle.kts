@@ -289,7 +289,7 @@ publishing {
 /**
  * Creates a release by building and then copying the release artifacts
  * to the rel directory. Release artifacts in include the jar,
- * sources jar, and kdocs.
+ * sources jar, and kdocs. Also publishes to MovenLocal repository.
  */
 tasks.register("release") {
   group = project.name
