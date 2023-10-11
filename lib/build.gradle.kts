@@ -18,7 +18,7 @@ import java.time.Instant
 
 buildscript {
   dependencies {
-    classpath("org.jetbrains.dokka:dokka-base:1.8.20")
+    classpath("org.jetbrains.dokka:dokka-base:1.9.0")
   }
 }
 
@@ -62,18 +62,18 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-  implementation(platform("software.amazon.awssdk:bom:2.20.129"))
+  implementation(platform("software.amazon.awssdk:bom:2.20.162"))
   implementation(group = "software.amazon.awssdk", name = "s3")
 
   // Logging
   implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "5.1.0")
-  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.7")
+  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.9")
   implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
 
   // Testing
   testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.13.0")
   testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.0")
-  testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.26.1")
+  testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.27.0")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
 }
 
