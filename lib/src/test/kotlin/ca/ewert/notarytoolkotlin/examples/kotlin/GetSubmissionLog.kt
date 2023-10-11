@@ -6,7 +6,11 @@ import ca.ewert.notarytoolkotlin.TestValuesReader
 import ca.ewert.notarytoolkotlin.resourceToPath
 import ca.ewert.notarytoolkotlin.response.SubmissionId
 import ca.ewert.notarytoolkotlin.response.SubmissionLogUrlResponse
-import com.github.michaelbull.result.*
+import com.github.michaelbull.result.Result
+import com.github.michaelbull.result.getOrThrow
+import com.github.michaelbull.result.mapBoth
+import com.github.michaelbull.result.onFailure
+import com.github.michaelbull.result.onSuccess
 import java.nio.file.Path
 
 /**
