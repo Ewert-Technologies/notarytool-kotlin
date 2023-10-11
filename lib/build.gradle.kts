@@ -243,6 +243,7 @@ tasks.register<Jar>("javadocJar") {
   archiveClassifier.set("javadoc")
 }
 
+
 publishing {
   publications {
     create<MavenPublication>("maven") {
@@ -284,6 +285,11 @@ publishing {
       }
     }
   }
+}
+
+// Add explicit dependency of publishMavenPublicationToMavenLocal on kotlinSourcesJar
+tasks.withType<AbstractPublishToMaven>().configureEach {
+  dependsOn("kotlinSourcesJar")
 }
 
 /**
