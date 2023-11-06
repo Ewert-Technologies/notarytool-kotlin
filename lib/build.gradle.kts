@@ -18,7 +18,7 @@ import java.time.Instant
 
 buildscript {
   dependencies {
-    classpath("org.jetbrains.dokka:dokka-base:1.9.0")
+    classpath("org.jetbrains.dokka:dokka-base:1.9.10")
   }
 }
 
@@ -31,7 +31,7 @@ plugins {
   `java-library`
   `maven-publish`
   id("com.jaredsburrows.license") version "0.9.3"
-  id("org.jetbrains.kotlin.jvm") version "1.9.0"
+  id("org.jetbrains.kotlin.jvm") version "1.9.20"
   id("com.github.ben-manes.versions") version "0.49.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
   id("org.jmailen.kotlinter")
@@ -57,12 +57,12 @@ dependencies {
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 
   // Other
-  implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.11.0")
+  implementation(group = "com.squareup.okhttp3", name = "okhttp", version = "4.12.0")
   implementation(group = "com.auth0", name = "java-jwt", version = "4.4.0")
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-  implementation(platform("software.amazon.awssdk:bom:2.20.162"))
+  implementation(platform("software.amazon.awssdk:bom:2.21.15"))
   implementation(group = "software.amazon.awssdk", name = "s3")
 
   // Logging
@@ -72,9 +72,9 @@ dependencies {
 
   // Testing
   testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.13.0")
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.0")
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1")
   testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.27.0")
-  testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.11.0")
+  testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.12.0")
 }
 
 //
