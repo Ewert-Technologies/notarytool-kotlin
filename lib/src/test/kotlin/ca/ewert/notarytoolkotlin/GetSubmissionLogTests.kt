@@ -359,7 +359,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
     getPreviousSubmissionsResult.onFailure { notaryToolError ->
       when (notaryToolError) {
         is NotaryToolError.ConnectionError -> {
-          log.info { notaryToolError }
+          log.warn { notaryToolError.msg }
           assertThat(notaryToolError.msg).isEqualTo("timeout")
         }
 
