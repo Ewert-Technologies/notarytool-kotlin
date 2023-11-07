@@ -11,7 +11,7 @@ methods that groups several Endpoint calls together.
 
 ## Project status
 
-This project is in development, no releases are available yet.
+This project is in development, and no official releases are available yet.
 
 ## Installation
 
@@ -118,22 +118,22 @@ val notaryToolClient = NotaryToolClient(
 
 The `NotaryToolClient` has the following functions:
 
-| Function                    | Notes                                                                                                                                                                                          |
-|-----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `submitSoftware()`          | Starts the process of uploading a new version of your software to the notary service. Maps to [Submit Software](https://developer.apple.com/documentation/notaryapi/submit_software) Endpoint. |
-| `getSubmissionStatus()`     | Fetches the status of a software notarization submission. Maps to [Get Submission Status](https://developer.apple.com/documentation/notaryapi/get_submission_status) Endpoint.                 |
-| `getSubmissionLog()`        | Fetches details about a single completed notarization. Maps to [Get Submission Log](https://developer.apple.com/documentation/notaryapi/get_submission_log) Endpoint.                          |
-| `getPreviousSubmissions()`  | Fetches a list of your team’s previous notarization submissions. Maps to [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions) Endpoint.    |
-| `submitAndUploadSoftware()` | A convenience method that calls `submitSoftware()` and then uploads the software to the Amazon S3 Server, where the Notary API can access it.                                                  |
-| `pollSubmissionStatus()`    | A convenience method that repeated calls `getSubmissionStatus()`, until the status is no longer `In Progress`.                                                                                 |
-| `retrieveSubmissionLog()`   | A convenience method that calls `getSubmissionLog()` and returns the log as String.                                                                                                            |
-| `downloadSubmssionLog()`    | A convenience method that calls `getSubmissionLog()` and downloads the log as file.                                                                                                            |
+| Function                    | Notes                                                                                                                                                                                              |
+|-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `submitSoftware()`          | Starts the process of uploading a new version of your software to the notary service. Maps to the [Submit Software](https://developer.apple.com/documentation/notaryapi/submit_software) Endpoint. |
+| `getSubmissionStatus()`     | Fetches the status of a software notarization submission. Maps to the [Get Submission Status](https://developer.apple.com/documentation/notaryapi/get_submission_status) Endpoint.                 |
+| `getSubmissionLog()`        | Fetches details about a single completed notarization. Maps to the [Get Submission Log](https://developer.apple.com/documentation/notaryapi/get_submission_log) Endpoint.                          |
+| `getPreviousSubmissions()`  | Fetches a list of your team’s previous notarization submissions. Maps to the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions) Endpoint.    |
+| `submitAndUploadSoftware()` | A convenience method that calls `submitSoftware()` and then uploads the software to the Amazon S3 Server, where the Notary API can access it.                                                      |
+| `pollSubmissionStatus()`    | A convenience method that repeated calls `getSubmissionStatus()`, until the status is no longer `In Progress`.                                                                                     |
+| `retrieveSubmissionLog()`   | A convenience method that calls `getSubmissionLog()` and returns the log as String.                                                                                                                |
+| `downloadSubmssionLog()`    | A convenience method that calls `getSubmissionLog()` and downloads the log as file.                                                                                                                |
 
 ### Error Handling
 
 Errors are handled using a Result type, using the [kotlin-result](https://github.com/michaelbull/kotlin-result) library.
-The Result type, has two subtypes, OK<V>, which represents and success the value to be returned and Err<E>, which
-represents failure, on contains an `NotaryToolError` subtype. In general, when a function returns a Result type, the
+The Result type, has two subtypes, `OK<V>`, which represents and success the value to be returned and `Err<E>`, which
+represents failure, and contains an `NotaryToolError` subtype. In general, when a function returns a Result type, the
 Result will either contain the success value, or it will contain an error type. See below for some examples.
 
 ### Examples
