@@ -61,3 +61,6 @@ rel
 
 # macOS
 .DS_Store
+
+# Signing
+*.gpg
