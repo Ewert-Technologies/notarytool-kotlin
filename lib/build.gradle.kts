@@ -30,6 +30,7 @@ plugins {
   idea
   `java-library`
   `maven-publish`
+  signing
   id("com.jaredsburrows.license") version "0.9.3"
   id("org.jetbrains.kotlin.jvm") version "1.9.20"
   id("com.github.ben-manes.versions") version "0.49.0"
@@ -246,7 +247,7 @@ tasks.register<Jar>("javadocJar") {
 
 publishing {
   publications {
-    create<MavenPublication>("maven") {
+    create<MavenPublication>("NotaryToolKotlin") {
       from(components["kotlin"])
       artifact(tasks.getByName("sourceJar"))
       artifact(tasks.getByName("javadocJar"))
@@ -287,20 +288,31 @@ publishing {
   }
 }
 
+//tasks.named("publishNotaryToolKotlinPublicationToMavenLocal").get().dependsOn("kotlinSourcesJar")
+
 // Add explicit dependency of publishMavenPublicationToMavenLocal on kotlinSourcesJar
-tasks.withType<AbstractPublishToMaven>().configureEach {
-  dependsOn("kotlinSourcesJar")
+//tasks.withType<PublishToMavenRepository>().configureEach {
+//  dependsOn("kotlinSourcesJar")
+//}
+
+signing {
+  sign(publishing.publications["NotaryToolKotlin"])
 }
 
 /**
- * Creates a release by building and then copying the release artifacts
+ * Creates a local release by building and then copying the release artifacts
  * to the rel directory. Release artifacts in include the jar,
- * sources jar, and kdocs. Also publishes to MovenLocal repository.
+ * sources jar, and kdocs.
  */
 tasks.register("release") {
   group = project.name
   description = "Creates a release"
-  dependsOn("buildInfo", "build", "kotlinSourcesJar", "dokkaHtmlPublic", "publishMavenPublicationToMavenLocal")
+  dependsOn(
+    "buildInfo",
+    "build",
+    "kotlinSourcesJar",
+    "dokkaHtmlPublic",
+  )
 
   doLast {
     val relDir = file(Paths.get("rel", "${project.version}"))
