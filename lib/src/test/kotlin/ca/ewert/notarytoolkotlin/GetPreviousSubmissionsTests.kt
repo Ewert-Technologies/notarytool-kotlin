@@ -158,7 +158,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       when (error) {
         is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
-          assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
+          assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request. Please check that the issuer id, key identifier, and private key file are correct.")
         }
 
         else -> log.warn {
@@ -197,7 +197,7 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       when (error) {
         is NotaryToolError.UserInputError.AuthenticationError -> {
           log.info { "Authentication Error" }
-          assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request.")
+          assertThat(error.msg).isEqualTo("Notary API Web Service could not authenticate the request. Please check that the issuer id, key identifier, and private key file are correct.")
         }
 
         else -> log.warn {
