@@ -239,7 +239,7 @@ This project uses the following runtime and test dependencies.
 - [assertk](https://github.com/willowtreeapps/assertk)
 - [mockwebserver](https://github.com/square/okhttp/tree/master/mockwebserver)
 
-See also Licenses file.
+See also [license.txt](licenses.txt) file.
 
 ## License
 
