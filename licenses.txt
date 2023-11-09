@@ -1,0 +1,224 @@
+Notice for packages
+
+
+     Apache Commons Codec (1.15) - Apache License, Version 2.0
+     The Apache Commons Codec package contains simple encoder and decoders for
+various formats such as Base64 and Hexadecimal.  In addition to these
+widely used encoders and decoders, the codec package also maintains a
+collection of phonetic encoding utilities.
+     https://commons.apache.org/proper/commons-codec/
+
+      Apache Commons Logging (1.2) - The Apache Software License, Version 2.0
+      Apache Commons Logging is a thin adapter allowing configurable bridging to other,
+well known logging systems.
+      http://commons.apache.org/proper/commons-logging/
+
+Apache HttpClient (4.5.13) - Apache License, Version 2.0
+Apache HttpComponents Client
+http://hc.apache.org/httpcomponents-client
+
+Apache HttpCore (4.4.13) - Apache License, Version 2.0
+Apache HttpComponents Core (blocking I/O)
+http://hc.apache.org/httpcomponents-core-ga
+
+AWS Event Stream (1.0.1) - Apache License, Version 2.0
+The AWS Event Stream decoder library.
+https://github.com/awslabs/aws-eventstream-java
+
+AWS Java SDK :: Annotations (2.21.15) - Apache License, Version 2.0
+
+AWS Java SDK :: Arns (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - Arns module holds the classes that are related to AWS ARN
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Auth (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - Auth module holds the classes that are used for authentication with services
+https://aws.amazon.com/sdkforjava
+
+  AWS Java SDK :: AWS Core (2.21.15) - Apache License, Version 2.0
+  The AWS SDK for Java - Core runtime module holds the classes that are used by the individual service
+clients to interact with
+Amazon Web Services. Users need to depend on aws-java-sdk artifact for accessing individual client classes.
+  https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: AWS CRT Core (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - AWS CRT Core holds common types that are built on the AWS Common Runtime
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Checksums (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - Checksums module contains checksums and related items that are used by other modules in
+  the library.
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Checksums SPI (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - Checksums SPI module contains checksum interfaces that are used by other modules
+  in the library.
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Core :: Protocols :: AWS Query Protocol (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - module holds the classes for AWS Query protocol
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Core :: Protocols :: AWS Xml Protocol (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - module holds the classes for AWS Xml protocol
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Core :: Protocols :: Json Utils (2.21.15) - Apache License, Version 2.0
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Core :: Protocols :: Protocol Core (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - module holds the core protocol classes
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Endpoints SPI (2.21.15) - Apache License, Version 2.0
+
+  AWS Java SDK :: HTTP Auth (2.21.15) - Apache License, Version 2.0
+  The AWS SDK for Java - HTTP Auth module contains interfaces and implementations
+for generic HTTP authentication
+  https://aws.amazon.com/sdkforjava
+
+  AWS Java SDK :: HTTP Auth AWS (2.21.15) - Apache License, Version 2.0
+  The AWS SDK for Java - HTTP Auth AWS module contains interfaces and implementations for HTTP
+authentication specific to AWS.
+  https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: HTTP Auth SPI (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - HTTP Auth SPI module contains the interfaces for authentication that are used by other
+  modules in the library.
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: HTTP Client Interface (2.21.15) - Apache License, Version 2.0
+
+AWS Java SDK :: HTTP Clients :: Apache (2.21.15) - Apache License, Version 2.0
+
+AWS Java SDK :: HTTP Clients :: Netty Non-Blocking I/O (2.21.15) - Apache License, Version 2.0
+
+AWS Java SDK :: Identity SPI (2.21.15) - Apache License, Version 2.0
+The AWS SDK for Java - Identity SPI module contains the Identity interfaces that are used by other modules in
+  the library.
+https://aws.amazon.com/sdkforjava
+
+  AWS Java SDK :: Metrics SPI (2.21.15) - Apache License, Version 2.0
+  This is the base module for SDK metrics feature. It contains the interfaces used for metrics feature
+that are used by other modules in the library.
+
+AWS Java SDK :: Profiles (2.21.15) - Apache License, Version 2.0
+Profile module allows loading information from AWS configuration and credentials files.
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Regions (2.21.15) - Apache License, Version 2.0
+
+  AWS Java SDK :: SDK Core (2.21.15) - Apache License, Version 2.0
+  The AWS SDK for Java - SDK Core runtime module holds the classes that are used by the individual service
+clients to interact with
+Amazon Web Services. Users need to depend on aws-java-sdk artifact for accessing individual client classes.
+  https://aws.amazon.com/sdkforjava
+
+  AWS Java SDK :: Services :: Amazon S3 (2.21.15) - Apache License, Version 2.0
+  The AWS Java SDK for Amazon S3 module holds the client classes that are used for communicating with
+Amazon Simple Storage Service
+  https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Third Party :: Jackson-core (2.21.15) - Apache License, Version 2.0
+https://aws.amazon.com/sdkforjava
+
+AWS Java SDK :: Utilities (2.21.15) - Apache License, Version 2.0
+
+IntelliJ IDEA Annotations (13.0) - The Apache Software License, Version 2.0
+A set of annotations used for code inspection support and code documentation.
+http://www.jetbrains.org
+
+Jackson-annotations (2.14.2) - The Apache Software License, Version 2.0
+Core annotations used for value types, used by Jackson data binding package.
+https://github.com/FasterXML/jackson
+
+Jackson-core (2.14.2) - The Apache Software License, Version 2.0
+Core Jackson processing abstractions (aka Streaming API), implementation for JSON
+https://github.com/FasterXML/jackson-core
+
+jackson-databind (2.14.2) - The Apache Software License, Version 2.0
+General data-binding functionality for Jackson: works on core streaming API
+https://github.com/FasterXML/jackson
+
+java jwt (4.4.0) - The MIT License (MIT)
+Java implementation of JSON Web Token (JWT)
+https://github.com/auth0/java-jwt
+
+Kotlin Reflect (1.8.21) - The Apache License, Version 2.0
+Kotlin Full Reflection Library
+https://kotlinlang.org/
+
+Kotlin Stdlib (1.9.20) - The Apache License, Version 2.0
+Kotlin Standard Library
+https://kotlinlang.org/
+
+Kotlin Stdlib Jdk7 (1.9.10) - The Apache License, Version 2.0
+Kotlin Standard Library JDK 7 extension
+https://kotlinlang.org/
+
+Kotlin Stdlib Jdk8 (1.9.10) - The Apache License, Version 2.0
+Kotlin Standard Library JDK 8 extension
+https://kotlinlang.org/
+
+kotlin-logging (5.1.0) - The Apache Software License, Version 2.0
+kotlin-logging 5.1.0 - Lightweight logging framework for Kotlin
+https://github.com/oshai/kotlin-logging
+
+kotlin-result (1.1.18) - ISC License
+A Result monad for modelling success or failure operations.
+https://github.com/michaelbull/kotlin-result
+
+Logback Classic Module (1.4.11) - Eclipse Public License - v 1.0,GNU Lesser General Public License
+logback-classic module
+
+Logback Core Module (1.4.11) - Eclipse Public License - v 1.0,GNU Lesser General Public License
+logback-core module
+
+moshi (1.15.0) - The Apache Software License, Version 2.0
+A modern JSON API for Android and Java
+https://github.com/square/moshi/
+
+moshi-adapters (1.15.0) - The Apache Software License, Version 2.0
+A modern JSON API for Android and Java
+https://github.com/square/moshi/
+
+moshi-kotlin (1.15.0) - The Apache Software License, Version 2.0
+A modern JSON API for Android and Java
+https://github.com/square/moshi/
+
+Netty/Buffer (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Codec (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Codec/HTTP (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Codec/HTTP2 (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Common (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Handler (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Resolver (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Transport (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Transport/Classes/Epoll (4.1.100.Final) - Apache License, Version 2.0
+
+Netty/Transport/Native/Unix/Common (4.1.100.Final) - Apache License, Version 2.0
+Static library which contains common unix utilities.
+
+okhttp (4.12.0) - The Apache Software License, Version 2.0
+Square’s meticulous HTTP client for Java and Kotlin.
+https://square.github.io/okhttp/
+
+okio (3.6.0) - The Apache Software License, Version 2.0
+A modern I/O library for Android, Java, and Kotlin Multiplatform.
+https://github.com/square/okio/
+
+reactive-streams (1.0.4) - MIT-0
+A Protocol for Asynchronous Non-Blocking Data Sequence
+http://www.reactive-streams.org/
+
+SLF4J API Module (2.0.9) - MIT License
+The slf4j API
+http://www.slf4j.org

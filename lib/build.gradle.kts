@@ -315,6 +315,7 @@ tasks.register("release") {
   dependsOn(
     "buildInfo",
     "build",
+    "licenseReport",
     "kotlinSourcesJar",
     "dokkaHtmlPublic",
   )
@@ -338,10 +339,26 @@ tasks.register("release") {
       into(kDocsDir)
     }
 
+    // Copy licenses file
+    copy {
+      from(
+        file(
+          Paths.get(
+            project.layout.buildDirectory.get().asFile.absolutePath,
+            "reports",
+            "licenses",
+            "licenseReport.txt"
+          )
+        )
+      ) {
+        rename("licenseReport.txt", "licenses.txt")
+      }
+      into(file(Paths.get(rootDir.absolutePath)))
+    }
+
     // Zip kdocs directory
     zipTo(
-      zipFile = file(Paths.get(relDir.absolutePath, "kdocs.zip")),
-      baseDir = kDocsDir
+      zipFile = file(Paths.get(relDir.absolutePath, "kdocs.zip")), baseDir = kDocsDir
     )
 
     logger.quiet("Release artifacts copied to $relDir")
