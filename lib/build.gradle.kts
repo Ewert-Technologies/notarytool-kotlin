@@ -260,8 +260,7 @@ publishing {
 
         properties.set(
           mapOf(
-            "project.build.sourceEncoding" to "UTF-8",
-            "java.version" to "${java.toolchain.languageVersion.get()}"
+            "project.build.sourceEncoding" to "UTF-8", "java.version" to "${java.toolchain.languageVersion.get()}"
           )
         )
 
