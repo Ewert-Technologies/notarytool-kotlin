@@ -117,7 +117,7 @@ val notaryToolClient = NotaryToolClient(
 
 ### Functions
 
-The `NotaryToolClient` has the following functions:
+The `NotaryToolClient` has the following methods:
 
 | Function                    | Notes                                                                                                                                                                                              |
 |-----------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -126,16 +126,17 @@ The `NotaryToolClient` has the following functions:
 | `getSubmissionLog()`        | Fetches details about a single completed notarization. Maps to the [Get Submission Log](https://developer.apple.com/documentation/notaryapi/get_submission_log) Endpoint.                          |
 | `getPreviousSubmissions()`  | Fetches a list of your team’s previous notarization submissions. Maps to the [Get Previous Submissions](https://developer.apple.com/documentation/notaryapi/get_previous_submissions) Endpoint.    |
 | `submitAndUploadSoftware()` | A convenience method that calls `submitSoftware()` and then uploads the software to the Amazon S3 Server, where the Notary API can access it.                                                      |
-| `pollSubmissionStatus()`    | A convenience method that repeated calls `getSubmissionStatus()`, until the status is no longer `In Progress`.                                                                                     |
+| `pollSubmissionStatus()`    | A convenience method that repeatedly calls `getSubmissionStatus()`, until the status is no longer `In Progress`.                                                                                   |
 | `retrieveSubmissionLog()`   | A convenience method that calls `getSubmissionLog()` and returns the log as String.                                                                                                                |
 | `downloadSubmssionLog()`    | A convenience method that calls `getSubmissionLog()` and downloads the log as file.                                                                                                                |
 
 ### Error Handling
 
 Errors are handled using a Result type, using the [kotlin-result](https://github.com/michaelbull/kotlin-result) library.
-The Result type, has two subtypes, `OK<V>`, which represents and success the value to be returned and `Err<E>`, which
-represents failure, and contains an `NotaryToolError` subtype. In general, when a function returns a Result type, the
-Result will either contain the success value, or it will contain an error type. See below for some examples.
+The Result type, has two subtypes, `OK<V>`, which represents success and contains the value to be returned, and
+`Err<E>`, which represents failure, and contains an `NotaryToolError` subtype. In general, when a function returns a
+Result type, the Result will either contain the success value, or it will contain an error type. See below for
+some examples.
 
 ### Examples
 
@@ -218,7 +219,8 @@ Status for submission 6253220d-ee59-4682-8d23-9a4fe87eaagg (softwareApp.dmg): Ac
 
 ## Support
 
-For any issues or suggestions please use github issues.
+For any issues or suggestions please
+use [GitHub Issues](https://github.com/Ewert-Technologies/notarytool-kotlin/issues).
 
 ## Third-Party Dependencies
 
