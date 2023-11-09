@@ -283,6 +283,12 @@ publishing {
             email.set(authorEmail)
           }
         }
+
+        scm {
+          connection = "scm:git:git://github.com/Ewert-Technologies/notarytool-kotlin.git"
+          developerConnection = "scm:git:ssh://github.com/Ewert-Technologies/notarytool-kotlin.git"
+          url = "https://github.com/Ewert-Technologies/notarytool-kotlin/tree/main"
+        }
       }
     }
   }
