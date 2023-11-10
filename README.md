@@ -7,7 +7,7 @@
 
 A Kotlin wrapper/library for notarizing applications for macOS,
 using [Apple's Notary Web Service REST API](https://developer.apple.com/documentation/notaryapi). This library tries to
-follow the Notary API, as closely as possible, mapping methods to the Endpoints calls. It also provides some convenience
+follow the Notary API, as closely as possible, mapping methods to the Endpoint calls. It also provides some convenience
 methods that groups several Endpoint calls together.
 
 ## Project status
@@ -16,7 +16,7 @@ This project is in development, and no official releases are available yet.
 
 ## Installation
 
-This library is available on Maven Central.
+This library is available on Maven Central. (Pending)
 
 ### Maven
 
