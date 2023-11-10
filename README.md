@@ -43,6 +43,9 @@ implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.1.0"
 
 ## Usage
 
+Please refer to the [notarytool-kotlin API Docs](https://apidocs.ewert-technologies.ca/notarytool-kotlin/current)
+for complete documentation details.
+
 ### Pre-Requisites
 
 To be able to notarize an application on macOS, you need to have an Apple Developer account with access to App Store
@@ -50,13 +53,14 @@ Connect. In order to make calls to the Notary API, you first need to create an A
 see: [Creating API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
 for instructions. After creating an API key, you should have the following information:
 
-| Name           | Description                                                    |
-|----------------|----------------------------------------------------------------|
-| Issuer ID      | Your issuer ID from the API Keys page in the App Store Connect |
-| Private Key ID | Your Private key ID from App Store Connect                     |
-| Private Key    | The `.p8` file downloaded when creating the API Key            |
+| Name           | Description                                                |
+|----------------|------------------------------------------------------------|
+| Issuer ID      | Your issuer ID from the API Keys page in App Store Connect |
+| Private Key ID | Your Private key ID from App Store Connect                 |
+| Private Key    | The `.p8` file downloaded when creating the API Key        |
 
-These items are used to generate a JSON Web Token (JWT), used for authentication when making calls to the Notary API
+These items are used to generate a [JSON Web Token (JWT)](https://jwt.io/), which is used for authentication when making
+calls to the Notary API
 (see
 [Generating Tokens for API Requests](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
 for more information). Note: the JWT is generated for you automatically by this library.
@@ -68,8 +72,8 @@ created once, subsequent calls should use the same instance.
 
 #### Basic creation
 
-This example shows creating a `NotaryToolClient` using the Authentication information obtained as above, and using the
-default configuration.
+This example shows creating a `NotaryToolClient` instance using the Authentication information obtained as above, and
+using the default configuration.
 
 ```kotlin
 val notaryToolClient = NotaryToolClient(
@@ -130,10 +134,13 @@ The `NotaryToolClient` has the following methods:
 | `retrieveSubmissionLog()`   | A convenience method that calls `getSubmissionLog()` and returns the log as String.                                                                                                                |
 | `downloadSubmssionLog()`    | A convenience method that calls `getSubmissionLog()` and downloads the log as file.                                                                                                                |
 
+Please refer to the [notarytool-kotlin API Docs](https://apidocs.ewert-technologies.ca/notarytool-kotlin/current)
+for complete documentation details.
+
 ### Error Handling
 
 Errors are handled using a Result type, using the [kotlin-result](https://github.com/michaelbull/kotlin-result) library.
-The Result type, has two subtypes, `OK<V>`, which represents success and contains the value to be returned, and
+The Result type, has two subtypes, `OK<V>`, which represents success, and contains the value to be returned, and
 `Err<E>`, which represents failure, and contains an `NotaryToolError` subtype. In general, when a function returns a
 Result type, the Result will either contain the success value, or it will contain an error type. See below for
 some examples.
@@ -239,7 +246,7 @@ This project uses the following runtime and test dependencies.
 - [assertk](https://github.com/willowtreeapps/assertk)
 - [mockwebserver](https://github.com/square/okhttp/tree/master/mockwebserver)
 
-See also [license.txt](licenses.txt) file.
+See also [licenses.txt](licenses.txt) file.
 
 ## License
 
