@@ -8,6 +8,7 @@
  */
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import nu.studer.gradle.credentials.domain.CredentialsContainer
 import org.gradle.kotlin.dsl.support.zipTo
 import org.jetbrains.dokka.DokkaConfiguration
 import org.jetbrains.dokka.base.DokkaBase
@@ -15,6 +16,8 @@ import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
 import java.nio.file.Paths
 import java.time.Instant
+
+val credentials: CredentialsContainer by project.extra
 
 buildscript {
   dependencies {
@@ -36,6 +39,7 @@ plugins {
   id("com.github.ben-manes.versions") version "0.49.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
   id("org.jmailen.kotlinter")
+  id("nu.studer.credentials") version "3.0"
 }
 
 //
@@ -107,6 +111,10 @@ val company: String by project
 val companyUrl: String by project
 val group: String by project
 val copyrightYear: String by project
+val mavenReleaseUrlString: String by project
+val mavenSnapshotUrlString: String by project
+val ossrhUsername: String = credentials.forKey("ossrhUsername")
+val ossrhPassword: String = credentials.forKey("ossrhPassword")
 
 //
 // Configure dependencyUpdates
@@ -288,6 +296,19 @@ publishing {
           developerConnection = "scm:git:ssh://github.com/Ewert-Technologies/notarytool-kotlin.git"
           url = "https://github.com/Ewert-Technologies/notarytool-kotlin/tree/main"
         }
+      }
+    }
+  }
+  repositories {
+    maven {
+      name = "OSSRH"
+      val releasesRepoUrl = uri(mavenReleaseUrlString)
+      val snapshotsRepoUrl = uri(mavenSnapshotUrlString)
+//      url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+      url = snapshotsRepoUrl
+      credentials {
+        username = ossrhUsername
+        password = ossrhPassword
       }
     }
   }
