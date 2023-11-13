@@ -304,8 +304,7 @@ publishing {
       name = "OSSRH"
       val releasesRepoUrl = uri(mavenReleaseUrlString)
       val snapshotsRepoUrl = uri(mavenSnapshotUrlString)
-//      url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
-      url = snapshotsRepoUrl
+      url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
       credentials {
         username = ossrhUsername
         password = ossrhPassword
