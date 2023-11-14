@@ -17,7 +17,9 @@ This project is in development, and no official releases are available yet.
 
 ## Installation
 
-This library is available on Maven Central. (Pending)
+This library is available
+on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin). (
+Pending)
 
 ### Maven
 
