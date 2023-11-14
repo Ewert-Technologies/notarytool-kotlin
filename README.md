@@ -1,5 +1,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Static Badge](https://img.shields.io/badge/Status-In%20Development-orange)
+![Maven Central](https://img.shields.io/maven-central/v/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin?color=blue)
 
 # notarytool-kotlin
 
