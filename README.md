@@ -13,13 +13,21 @@ methods that groups several Endpoint calls together.
 
 ## Project status
 
-This project is in development, and no official releases are available yet.
+This project is in development and its API may be unstable. It has been tested and can be considered as being beta.
+
+## Versioning
+
+This project adheres to [Semantic Versioning 2.0.0](https://semver.org/).
+
+## Contributing
+
+This project is not currently accepting any pull requests. If you find a problem, or have a suggestion please
+log an [issue](https://github.com/Ewert-Technologies/notarytool-kotlin/issues).
 
 ## Installation
 
 This library is available
-on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin). (
-Pending)
+on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin).
 
 ### Maven
 
@@ -51,12 +59,12 @@ for complete documentation details.
 
 ### Pre-Requisites
 
-To be able to notarize an application on macOS, you need to have an Apple Developer account with access to App Store
+To be able to notarize an application for macOS, you need to have an Apple Developer account, with access to App Store
 Connect. In order to make calls to the Notary API, you first need to create an API Key,
 see: [Creating API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
 for instructions. After creating an API key, you should have the following information:
 
-| Name           | Description                                                |
+| Item           | Description                                                |
 |----------------|------------------------------------------------------------|
 | Issuer ID      | Your issuer ID from the API Keys page in App Store Connect |
 | Private Key ID | Your Private key ID from App Store Connect                 |
