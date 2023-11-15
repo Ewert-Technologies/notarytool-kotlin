@@ -17,7 +17,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
  * Top level Response from making a [**`Get Submission Log`**](https://developer.apple.com/documentation/notaryapi/get_submission_log)
  * Request.
  * Corresponds to [`SubmissionLogURLResponse`](https://developer.apple.com/documentation/notaryapi/newsubmissionresponse),
- * from Apple's API. _The notary service's response to a request for the log information about a completed submission_
+ * from the Notary API. _The notary service's response to a request for the log information about a completed submission_
  *
  * @property submissionLogResponseData `SubmissionLogURLResponse.Data` Data that indicates how to get the
  * log information for a particular submission.
@@ -61,7 +61,7 @@ data class SubmissionLogUrlResponseJson internal constructor(
 
 /**
  * Corresponds to [`SubmissionLogURLResponse.Data`](https://developer.apple.com/documentation/notaryapi/submissionlogurlresponse/data),
- * from Apple's API. _Data that indicates how to get the log information for a particular submission._
+ * from the Notary API. _Data that indicates how to get the log information for a particular submission._
  *
  * @property attributes `SubmissionLogURLResponse.Data.Attributes` Information about the log
  * associated with the submission.
@@ -90,6 +90,6 @@ data class SubmissionLogUrlResponseAttributesJson(
 
 /**
  * Corresponds to [`SubmissionLogURLResponse.Meta`](https://developer.apple.com/documentation/notaryapi/submissionlogurlresponse/meta),
- * from Apple's API. _An empty object. This object is reserved for future use._
+ * from the Notary API. _An empty object. This object is reserved for future use._
  */
 class SubmissionLogUrlResponseMetaJson

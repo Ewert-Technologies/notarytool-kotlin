@@ -16,7 +16,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
 /**
  * Top level Request for making a **`Submit Software`** Request.
  * Corresponds to [`NewSubmissionRequest`](https://developer.apple.com/documentation/notaryapi/newsubmissionrequest),
- * from Apple's API. _Data that you provide when starting a submission to the notary service._
+ * from the Notary API. _Data that you provide when starting a submission to the notary service._
  *
  * @property notifications `NewSubmissionRequest.Notifications` An optional array of notifications that
  * you want to receive when notarization finishes. Omit this key if you don’t need a notification.
@@ -72,7 +72,7 @@ data class NewSubmissionRequestNotificationJson(
 /**
  * Top level Response from making a **`Submit Software`** Request.
  * Corresponds to [`NewSubmissionResponse`](https://developer.apple.com/documentation/notaryapi/newsubmissionresponse),
- * from Apple's API. _The notary service's response to a software submission._
+ * from the Notary API. _The notary service's response to a software submission._
  *
  * @property newSubmissionResponseData `NewSubmissionResponse.Data` Data that describes the result of the
  * submission request.

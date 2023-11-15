@@ -16,7 +16,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
 /**
  * Top level Response from making a **`Get Submission Status`** Request.
  * Corresponds to [`SubmissionResponse`](https://developer.apple.com/documentation/notaryapi/submissionresponse),
- * from Apple's API. _You receive a structure of this type in response to a call to
+ * from the Notary API. _You receive a structure of this type in response to a call to
  * the `Get Submission Status` endpoint._
  *
  * Instances can be created by parsing the json response
@@ -63,7 +63,7 @@ data class SubmissionResponseJson internal constructor(
 /**
  * Top level Response from making a **`Get Previous Submissions`** Request.
  * Corresponds to [`SubmissionsListResponse`](https://developer.apple.com/documentation/notaryapi/submissionlistresponse),
- * from Apple's API. _You receive a structure of this type in response to a call to the
+ * from the Notary API. _You receive a structure of this type in response to a call to the
  * `Get Previous Submissions` endpoint. The list includes only the 100 most recent submissions._
  *
  * @property submissionListResponseData `SubmissionListResponse.Data` An array of objects, each of which describes

@@ -8,7 +8,7 @@ private val moshi: Moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).b
 
 /**
  * Data class representing a Jason Web Token header. Used for serializing
- * and de-serializing the raw json. See [JWT Introduction](https://jwt.io/introduction)
+ * and de-serializing the raw json. See [JWT Introduction](https://jwt.io/introduction) and
  * [App Store Connect API documentation](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
  *
  * @property alg Encryption Algorithm
@@ -39,7 +39,7 @@ data class JwtHeaderJson(
 
 /**
  * Data class representing a Jason Web Token payload. Used for serializing
- * and de-serializing the raw json. See [JWT Introduction](https://jwt.io/introduction)
+ * and de-serializing the raw json. See [JWT Introduction](https://jwt.io/introduction) and
  * [App Store Connect API documentation](https://developer.apple.com/documentation/appstoreconnectapi/generating_tokens_for_api_requests)
  *
  * @property iss Issuer ID
