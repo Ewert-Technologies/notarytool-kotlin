@@ -281,6 +281,7 @@ publishing {
           license {
             name.set("The MIT License")
             url.set("https://mit-license.org/")
+            comments.set("A permissive free software license originating at the Massachusetts Institute of Technology (MIT)")
           }
         }
 
