@@ -7,6 +7,7 @@ import assertk.assertions.isGreaterThan
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotNull
+import assertk.assertions.matches
 import assertk.assertions.prop
 import assertk.fail
 import ca.ewert.notarytoolkotlin.response.SubmissionId
@@ -360,7 +361,7 @@ class GetSubmissionLogTests : NotaryToolClientTests() {
       when (notaryToolError) {
         is NotaryToolError.ConnectionError -> {
           log.warn { notaryToolError.msg }
-          assertThat(notaryToolError.msg).isEqualTo("timeout")
+          assertThat(notaryToolError.msg).matches(Regex("timeout|Read timed out"))
         }
 
         else -> {
