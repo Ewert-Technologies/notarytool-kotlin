@@ -110,7 +110,7 @@ val authorEmail: String by project
 val company: String by project
 val companyUrl: String by project
 val group: String by project
-val inceptionYear: String by project
+val createdYear: String by project
 val copyrightYear: String by project
 val mavenReleaseUrlString: String by project
 val mavenSnapshotUrlString: String by project
@@ -265,7 +265,7 @@ publishing {
         name.set(longName)
         description.set(project.description)
         url.set(projectUrl)
-        inceptionYear.set(inceptionYear)
+        inceptionYear.set(createdYear)
 
         properties.set(
           mapOf(
