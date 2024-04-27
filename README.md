@@ -13,7 +13,7 @@ methods that groups several Endpoint calls together.
 
 ## Project status
 
-This project is in development and its API may be unstable. It has been tested and can be considered as being beta.
+This project is in Beta and its API may be unstable.
 
 ## Versioning
 
@@ -60,7 +60,7 @@ for complete documentation details.
 ### Pre-Requisites
 
 To be able to notarize an application for macOS, you need to have an Apple Developer account, with access to App Store
-Connect. In order to make calls to the Notary API, you first need to create an API Key,
+Connect. In order to make calls to the Notary API, you first need to create an API Key;
 see: [Creating API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
 for instructions. After creating an API key, you should have the following information:
 
