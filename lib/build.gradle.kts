@@ -133,7 +133,6 @@ fun isNonStable(version: String): Boolean {
   return isStable.not()
 }
 
-
 //
 // Configure Testing
 //
@@ -229,13 +228,21 @@ tasks.register("buildInfo") {
   group = "help"
   description = "Displays general build info, such as versions, etc."
 
+  logger.quiet("--- Project Info -----------------------------")
   logger.quiet("Project: ${project.name} - ${project.description}")
   logger.quiet("Project version: ${project.version}")
   logger.quiet("Group:  ${project.group}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
+  logger.quiet("--- Environment Info --------------------------")
   logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
+  logger.quiet("Java Version: ${System.getProperty("java.version")}")
+  logger.quiet("JRE Arch: ${System.getProperty("os.arch")}")
+  logger.quiet("Java Home: ${System.getProperty("java.home")}")
+  logger.quiet("Java Vendor: ${System.getProperty("java.vendor")}")
+  logger.quiet("Java Vendor Version: ${System.getProperty("java.vendor.version")}")
+  logger.quiet("Operating System: ${System.getProperty("os.name")}, version: ${System.getProperty("os.version")}")
   logger.quiet("build dir: ${project.layout.buildDirectory.asFile.get()}")
 }
 
