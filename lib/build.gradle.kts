@@ -21,7 +21,7 @@ val credentials: CredentialsContainer by project.extra
 
 buildscript {
   dependencies {
-    classpath("org.jetbrains.dokka:dokka-base:1.9.10")
+    classpath("org.jetbrains.dokka:dokka-base:1.9.20")
   }
 }
 
@@ -34,9 +34,9 @@ plugins {
   `java-library`
   `maven-publish`
   signing
-  id("com.jaredsburrows.license") version "0.9.3"
+  id("com.jaredsburrows.license") version "0.9.7"
   id("org.jetbrains.kotlin.jvm") version "1.9.20"
-  id("com.github.ben-manes.versions") version "0.49.0"
+  id("com.github.ben-manes.versions") version "0.51.0"
   id("org.barfuin.gradle.taskinfo") version "2.1.0"
   id("org.jmailen.kotlinter")
   id("nu.studer.credentials") version "3.0"
