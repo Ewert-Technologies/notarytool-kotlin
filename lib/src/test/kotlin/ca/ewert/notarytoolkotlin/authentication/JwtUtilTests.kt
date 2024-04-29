@@ -109,7 +109,7 @@ class JwtUtilTests {
     )
 
     val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
-      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist."
+      "Private Key File: 'V:\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist."
     } else {
       "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/notExist.file' does not exist."
     }
@@ -339,7 +339,7 @@ class JwtUtilTests {
   @Test
   fun parsePrivateKeyFromFileTest4() {
     val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
-      "Private Key File: 'D:\\users\\vewert\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist."
+      "Private Key File: 'V:\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist."
     } else {
       "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/./noFile.file' does not exist."
     }
