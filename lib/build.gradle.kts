@@ -71,9 +71,9 @@ dependencies {
   implementation(group = "software.amazon.awssdk", name = "s3")
 
   // Logging
-  implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "5.1.0")
-  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.9")
-  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
+  implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "5.1.4")
+  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.13")
+  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.14")
 
   // Testing
   testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.14.0")
