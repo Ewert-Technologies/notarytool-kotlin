@@ -54,7 +54,7 @@ repositories {
 //
 dependencies {
 
-  val moshiVersion = "1.15.0"
+  val moshiVersion = "1.15.1"
 
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
   api(group = "com.michael-bull.kotlin-result", name = "kotlin-result", version = "1.1.18")
@@ -67,7 +67,7 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-  implementation(platform("software.amazon.awssdk:bom:2.21.24"))
+  implementation(platform("software.amazon.awssdk:bom:2.25.41"))
   implementation(group = "software.amazon.awssdk", name = "s3")
 
   // Logging
