@@ -10,14 +10,13 @@ import assertk.assertions.prop
 import assertk.fail
 import ca.ewert.notarytoolkotlin.NotaryToolError
 import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenError.InvalidPrivateKeyError
-import ca.ewert.notarytoolkotlin.hasMessage
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd
+import ca.ewert.notarytoolkotlin.messageContainsMatch
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.apache.commons.lang3.SystemUtils
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
@@ -107,13 +106,8 @@ class JwtUtilTests {
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
-
-    val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
-      "Private Key File: 'V:\\DevProj\\notarytool-kotlin\\lib\\notExist.file' does not exist."
-    } else {
-      "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/notExist.file' does not exist."
-    }
-    assertThat(generateJwtResult).isErrAnd().hasMessage(expectedMsg)
+    val expectedMsgRegex = "'.*notExist.file' does not exist.".toRegex()
+    assertThat(generateJwtResult).isErrAnd().messageContainsMatch(expectedMsgRegex)
     generateJwtResult.onFailure { jsonWebTokenError ->
       assertThat(jsonWebTokenError is NotaryToolError.UserInputError.JsonWebTokenError.PrivateKeyNotFoundError)
     }
@@ -338,13 +332,9 @@ class JwtUtilTests {
    */
   @Test
   fun parsePrivateKeyFromFileTest4() {
-    val expectedMsg = if (SystemUtils.IS_OS_WINDOWS) {
-      "Private Key File: 'V:\\DevProj\\notarytool-kotlin\\lib\\.\\noFile.file' does not exist."
-    } else {
-      "Private Key File: '/Users/vewert/DevProj/notarytool-kotlin/lib/./noFile.file' does not exist."
-    }
+    val expectedMsgRegex = "'.*noFile.file' does not exist.".toRegex()
 
     val privateKeyFile = Paths.get("./noFile.file")
-    assertThat(parsePrivateKeyString(privateKeyFile)).isErrAnd().hasMessage(expectedMsg)
+    assertThat(parsePrivateKeyString(privateKeyFile)).isErrAnd().messageContainsMatch(expectedMsgRegex)
   }
 }
