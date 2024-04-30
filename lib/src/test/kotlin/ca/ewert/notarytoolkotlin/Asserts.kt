@@ -1,6 +1,7 @@
 package ca.ewert.notarytoolkotlin
 
 import assertk.Assert
+import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import assertk.assertions.support.appendName
 import assertk.assertions.support.expected
@@ -82,8 +83,15 @@ fun <V, E> Assert<Result<V, E>>.isErrAnd() = transform { actual ->
 }
 
 /**
- * Checks the message of a [NotaryToolError]
+ * Checks the message of a
  */
 fun Assert<NotaryToolError>.hasMessage(expected: String) = given { actual ->
   assertk.assertThat(actual.msg).isEqualTo(expected)
+}
+
+/**
+ * Checks the message of a [NotaryToolError] using Regex.
+ */
+fun Assert<NotaryToolError>.messageContainsMatch(regex: Regex) = given { actual ->
+  assertk.assertThat(actual.msg).containsMatch(regex)
 }
