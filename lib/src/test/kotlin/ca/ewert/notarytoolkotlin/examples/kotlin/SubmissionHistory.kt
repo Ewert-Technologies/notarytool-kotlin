@@ -4,8 +4,6 @@ import ca.ewert.notarytoolkotlin.NotaryToolClient
 import ca.ewert.notarytoolkotlin.NotaryToolError
 import ca.ewert.notarytoolkotlin.TestValuesReader
 import ca.ewert.notarytoolkotlin.resourceToPath
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Path
 import java.time.ZoneId
@@ -34,8 +32,9 @@ fun main() {
     println("Connect Timeout: ${notaryToolClient.connectTimeout}")
     println(notaryToolClient.userAgent)
 
-    when (val result = notaryToolClient.getPreviousSubmissions()) {
-      is Ok -> {
+    val result = notaryToolClient.getPreviousSubmissions()
+    when {
+      result.isOk -> {
         val submissionListResponse = result.value
         println(
           "Response Received on: ${
@@ -49,7 +48,7 @@ fun main() {
         }
       }
 
-      is Err -> {
+      else -> {
         when (val notaryToolError = result.error) {
           is NotaryToolError.UserInputError.AuthenticationError ->
             println("Authentication Error: '${notaryToolError.msg}' Please check your Apple API Key credentials")

@@ -21,6 +21,7 @@ import com.github.michaelbull.result.Err
 import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.andThen
+import com.github.michaelbull.result.asErr
 import com.github.michaelbull.result.flatMap
 import com.github.michaelbull.result.map
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -211,8 +212,8 @@ class NotaryToolClient internal constructor(
    * @return The [NewSubmissionResponse] or a [NotaryToolError] if there is an error.
    */
   fun submitSoftware(softwarePath: Path): Result<NewSubmissionResponse, NotaryToolError> {
-    return when (this.jsonWebTokenResult) {
-      is Ok -> {
+    return when {
+      this.jsonWebTokenResult.isOk -> {
         val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {
           jsonWebToken.updateWebToken()
@@ -245,7 +246,7 @@ class NotaryToolClient internal constructor(
         }
       }
 
-      is Err -> jsonWebTokenResult
+      else -> jsonWebTokenResult.asErr()
     }
   }
 
@@ -388,8 +389,8 @@ class NotaryToolClient internal constructor(
    * @return The [SubmissionStatusResponse] or a [NotaryToolError]
    */
   fun getSubmissionStatus(submissionId: SubmissionId): Result<SubmissionStatusResponse, NotaryToolError> {
-    return when (this.jsonWebTokenResult) {
-      is Ok -> {
+    return when {
+      this.jsonWebTokenResult.isOk -> {
         val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {
           jsonWebToken.updateWebToken()
@@ -429,7 +430,7 @@ class NotaryToolClient internal constructor(
         }
       }
 
-      is Err -> jsonWebTokenResult
+      else -> this.jsonWebTokenResult.asErr()
     }
   }
 
@@ -455,8 +456,9 @@ class NotaryToolClient internal constructor(
     progressCallback: (currentPollCount: Int, submissionStatusResponse: SubmissionStatusResponse) -> Unit = { _, _ -> },
   ): Result<SubmissionStatusResponse, NotaryToolError> {
     for (count in 1..maxPollCount) {
-      when (val submissionStatusResult = getSubmissionStatus(submissionId)) {
-        is Ok -> {
+      val submissionStatusResult = getSubmissionStatus(submissionId)
+      when {
+        submissionStatusResult.isOk -> {
           val submissionStatusResponse = submissionStatusResult.value
           progressCallback(count, submissionStatusResponse)
           log.debug { "Current status: $submissionStatusResponse.submissionInfo.status" }
@@ -466,7 +468,7 @@ class NotaryToolClient internal constructor(
           }
         }
 
-        is Err -> return submissionStatusResult
+        else -> return submissionStatusResult.asErr()
       }
       val delay: Duration = delayFunction(count)
       Thread.sleep(delay.toMillis())
@@ -495,8 +497,8 @@ class NotaryToolClient internal constructor(
    * @return A [SubmissionLogUrlResponse] containing the log URL, or a [NotaryToolError]
    */
   fun getSubmissionLog(submissionId: SubmissionId): Result<SubmissionLogUrlResponse, NotaryToolError> {
-    return when (this.jsonWebTokenResult) {
-      is Ok -> {
+    return when {
+      this.jsonWebTokenResult.isOk -> {
         val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {
           jsonWebToken.updateWebToken()
@@ -539,7 +541,7 @@ class NotaryToolClient internal constructor(
         }
       }
 
-      is Err -> jsonWebTokenResult
+      else -> jsonWebTokenResult.asErr()
     }
   }
 
@@ -613,8 +615,8 @@ class NotaryToolClient internal constructor(
    * @return A [SubmissionListResponse] or a [NotaryToolError]
    */
   fun getPreviousSubmissions(): Result<SubmissionListResponse, NotaryToolError> {
-    return when (this.jsonWebTokenResult) {
-      is Ok -> {
+    return when {
+      this.jsonWebTokenResult.isOk -> {
         val jsonWebToken: JsonWebToken = jsonWebTokenResult.value
         if (jsonWebToken.isExpired) {
           jsonWebToken.updateWebToken()
@@ -655,7 +657,7 @@ class NotaryToolClient internal constructor(
         }
       }
 
-      is Err -> jsonWebTokenResult
+      else -> jsonWebTokenResult.asErr()
     }
   }
 }
@@ -683,16 +685,15 @@ private fun handleUnsuccessfulResponse(responseMetaData: ResponseMetaData): Nota
         )
       } else {
         // This is a Notary Error Response, likely incorrect submissionId
-        return when (
-          val errorResponseJsonResult =
-            ErrorResponseJson.create(responseMetaData.rawContents)
-        ) {
-          is Ok -> {
+        val errorResponseJsonResult =
+          ErrorResponseJson.create(responseMetaData.rawContents)
+        return when {
+          errorResponseJsonResult.isOk -> {
             // FIXME: Should maybe check that there is at least one error
             NotaryToolError.UserInputError.InvalidSubmissionIdError(errorResponseJsonResult.value.errors[0].detail)
           }
 
-          is Err -> {
+          else -> {
             log.warn { errorResponseJsonResult.error }
             errorResponseJsonResult.error
           }
