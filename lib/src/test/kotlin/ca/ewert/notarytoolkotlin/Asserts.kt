@@ -6,8 +6,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.support.appendName
 import assertk.assertions.support.expected
 import assertk.assertions.support.show
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
 import com.github.michaelbull.result.Result
 import java.time.Duration
 import java.time.Instant
@@ -17,7 +15,7 @@ import java.time.ZonedDateTime
  * Some custom AssertK asserts
  *
  * Created: 2023-06-09
- * @author vewert
+ * @author vewer
  */
 
 /**
@@ -44,7 +42,7 @@ fun Assert<Instant>.isCloseTo(expected: Instant, tolerance: Duration) = given { 
  * Asserts that a [Result] is Ok
  */
 fun <V, E> Assert<Result<V, E>>.isOk() = given { actual ->
-  if (actual !is Ok) {
+  if (!actual.isOk) {
     expected("$actual to be Result.Ok}")
   }
 }
@@ -54,7 +52,7 @@ fun <V, E> Assert<Result<V, E>>.isOk() = given { actual ->
  * so further asserts can be done on the Ok Value
  */
 fun <V, E> Assert<Result<V, E>>.isOkAnd(): Assert<V> = transform(appendName("Result.Ok value", ".")) { actual ->
-  if (actual is Ok) {
+  if (actual.isOk) {
     actual.value
   } else {
     expected("${show(actual)} to be Result.Ok}")
@@ -65,7 +63,7 @@ fun <V, E> Assert<Result<V, E>>.isOkAnd(): Assert<V> = transform(appendName("Res
  * Asserts that a [Result] is an Err
  */
 fun <V, E> Assert<Result<V, E>>.isErr() = given { actual ->
-  if (actual !is Err) {
+  if (!actual.isErr) {
     expected("${show(actual)} to be Result.Err")
   }
 }
@@ -75,7 +73,7 @@ fun <V, E> Assert<Result<V, E>>.isErr() = given { actual ->
  * so further asserts can be done on the Err Value
  */
 fun <V, E> Assert<Result<V, E>>.isErrAnd() = transform { actual ->
-  if (actual is Err) {
+  if (actual.isErr) {
     actual.error
   } else {
     expected("${show(actual)} to be Result.Err")
