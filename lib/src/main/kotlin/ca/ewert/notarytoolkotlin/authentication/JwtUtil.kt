@@ -15,6 +15,7 @@ import io.github.oshai.kotlinlogging.KLogger
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.file.Path
 import java.security.KeyFactory
+import java.security.interfaces.ECKey
 import java.security.interfaces.ECPrivateKey
 import java.security.spec.EncodedKeySpec
 import java.security.spec.PKCS8EncodedKeySpec
@@ -68,11 +69,11 @@ internal enum class Scope(val scopeValue: String) {
 fun generateJwt(
   privateKeyId: String,
   issuerId: String,
-  privateKeyFile: Path,
+  privateKeyProvider: () -> Result<ECKey, JsonWebTokenError>,
   issuedDate: Instant,
   expiryDate: Instant,
 ): Result<String, JsonWebTokenError> {
-  return createPrivateKey(privateKeyFile).flatMap {
+  return privateKeyProvider().flatMap {
     val algorithm = Algorithm.ECDSA256(it)
     val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
     try {

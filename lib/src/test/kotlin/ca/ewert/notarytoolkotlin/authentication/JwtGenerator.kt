@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isNotNull
 import ca.ewert.notarytoolkotlin.TestValuesReader
 import ca.ewert.notarytoolkotlin.isOk
+import ca.ewert.notarytoolkotlin.privateKeyFromPath
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -42,7 +43,7 @@ class JwtGenerator {
       val generateJwtResult = generateJwt(
         keyId,
         issuerId,
-        privateKeyFile,
+        privateKeyProvider = { privateKeyFromPath(privateKeyFile) },
         Instant.now(),
         Instant.now().plus(Duration.ofMinutes(15)),
       )

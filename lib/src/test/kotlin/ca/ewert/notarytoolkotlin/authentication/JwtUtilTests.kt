@@ -13,6 +13,7 @@ import ca.ewert.notarytoolkotlin.NotaryToolError.UserInputError.JsonWebTokenErro
 import ca.ewert.notarytoolkotlin.isErrAnd
 import ca.ewert.notarytoolkotlin.isOkAnd
 import ca.ewert.notarytoolkotlin.messageContainsMatch
+import ca.ewert.notarytoolkotlin.privateKeyFromPath
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onFailure
 import com.github.michaelbull.result.onSuccess
@@ -51,7 +52,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -102,7 +103,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -129,7 +130,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "",
       issuerId = "",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -180,7 +181,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -209,7 +210,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -238,7 +239,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
@@ -267,7 +268,7 @@ class JwtUtilTests {
     val generateJwtResult = generateJwt(
       privateKeyId = "ABCDE12345",
       issuerId = "70c5de5f-f737-47e2-e043-5b8c7c22a4d9",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       issuedDate.toInstant(),
       expiryDate.toInstant(),
     )
