@@ -47,7 +47,7 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.nio.file.Path
-import java.security.interfaces.ECKey
+import java.security.interfaces.ECPrivateKey
 import java.time.Duration
 import java.time.temporal.ChronoUnit
 import kotlin.io.path.absolutePathString
@@ -77,7 +77,7 @@ private val log = KotlinLogging.logger {}
  * testing with MockWebServer
  * @property privateKeyId The private key ID, provided by Apple.
  * @property issuerId The issuer ID, provided by Apple.
- * @property privateKeyProvider A function that creates an [ECKey], using the private key file (`.p8`) provided by Apple.
+ * @property privateKeyProvider A function that creates an [ECPrivateKey], using the private key file (`.p8`) provided by Apple.
  * @property tokenLifetime Lifetime of the token used for Authentication. It should be less than 20 minutes,
  * or request will be rejected by Apple. The default value is **15 minutes**
  * @property baseUrlString The base url of Apple's Notary Web API. The default value is:
@@ -89,7 +89,7 @@ private val log = KotlinLogging.logger {}
 class NotaryToolClient internal constructor(
   val privateKeyId: String,
   val issuerId: String,
-  val privateKeyProvider: () -> Result<ECKey, JsonWebTokenError>,
+  val privateKeyProvider: () -> Result<ECPrivateKey, JsonWebTokenError>,
   val tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
   private val baseUrlString: String,
   val connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
@@ -159,7 +159,7 @@ class NotaryToolClient internal constructor(
    *
    * @param privateKeyId The private key ID, provided by Apple.
    * @param issuerId The issuer ID, provided by Apple.
-   * @param privateKeyProvider A function that creates an [ECKey], using the private key file (`.p8`) provided by Apple.
+   * @param privateKeyProvider A function that creates an [ECPrivateKey], using the private key file (`.p8`) provided by Apple.
    * @param tokenLifetime Lifetime of the token used for Authentication. It should be less than 20 minutes,
    * or request will be rejected by Apple. The default value is **15 minutes**
    * @param connectTimeout Sets the default *connect timeout* for the connection. The default value is **10 seconds**
@@ -168,7 +168,7 @@ class NotaryToolClient internal constructor(
   constructor(
     privateKeyId: String,
     issuerId: String,
-    privateKeyProvider: () -> Result<ECKey, JsonWebTokenError>,
+    privateKeyProvider: () -> Result<ECPrivateKey, JsonWebTokenError>,
     tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
     connectTimeout: Duration = Duration.of(10, ChronoUnit.SECONDS),
     userAgent: String = USER_AGENT_VALUE,
