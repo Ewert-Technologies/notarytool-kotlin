@@ -39,11 +39,12 @@ private val log = KotlinLogging.logger {}
 class GetPreviousSubmissionsTests : NotaryToolClientTests() {
   /**
    * Tests making a request to getPreviousSubmission, with a valid response.
+   * Uses private key file.
    */
   @Test
   @Tag("MockServer")
   @DisplayName("getPreviousSubmissions - Success Test")
-  fun getPreviousSubmissionsValid() {
+  fun getPreviousSubmissionsValid1() {
     val responseBody: String = """
     {
       "data": [
@@ -97,6 +98,99 @@ class GetPreviousSubmissionsTests : NotaryToolClientTests() {
       privateKeyId = "A8B3X24VG1",
       issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
       privateKeyFile = privateKeyFile!!,
+      baseUrlString = baseUrl.toString(),
+    )
+
+    val getPreviousSubmissionsResult = notaryToolClient.getPreviousSubmissions()
+    getPreviousSubmissionsResult.onSuccess { submissionListResponse ->
+      assertThat(submissionListResponse.submissionInfoList).hasSize(4)
+      assertThat(submissionListResponse.submissionInfoList[2].status).isEqualTo(Status.INVALID)
+      val expectedCreatedDate: Instant =
+        ZonedDateTime.of(2021, 4, 23, 17, 44, 54, 761000000, ZoneId.of("GMT")).toInstant()
+      assertThat(submissionListResponse.submissionInfoList[1].createdDate ?: Instant.now())
+        .isEqualTo(expectedCreatedDate)
+
+      val submissionInfo4 = submissionListResponse.submissionInfoList[3]
+      assertThat(submissionInfo4).prop(SubmissionInfo::status).isEqualTo(Status.IN_PROGRESS)
+      assertThat(submissionInfo4).prop(SubmissionInfo::name).isEqualTo("OvernightTextEditor_11.6.8.zip")
+
+      val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
+      assertThat(recordedRequest.getHeader("User-Agent") ?: "").matches(Regex("notarytool-kotlin/\\d+\\.\\d+\\.\\d+"))
+      assertThat(recordedRequest.requestUrl?.toString() ?: "").endsWith("/submissions")
+    }
+
+    getPreviousSubmissionsResult.onFailure { error ->
+      when (error) {
+        is NotaryToolError.UserInputError.JsonWebTokenError.TokenCreationError -> log.warn { "${error.msg} - ${error.exceptionMsg}" }
+        is NotaryToolError.HttpError ->
+          log.warn { "An HTTP Error occurred. Code: ${error.responseMetaData.httpStatusCode} - ${error.responseMetaData.httpStatusMessage}, for request to: ${error.responseMetaData.requestUrlString}" }
+
+        else -> log.warn { error.msg }
+      }
+      fail(AssertionError("Request failed with: $error"))
+    }
+  }
+
+  /**
+   * Tests making a request to getPreviousSubmission, with a valid response.
+   * Uses function to generate ECKey.
+   */
+  @Test
+  @Tag("MockServer")
+  @DisplayName("getPreviousSubmissions - Success Test")
+  fun getPreviousSubmissionsValid2() {
+    val responseBody: String = """
+    {
+      "data": [
+        {
+          "attributes": {
+            "createdDate": "2021-04-29T01:38:09.498Z",
+            "name": "OvernightTextEditor_11.6.8.zip",
+            "status": "Accepted"
+          },
+          "id": "2efe2717-52ef-43a5-96dc-0797e4ca1041",
+          "type": "submissions"
+        },
+        {
+          "attributes": {
+            "createdDate": "2021-04-23T17:44:54.761Z",
+            "name": "OvernightTextEditor_11.6.7.zip",
+            "status": "Accepted"
+          },
+          "id": "cf0c235a-dad2-4c24-96eb-c876d4cb3a2d",
+          "type": "submissions"
+        },
+        {
+          "attributes": {
+            "createdDate": "2021-04-19T16:56:17.839Z",
+            "name": "OvernightTextEditor_11.6.7.zip",
+            "status": "Invalid"
+          },
+          "id": "38ce81cc-0bf7-454b-91ef-3f7395bf297b",
+          "type": "submissions"
+        },
+        {
+          "attributes": {
+            "createdDate": "2023-04-19T16:56:17.839Z",
+            "name": "OvernightTextEditor_11.6.8.zip",
+            "status": "In Progress"
+          },
+          "id": "38ce81cc-0bf7-454b-91ef-3f7395bf297b",
+          "type": "submissions"
+        }
+      ],
+      "meta": {}
+    }
+    """.trimIndent()
+
+    mockWebServer.enqueue(createMockResponse200(responseBody))
+
+    mockWebServer.start()
+    val baseUrl: HttpUrl = mockWebServer.url("")
+    val notaryToolClient = NotaryToolClient(
+      privateKeyId = "A8B3X24VG1",
+      issuerId = "70a7de6a-a537-48e3-a053-5a8a7c22a4a1",
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       baseUrlString = baseUrl.toString(),
     )
 

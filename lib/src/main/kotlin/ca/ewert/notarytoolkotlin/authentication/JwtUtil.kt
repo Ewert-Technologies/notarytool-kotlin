@@ -68,11 +68,11 @@ internal enum class Scope(val scopeValue: String) {
 fun generateJwt(
   privateKeyId: String,
   issuerId: String,
-  privateKeyFile: Path,
+  privateKeyProvider: () -> Result<ECPrivateKey, JsonWebTokenError>,
   issuedDate: Instant,
   expiryDate: Instant,
 ): Result<String, JsonWebTokenError> {
-  return createPrivateKey(privateKeyFile).flatMap {
+  return privateKeyProvider().flatMap {
     val algorithm = Algorithm.ECDSA256(it)
     val scopeArray = arrayOf(Scope.GET_SUBMISSIONS.scopeValue)
     try {
