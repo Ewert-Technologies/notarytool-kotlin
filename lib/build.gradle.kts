@@ -176,7 +176,7 @@ tasks.register<DokkaTask>("dokkaHtmlPrivate") {
   description = "Generates Dokka Documentation in `html` format for all visibilities"
 
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-    footerMessage = "(c) 2023 Ewert Technologies"
+    footerMessage = "(c) $copyrightYear Ewert Technologies"
   }
 
   dokkaSourceSets {
@@ -202,7 +202,7 @@ tasks.register<DokkaTask>("dokkaHtmlPublic") {
   description = "Generates Dokka Documentation in 'html' format for public items"
 
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-    footerMessage = "(c) 2023 Ewert Technologies"
+    footerMessage = "(c) $copyrightYear Ewert Technologies"
   }
 
   dokkaSourceSets {
