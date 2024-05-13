@@ -340,7 +340,7 @@ signing {
  */
 tasks.register("release") {
   group = project.name
-  description = "Creates a release"
+  description = "Creates a local release"
   dependsOn(
     "buildInfo",
     "build",
