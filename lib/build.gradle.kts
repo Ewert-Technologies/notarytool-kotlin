@@ -35,7 +35,7 @@ plugins {
   `maven-publish`
   signing
   id("com.jaredsburrows.license") version "0.9.7"
-  id("org.jetbrains.kotlin.jvm") version "1.9.23"
+  id("org.jetbrains.kotlin.jvm") version "1.9.24"
   id("com.github.ben-manes.versions") version "0.51.0"
   id("org.barfuin.gradle.taskinfo") version "2.2.0"
   id("org.jmailen.kotlinter")
