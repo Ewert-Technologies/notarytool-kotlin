@@ -13,7 +13,7 @@ methods that groups several Endpoint calls together.
 
 ## Project status
 
-This project is in development and its API may be unstable. It has been tested and can be considered as being beta.
+This project is in Beta and its API may be unstable.
 
 ## Versioning
 
@@ -34,22 +34,22 @@ on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.n
 ```xml
 
 <dependency>
-    <groupId>
-        ca.ewert-technologies.notarytoolkotlin
-    </groupId>
-    <artifactId>
-        notarytool-kotlin
-    </artifactId>
-    <version>
-        0.1.0
-    </version>
+  <groupId>
+    ca.ewert-technologies.notarytoolkotlin
+  </groupId>
+  <artifactId>
+    notarytool-kotlin
+  </artifactId>
+  <version>
+    0.2.0
+  </version>
 </dependency>
 ```
 
 ### Gradle
 
 ```kotlin
-implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.1.0"
+implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.2.0"
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ for complete documentation details.
 ### Pre-Requisites
 
 To be able to notarize an application for macOS, you need to have an Apple Developer account, with access to App Store
-Connect. In order to make calls to the Notary API, you first need to create an API Key,
+Connect. In order to make calls to the Notary API, you first need to create an API Key;
 see: [Creating API Keys for App Store Connect API](https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api)
 for instructions. After creating an API key, you should have the following information:
 
@@ -81,21 +81,46 @@ for more information). Note: the JWT is generated for you automatically by this 
 All calls to the Notary API are done using the `NotaryToolClient` class. A `NotaryToolClient` object should only be
 created once, subsequent calls should use the same instance.
 
-#### Basic creation
+#### Basic creation using a Private Key (`.p8`) file
 
 This example shows creating a `NotaryToolClient` instance using the Authentication information obtained as above, and
 using the default configuration.
 
 ```kotlin
 val notaryToolClient = NotaryToolClient(
-    privateKeyId = "<Private Key ID>",
-    issuerId = "<Issuer ID here>",
-    privateKeyFile = Path.of(
-        "path",
-        "to",
-        "privateKeyFile.p8"
-    ),
+  privateKeyId = "<Private Key ID>",
+  issuerId = "<Issuer ID here>",
+  privateKeyFile = Path.of(
+    "path",
+    "to",
+    "privateKeyFile.p8"
+  ),
 )
+```
+
+#### Basic creation using a Private Key supplier
+
+This example shows creating a `NotaryToolClient` instance using the Authentication information obtained as above, but
+using a function that supplies an `ECPrivateKey` based on the Private Key file.
+
+```kotlin
+val notaryToolClient = NotaryToolClient(
+  privateKeyId = "<Private Key ID>",
+  issuerId = "<Issuer ID here>",
+  privateKeyProvider = ::privateKeyProvider
+)
+)
+
+...
+
+/**
+ * Creates an ECPrivateKey.
+ *
+ * @return an ECPrivateKey or a JsonWebTokenError
+ */
+internal fun privateKeyProvider(): Result<ECPrivateKey, JsonWebTokenError> {
+  // Custom code that creates an ECPrivateKey
+}
 ```
 
 #### Custom Parameters
@@ -105,22 +130,22 @@ custom parameters.
 
 ```kotlin
 val notaryToolClient = NotaryToolClient(
-    privateKeyId = "<Private Key ID>",
-    issuerId = "<Issuer ID here>",
-    privateKeyFile = Path.of(
-        "path",
-        "to",
-        "privateKeyFile.p8"
-    ),
-    tokenLifetime = Duration.of(
-        10,
-        ChronoUnit.MINUTES
-    ),
-    connectTimeout = Duration.of(
-        15,
-        ChronoUnit.SECONDS
-    ),
-    userAgent = "MyTool/1.0.0"
+  privateKeyId = "<Private Key ID>",
+  issuerId = "<Issuer ID here>",
+  privateKeyFile = Path.of(
+    "path",
+    "to",
+    "privateKeyFile.p8"
+  ),
+  tokenLifetime = Duration.of(
+    10,
+    ChronoUnit.MINUTES
+  ),
+  connectTimeout = Duration.of(
+    15,
+    ChronoUnit.SECONDS
+  ),
+  userAgent = "MyTool/1.0.0"
 )
 ```
 
@@ -166,13 +191,13 @@ status.
 
 ```kotlin
 val notaryToolClient = NotaryToolClient(
-    privateKeyId = "<Private Key ID>",
-    issuerId = "<Issuer ID here>",
-    privateKeyFile = Path.of(
-        "path",
-        "to",
-        "privateKeyFile.p8"
-    ),
+  privateKeyId = "<Private Key ID>",
+  issuerId = "<Issuer ID here>",
+  privateKeyFile = Path.of(
+    "path",
+    "to",
+    "privateKeyFile.p8"
+  ),
 )
 
 val softwareFile: Path = Path.of("softwareApp.dmg")
@@ -180,11 +205,11 @@ val softwareFile: Path = Path.of("softwareApp.dmg")
 val result: Result<AwsUploadData, NotaryToolError> = notaryToolClient.submitAndUploadSoftware(softwareFile)
 
 result.onSuccess { awsUploadData ->
-    println("Uploaded file: ${softwareFile.fileName}, and received submissionId: ${awsUploadData.submissionId}")
+  println("Uploaded file: ${softwareFile.fileName}, and received submissionId: ${awsUploadData.submissionId}")
 }
 
 result.onFailure { notaryToolError ->
-    println(notaryToolError.longMsg)
+  println(notaryToolError.longMsg)
 }
 
 ```
@@ -201,31 +226,31 @@ This example uses `getSubmissionStatus()`, to check the status of a previous sub
 
 ```kotlin
 val submissionIdResult: Result<SubmissionId, NotaryToolError.UserInputError.MalformedSubmissionIdError> =
-    SubmissionId.of("6253220d-ee59-4682-8d23-9a4fe87eaagg")
+  SubmissionId.of("6253220d-ee59-4682-8d23-9a4fe87eaagg")
 
 submissionIdResult.onSuccess { submissionId ->
-    val notaryToolClient = NotaryToolClient(
-        privateKeyId = "<Private Key ID>",
-        issuerId = "<Issuer ID here>",
-        privateKeyFile = Path.of(
-            "path",
-            "to",
-            "privateKeyFile.p8"
-        ),
-    )
-    val result: Result<SubmissionStatusResponse, NotaryToolError> = notaryToolClient.getSubmissionStatus(submissionId)
-    result.onSuccess { submissionStatusResponse ->
-        val statusInfo = submissionStatusResponse.submissionInfo
-        println("Status for submission $submissionId (${statusInfo.name}): ${statusInfo.status}")
-    }
+  val notaryToolClient = NotaryToolClient(
+    privateKeyId = "<Private Key ID>",
+    issuerId = "<Issuer ID here>",
+    privateKeyFile = Path.of(
+      "path",
+      "to",
+      "privateKeyFile.p8"
+    ),
+  )
+  val result: Result<SubmissionStatusResponse, NotaryToolError> = notaryToolClient.getSubmissionStatus(submissionId)
+  result.onSuccess { submissionStatusResponse ->
+    val statusInfo = submissionStatusResponse.submissionInfo
+    println("Status for submission $submissionId (${statusInfo.name}): ${statusInfo.status}")
+  }
 
-    result.onFailure { notaryToolError ->
-        println(notaryToolError.longMsg)
-    }
+  result.onFailure { notaryToolError ->
+    println(notaryToolError.longMsg)
+  }
 }
 
 submissionIdResult.onFailure { malformedSubmissionIdError ->
-    println(malformedSubmissionIdError)
+  println(malformedSubmissionIdError)
 }
 ```
 
@@ -234,6 +259,11 @@ This would return output similar to:
 ```text
 Status for submission 6253220d-ee59-4682-8d23-9a4fe87eaagg (softwareApp.dmg): Accepted
 ```
+
+#### Other examples
+
+Other Kotlin examples can be found in: [Kotlin examples](lib/src/test/kotlin/ca/ewert/notarytoolkotlin/examples/kotlin).
+Examples for use with Java can be found in: [Java examples](lib/src/test/java/ca/ewert/notarytoolkotlin/examples/java).
 
 ## Support
 

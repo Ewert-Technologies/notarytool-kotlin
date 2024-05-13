@@ -10,7 +10,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
+import java.security.interfaces.ECPrivateKey
 import java.time.Duration
 import java.time.Instant
 import java.time.ZoneId
@@ -33,7 +33,7 @@ private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
  *
  * @property privateKeyId Apple private key ID
  * @property issuerId Apple Issuer ID
- * @property privateKeyFile Private Key file `.p8` provided by Apple
+ * @property privateKeyProvider Function that provides an [ECPrivateKey], used in generating the jwt.
  * @property tokenLifetime Lifetime of the token, should be less than 20 minutes
  *
  * @author vewert
@@ -41,7 +41,7 @@ private val moshi = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
 internal class JsonWebToken private constructor(
   private val privateKeyId: String,
   private val issuerId: String,
-  private val privateKeyFile: Path,
+  private val privateKeyProvider: () -> Result<ECPrivateKey, JsonWebTokenError>,
   private val tokenLifetime: Duration = Duration.ofMinutes(15),
   _issuedAtTime: Instant,
   _expirationTime: Instant,
@@ -54,8 +54,8 @@ internal class JsonWebToken private constructor(
      * a Result containing a [JsonWebToken] or a [JsonWebTokenError]
      *
      * @param privateKeyId Private Key ID, provided by Apple
-     * @param issuerId Team Issuer ID provided by Appple
-     * @param privateKeyFile Private Key file `.p8` provided by Apple
+     * @param issuerId Team Issuer ID provided by Apple
+     * @param privateKeyProvider Function that provides an [ECPrivateKey], used in generating the jwt.
      * @param tokenLifetime Lifetime for the token, should be less than 20 minutes,
      * default value is 15 minutes
      *
@@ -65,7 +65,7 @@ internal class JsonWebToken private constructor(
     fun create(
       privateKeyId: String,
       issuerId: String,
-      privateKeyFile: Path,
+      privateKeyProvider: () -> Result<ECPrivateKey, JsonWebTokenError>,
       tokenLifetime: Duration = Duration.of(15, ChronoUnit.MINUTES),
     ): Result<JsonWebToken, JsonWebTokenError> {
       val issued = Instant.now()
@@ -73,14 +73,14 @@ internal class JsonWebToken private constructor(
       return generateJwt(
         privateKeyId,
         issuerId,
-        privateKeyFile,
+        privateKeyProvider,
         issued,
         expiry,
       ).map { jwtString ->
         JsonWebToken(
           privateKeyId,
           issuerId,
-          privateKeyFile,
+          privateKeyProvider,
           tokenLifetime,
           issued,
           expiry,
@@ -165,7 +165,7 @@ internal class JsonWebToken private constructor(
   internal fun updateWebToken(): Result<Unit, JsonWebTokenError> {
     issuedAtTime = Instant.now()
     expirationTime = issuedAtTime.plus(tokenLifetime)
-    return generateJwt(privateKeyId, issuerId, privateKeyFile, issuedAtTime, expirationTime).map { jwtString ->
+    return generateJwt(privateKeyId, issuerId, privateKeyProvider, issuedAtTime, expirationTime).map { jwtString ->
       signedToken = jwtString
     }
   }

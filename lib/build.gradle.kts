@@ -21,7 +21,7 @@ val credentials: CredentialsContainer by project.extra
 
 buildscript {
   dependencies {
-    classpath("org.jetbrains.dokka:dokka-base:1.9.10")
+    classpath("org.jetbrains.dokka:dokka-base:1.9.20")
   }
 }
 
@@ -34,10 +34,10 @@ plugins {
   `java-library`
   `maven-publish`
   signing
-  id("com.jaredsburrows.license") version "0.9.3"
-  id("org.jetbrains.kotlin.jvm") version "1.9.20"
-  id("com.github.ben-manes.versions") version "0.49.0"
-  id("org.barfuin.gradle.taskinfo") version "2.1.0"
+  id("com.jaredsburrows.license") version "0.9.7"
+  id("org.jetbrains.kotlin.jvm") version "1.9.24"
+  id("com.github.ben-manes.versions") version "0.51.0"
+  id("org.barfuin.gradle.taskinfo") version "2.2.0"
   id("org.jmailen.kotlinter")
   id("nu.studer.credentials") version "3.0"
 }
@@ -54,10 +54,10 @@ repositories {
 //
 dependencies {
 
-  val moshiVersion = "1.15.0"
+  val moshiVersion = "1.15.1"
 
   // These dependencies are exported to consumers, that is to say found on their compile classpath.
-  api(group = "com.michael-bull.kotlin-result", name = "kotlin-result", version = "1.1.18")
+  api(group = "com.michael-bull.kotlin-result", name = "kotlin-result", version = "1.1.21")
 
   // These dependencies are used internally, and not exposed to consumers on their own compile classpath.
 
@@ -67,18 +67,18 @@ dependencies {
   implementation(group = "com.squareup.moshi", name = "moshi", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-adapters", version = moshiVersion)
   implementation(group = "com.squareup.moshi", name = "moshi-kotlin", version = moshiVersion)
-  implementation(platform("software.amazon.awssdk:bom:2.21.24"))
+  implementation(platform("software.amazon.awssdk:bom:2.25.41"))
   implementation(group = "software.amazon.awssdk", name = "s3")
 
   // Logging
-  implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "5.1.0")
-  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.9")
-  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.4.11")
+  implementation(group = "io.github.oshai", name = "kotlin-logging-jvm", version = "6.0.9")
+  implementation(group = "org.slf4j", name = "slf4j-api", version = "2.0.13")
+  implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.5.6")
 
   // Testing
-  testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.13.0")
-  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.1")
-  testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.27.0")
+  testImplementation(group = "org.apache.commons", name = "commons-lang3", version = "3.14.0")
+  testImplementation(group = "org.junit.jupiter", name = "junit-jupiter", version = "5.10.2")
+  testImplementation(group = "com.willowtreeapps.assertk", name = "assertk", version = "0.28.1")
   testImplementation(group = "com.squareup.okhttp3", name = "mockwebserver", version = "4.12.0")
 }
 
@@ -133,12 +133,11 @@ fun isNonStable(version: String): Boolean {
   return isStable.not()
 }
 
-
 //
 // Configure Testing
 //
 tasks.named<Test>("test") {
-  useJUnitPlatform() {
+  useJUnitPlatform {
     excludeTags("Slow", "Private")
   }
 }
@@ -177,7 +176,7 @@ tasks.register<DokkaTask>("dokkaHtmlPrivate") {
   description = "Generates Dokka Documentation in `html` format for all visibilities"
 
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-    footerMessage = "(c) 2023 Ewert Technologies"
+    footerMessage = "(c) $copyrightYear Ewert Technologies"
   }
 
   dokkaSourceSets {
@@ -203,7 +202,7 @@ tasks.register<DokkaTask>("dokkaHtmlPublic") {
   description = "Generates Dokka Documentation in 'html' format for public items"
 
   pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
-    footerMessage = "(c) 2023 Ewert Technologies"
+    footerMessage = "(c) $copyrightYear Ewert Technologies"
   }
 
   dokkaSourceSets {
@@ -229,13 +228,21 @@ tasks.register("buildInfo") {
   group = "help"
   description = "Displays general build info, such as versions, etc."
 
+  logger.quiet("--- Project Info -----------------------------")
   logger.quiet("Project: ${project.name} - ${project.description}")
   logger.quiet("Project version: ${project.version}")
   logger.quiet("Group:  ${project.group}")
   logger.quiet("Author: $author")
   logger.quiet("Company: $company")
+  logger.quiet("--- Environment Info --------------------------")
   logger.quiet("Gradle Version: ${gradle.gradleVersion}")
   logger.quiet("Java Toolchain: Version ${java.toolchain.languageVersion.get()} (${java.toolchain.vendor.get()})")
+  logger.quiet("Java Version: ${System.getProperty("java.version")}")
+  logger.quiet("JRE Arch: ${System.getProperty("os.arch")}")
+  logger.quiet("Java Home: ${System.getProperty("java.home")}")
+  logger.quiet("Java Vendor: ${System.getProperty("java.vendor")}")
+  logger.quiet("Java Vendor Version: ${System.getProperty("java.vendor.version")}")
+  logger.quiet("Operating System: ${System.getProperty("os.name")}, version: ${System.getProperty("os.version")}")
   logger.quiet("build dir: ${project.layout.buildDirectory.asFile.get()}")
 }
 

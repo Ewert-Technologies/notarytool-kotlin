@@ -8,6 +8,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isTrue
 import ca.ewert.notarytoolkotlin.isCloseTo
 import ca.ewert.notarytoolkotlin.isOk
+import ca.ewert.notarytoolkotlin.privateKeyFromPath
 import ca.ewert.notarytoolkotlin.resourceToPath
 import com.github.michaelbull.result.onSuccess
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -58,7 +59,7 @@ class JsonWebTokenTest {
     val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       tokenLifetime = tokenLifetime,
     )
     assertThat(jsonWebTokenResult).isOk()
@@ -112,7 +113,7 @@ class JsonWebTokenTest {
     val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       tokenLifetime = tokenLifetime,
     )
 
@@ -146,7 +147,7 @@ class JsonWebTokenTest {
     val jsonWebTokenResult = JsonWebToken.create(
       privateKeyId = "ABCDEFG",
       issuerId = "1234567",
-      privateKeyFile = privateKeyFile!!,
+      privateKeyProvider = { privateKeyFromPath(privateKeyFile!!) },
       tokenLifetime = tokenLifetime,
     )
 
