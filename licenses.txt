@@ -168,10 +168,10 @@ kotlin-result (1.1.21) - ISC License
 A multiplatform Result monad for modelling success or failure operations.
 https://github.com/michaelbull/kotlin-result
 
-Logback Classic Module (1.5.6) - Eclipse Public License - v 1.0,GNU Lesser General Public License
+Logback Classic Module (1.4.14) - Eclipse Public License - v 1.0,GNU Lesser General Public License
 logback-classic module
 
-Logback Core Module (1.5.6) - Eclipse Public License - v 1.0,GNU Lesser General Public License
+Logback Core Module (1.4.14) - Eclipse Public License - v 1.0,GNU Lesser General Public License
 logback-core module
 
 moshi (1.15.1) - The Apache Software License, Version 2.0
