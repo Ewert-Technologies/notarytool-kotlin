@@ -301,9 +301,9 @@ publishing {
         }
 
         scm {
-          connection = "scm:git:git://github.com/Ewert-Technologies/notarytool-kotlin.git"
-          developerConnection = "scm:git:ssh://github.com/Ewert-Technologies/notarytool-kotlin.git"
-          url = "https://github.com/Ewert-Technologies/notarytool-kotlin/tree/main"
+          connection.set("scm:git:git://github.com/Ewert-Technologies/notarytool-kotlin.git")
+          developerConnection.set("scm:git:ssh://github.com/Ewert-Technologies/notarytool-kotlin.git")
+          url.set("https://github.com/Ewert-Technologies/notarytool-kotlin/tree/main")
         }
       }
     }
