@@ -114,8 +114,8 @@ val createdYear: String by project
 val copyrightYear: String by project
 val mavenReleaseUrlString: String by project
 val mavenSnapshotUrlString: String by project
-val ossrhUsername: String = credentials.forKey("ossrhUsername")
-val ossrhPassword: String = credentials.forKey("ossrhPassword")
+val ossrhUsername: String = credentials.forKey("ossrhTokenUsername")
+val ossrhPassword: String = credentials.forKey("ossrhTokenPassword")
 
 //
 // Configure dependencyUpdates
