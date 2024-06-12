@@ -41,7 +41,7 @@ on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.n
     notarytool-kotlin
   </artifactId>
   <version>
-    0.2.0
+    0.2.1
   </version>
 </dependency>
 ```
@@ -49,7 +49,7 @@ on [Maven Central](https://central.sonatype.com/artifact/ca.ewert-technologies.n
 ### Gradle
 
 ```kotlin
-implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.2.0"
+implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.2.1"
 ```
 
 ## Usage
