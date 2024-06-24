@@ -1,6 +1,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 ![Static Badge](https://img.shields.io/badge/Status-Beta-orange)
 [![Maven Central](https://img.shields.io/maven-central/v/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin?color=blue)](https://central.sonatype.com/artifact/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin)
+[![javadoc](https://javadoc.io/badge2/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin/javadoc.svg)](https://javadoc.io/doc/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin) 
 
 # notarytool-kotlin
 
@@ -54,7 +55,7 @@ implementation "ca.ewert-technologies.notarytoolkotlin:notarytool-kotlin:0.2.1"
 
 ## Usage
 
-Please refer to the [notarytool-kotlin API Docs](https://apidocs.ewert-technologies.ca/notarytool-kotlin/current)
+Please refer to the [notarytool-kotlin API Docs](https://www.javadoc.io/doc/ca.ewert-technologies.notarytoolkotlin/notarytool-kotlin/latest/index.html)
 for complete documentation details.
 
 ### Pre-Requisites
